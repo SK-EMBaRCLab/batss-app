@@ -1,0 +1,32 @@
+services:
+  electron-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: albatross-dev
+
+    user: '${UID}:${GID}'
+
+    environment:
+      - NODE_ENV=development
+      - DISPLAY=${DISPLAY}
+      - ELECTRON_DISABLE_SANDBOX=1
+      - ENV LIBGL_ALWAYS_SOFTWARE=1
+      - ENV ELECTRON_DISABLE_GPU=1
+      - ENV ELECTRON_OZONE_PLATFORM_HINT=x11
+      - ENV MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/dri:/dev/dri:ro
+
+    stdin_open: true
+    tty: true
+
+    command: bash
+
+volumes:
+  node_modules:
