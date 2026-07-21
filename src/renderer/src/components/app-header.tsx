@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import { Moon, Play, Save, Settings, Sun } from 'lucide-react'
 
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { AppBreadcrumb } from './app-breadcrumb'
 import { useTheme } from '@/stores/theme'
 
-export function AppHeader() {
+export function AppHeader(): JSX.Element {
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
 

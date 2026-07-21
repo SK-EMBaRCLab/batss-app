@@ -1,9 +1,16 @@
+import { JSX } from 'react'
 import { Button } from '@/components/ui/button'
 import type { BatssRunResult } from '@shared/batss-types'
 import { SummaryTable } from './summary-table'
 import { BatssChart } from './results-chart'
 
-export function Results({ result, onClose }: { result: BatssRunResult; onClose: () => void }) {
+export function Results({
+  result,
+  onClose
+}: {
+  result: BatssRunResult
+  onClose: () => void
+}): JSX.Element {
   return (
     <div className="space-y-6 text-foreground">
       <div className="flex justify-between">

@@ -46,7 +46,7 @@ const batss = {
 
   // Streamed raw R/INLA output from a batss.glm() run, as it happens.
   onLog: (callback: (line: string) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, line: string) => {
+    const listener = (_event: Electron.IpcRendererEvent, line: string): void => {
       callback(line)
     }
 
@@ -66,7 +66,7 @@ const theme = {
   onUpdated: (
     callback: (theme: { source: 'system' | 'light' | 'dark'; dark: boolean }) => void
   ) => {
-    const listener = (_: Electron.IpcRendererEvent, payload: any) => callback(payload)
+    const listener = (_: Electron.IpcRendererEvent, payload: any): void => callback(payload)
 
     ipcRenderer.on('theme:updated', listener)
 

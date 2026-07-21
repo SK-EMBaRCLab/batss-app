@@ -7,7 +7,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { BatssSummaryRow } from '@shared/batss-types'
-import { JSX } from 'react/jsx-runtime'
+import type { JSX } from 'react'
 
 export function SummaryTable({ rows }: { rows: BatssSummaryRow[] }): JSX.Element {
   return (

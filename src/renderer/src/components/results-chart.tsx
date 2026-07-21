@@ -9,7 +9,7 @@ import {
   ChartTooltipContent
 } from '@/components/ui/chart'
 import { BatssChartRow } from '@shared/batss-types'
-import { JSX } from 'react/jsx-runtime'
+import type { JSX } from 'react'
 
 const chartConfig = {
   superior: {

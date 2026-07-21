@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +12,7 @@ import {
 import { useNavigation } from '@/stores/navigation'
 import { navigationItems } from '@/config/navigation'
 
-export function AppSidebar() {
+export function AppSidebar(): JSX.Element {
   const navigate = useNavigation((state) => state.navigate)
 
   return (
