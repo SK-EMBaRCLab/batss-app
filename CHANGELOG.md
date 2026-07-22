@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.0...v1.2.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* build for mac related to damaged dmg ([e13693f](https://github.com/SK-EMBaRCLab/batss-app/commit/e13693f7720ae2c0bb4df7b0b56ac499923b85cf))
+
 ## [1.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.1.0...v1.2.0) (2026-07-22)
 
 
