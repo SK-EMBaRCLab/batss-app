@@ -27,5 +27,10 @@ declare global {
         callback: (theme: { source: 'system' | 'light' | 'dark'; dark: boolean }) => void
       ): () => void
     }
+    settings: {
+      getOutputPath: () => Promise<string>
+      setOutputPath: (outputPath: string) => Promise<string>
+      selectOutputDirectory: () => Promise<string | null>
+    }
   }
 }

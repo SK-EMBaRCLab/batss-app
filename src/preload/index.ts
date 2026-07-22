@@ -76,6 +76,20 @@ const theme = {
   }
 }
 
+const settings = {
+  getOutputPath: (): Promise<string> => {
+    return ipcRenderer.invoke('settings:getOutputPath')
+  },
+
+  setOutputPath: (outputPath: string): Promise<string> => {
+    return ipcRenderer.invoke('settings:setOutputPath', outputPath)
+  },
+
+  selectOutputDirectory: (): Promise<string | null> => {
+    return ipcRenderer.invoke('settings:selectOutputDirectory')
+  }
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
@@ -87,6 +101,8 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('batss', batss)
 
     contextBridge.exposeInMainWorld('theme', theme)
+
+    contextBridge.exposeInMainWorld('settings', settings)
   } catch (error) {
     console.error(error)
   }
@@ -105,4 +121,7 @@ if (process.contextIsolated) {
 
   // @ts-ignore
   window.theme = theme
+
+  // @ts-ignore
+  window.settings = settings
 }

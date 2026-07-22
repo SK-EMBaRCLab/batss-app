@@ -5,6 +5,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import { registerRuntimeIPC } from './ipc/runtime.ipc'
+import { registerSettingsIPC } from './ipc/settings.ipc'
 import { BatssService } from './services/batss.service'
 import { settingsService } from './services/settings.service'
 import { BatssRunInput } from '../shared/batss-types'
@@ -101,6 +102,9 @@ app.whenReady().then(() => {
 
   // Runtime bootstrap IPC
   registerRuntimeIPC()
+
+  // Settings IPC (output folder, etc.)
+  registerSettingsIPC()
 
   ipcMain.removeHandler('batss:example')
 
