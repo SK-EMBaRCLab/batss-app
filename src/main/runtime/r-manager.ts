@@ -2,6 +2,8 @@
 
 import { spawn, execFile } from 'child_process'
 import { promisify } from 'util'
+import fs from 'fs/promises'
+import path from 'path'
 
 import { getRLibraryPath } from '../services/filesystem/app-paths'
 
@@ -18,32 +20,97 @@ type ExecuteResult = { stdout: string; stderr: string }
 export type OutputListener = (line: string, stream: 'stdout' | 'stderr') => void
 
 export class RManager {
-  private readonly rCandidates =
-    process.platform === 'darwin'
-      ? [
-          'Rscript',
-          '/Library/Frameworks/R.framework/Resources/bin/Rscript', // CRAN
-          '/opt/homebrew/bin/Rscript', // Apple Silicon Homebrew
-          '/usr/local/bin/Rscript' // Intel Homebrew
-        ]
-      : process.platform === 'win32'
-        ? [
-            'Rscript.exe' // PATH (CRAN or rig)
-          ]
-        : [
-            'Rscript', // PATH
-            '/usr/bin/Rscript',
-            '/usr/local/bin/Rscript'
-          ]
-
   private resolvedExecutable?: string
+
+  private async getCandidates(): Promise<string[]> {
+    if (process.platform === 'darwin') {
+      return [
+        'Rscript',
+        '/Library/Frameworks/R.framework/Resources/bin/Rscript', // CRAN
+        '/opt/homebrew/bin/Rscript', // Apple Silicon Homebrew
+        '/usr/local/bin/Rscript' // Intel Homebrew
+      ]
+    }
+
+    if (process.platform === 'win32') {
+      return [
+        'Rscript.exe', // PATH (only works if "add to PATH" was checked, or rig)
+        ...(await this.getWindowsInstallCandidates())
+      ]
+    }
+
+    return ['Rscript', '/usr/bin/Rscript', '/usr/local/bin/Rscript']
+  }
+
+  /**
+   * The CRAN Windows installer does NOT add R to PATH by default, so
+   * relying on 'Rscript.exe' alone (the old behavior) fails on most
+   * fresh Windows installs even though R is present. R-core does write
+   * its install location to the registry on setup, and that's more
+   * reliable than PATH — check that first, then fall back to scanning
+   * the default Program Files install directory.
+   */
+  private async getWindowsInstallCandidates(): Promise<string[]> {
+    const candidates: string[] = []
+
+    for (const key of [
+      'HKLM\\SOFTWARE\\R-core\\R64',
+      'HKLM\\SOFTWARE\\R-core\\R',
+      'HKCU\\SOFTWARE\\R-core\\R64',
+      'HKCU\\SOFTWARE\\R-core\\R'
+    ]) {
+      try {
+        const { stdout } = await execFileAsync('reg', ['query', key, '/v', 'InstallPath'])
+        const match = stdout.match(/InstallPath\s+REG_SZ\s+(.+)/)
+
+        if (match) {
+          const installPath = match[1].trim()
+          candidates.push(path.join(installPath, 'bin', 'x64', 'Rscript.exe'))
+          candidates.push(path.join(installPath, 'bin', 'Rscript.exe'))
+        }
+      } catch {
+        // This particular registry key doesn't exist on this machine —
+        // not every user has every combination of 32/64-bit R and
+        // HKLM/HKCU installs. Try the next one.
+      }
+    }
+
+    // Fallback: scan the default install directory directly, in case
+    // the registry lookup above didn't turn up anything. R version
+    // folders are named "R-4.x.y", so we can't hardcode a path — glob
+    // for them and prefer the newest.
+    for (const programFiles of [process.env['ProgramFiles'], process.env['ProgramFiles(x86)']]) {
+      if (!programFiles) continue
+
+      const rDir = path.join(programFiles, 'R')
+
+      try {
+        const entries = await fs.readdir(rDir)
+        const versions = entries
+          .filter((v) => v.startsWith('R-'))
+          .sort()
+          .reverse()
+
+        for (const version of versions) {
+          candidates.push(path.join(rDir, version, 'bin', 'x64', 'Rscript.exe'))
+          candidates.push(path.join(rDir, version, 'bin', 'Rscript.exe'))
+        }
+      } catch {
+        // No R directory under this Program Files — fine, try the next.
+      }
+    }
+
+    return candidates
+  }
 
   private async getRExecutable(): Promise<string> {
     if (this.resolvedExecutable) {
       return this.resolvedExecutable
     }
 
-    for (const executable of this.rCandidates) {
+    const candidates = await this.getCandidates()
+
+    for (const executable of candidates) {
       try {
         await execFileAsync(executable, ['--version'])
         this.resolvedExecutable = executable
@@ -53,7 +120,7 @@ export class RManager {
       }
     }
 
-    throw new Error(`Unable to locate Rscript. Tried:\n${this.rCandidates.join('\n')}`)
+    throw new Error(`Unable to locate Rscript. Tried:\n${candidates.join('\n')}`)
   }
 
   async version(): Promise<string> {
