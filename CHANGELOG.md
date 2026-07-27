@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.6](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.5...v1.2.6) (2026-07-27)
+
+
+### Bug Fixes
+
+* debugging install issue ([cfdc4dd](https://github.com/SK-EMBaRCLab/batss-app/commit/cfdc4ddd5c8656854a61f0458f3cf2b5eb3e9666))
+
 ## [1.2.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.4...v1.2.5) (2026-07-27)
 
 
