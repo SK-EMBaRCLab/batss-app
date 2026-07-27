@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.16...v1.3.0) (2026-07-27)
+
+
+### Features
+
+* add banner and dont block gui on failed install ([09a03d7](https://github.com/SK-EMBaRCLab/batss-app/commit/09a03d7b5f5ab62569ad2f10a683055d9c7c27a1))
+
 ## [1.2.16](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.15...v1.2.16) (2026-07-27)
 
 
