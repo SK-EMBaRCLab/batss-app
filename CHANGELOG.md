@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.9](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.8...v1.2.9) (2026-07-27)
+
+
+### Bug Fixes
+
+* more debugging ([db38829](https://github.com/SK-EMBaRCLab/batss-app/commit/db3882900fa47acb74323cc2b2f0a58d4c82f072))
+
 ## [1.2.8](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.7...v1.2.8) (2026-07-27)
 
 
