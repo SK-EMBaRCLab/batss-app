@@ -49,11 +49,41 @@ export class RManager {
       return undefined
     }
 
-    const candidates = [
-      'C:\\rtools46\\usr\\bin',
-      'C:\\rtools45\\usr\\bin',
-      'C:\\rtools44\\usr\\bin'
-    ]
+    const candidates: string[] = []
+
+    // Rtools' installer writes its location to the registry the same way
+    // R itself does, so check that first — more reliable than guessing a
+    // version-numbered folder name or assuming the default C:\ drive.
+    for (const key of ['HKLM\\SOFTWARE\\R-core\\Rtools', 'HKCU\\SOFTWARE\\R-core\\Rtools']) {
+      try {
+        const stdout = execSync(`reg query "${key}" /s /v InstallPath`, { encoding: 'utf8' })
+        const matches = [...stdout.matchAll(/InstallPath\s+REG_SZ\s+(.+)/g)]
+
+        for (const match of matches) {
+          candidates.push(path.join(match[1].trim(), 'usr', 'bin'))
+        }
+      } catch {
+        // Key doesn't exist — no Rtools registered under this hive.
+      }
+    }
+
+    // Fallback: scan the default C:\rtools* install locations directly,
+    // in case the registry lookup above found nothing. Glob rather than
+    // hardcode specific version numbers, since a new Rtools ships nearly
+    // every year alongside a new R release.
+    try {
+      const entries = fsSync.readdirSync('C:\\')
+      const rtoolsDirs = entries
+        .filter((v) => /^rtools\d+$/i.test(v))
+        .sort()
+        .reverse()
+
+      for (const dir of rtoolsDirs) {
+        candidates.push(path.join('C:\\', dir, 'usr', 'bin'))
+      }
+    } catch {
+      // Can't read C:\ root — unlikely, but don't let it crash the check.
+    }
 
     return candidates.find((p) => {
       return fsSync.existsSync(path.join(p, 'cp.exe'))
