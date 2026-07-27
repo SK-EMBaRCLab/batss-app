@@ -26,7 +26,7 @@ export default function App(): JSX.Element {
     initializeTheme()
   }, [initializeTheme])
 
-  if (status !== 'ready') {
+  if (status === 'checking' || status === 'installing') {
     return <RuntimeScreen />
   }
 

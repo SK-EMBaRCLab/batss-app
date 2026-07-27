@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Item,
@@ -13,7 +14,7 @@ import { useRuntime } from '@/stores/runtime'
 import { PackageCheck, PackageX } from 'lucide-react'
 import { useEffect } from 'react'
 
-export default function About() {
+export default function About(): JSX.Element {
   const status = useRuntime((state) => state.status)
   const checkRuntime = useRuntime((state) => state.checkRuntime)
   const packages = useRuntime((state) => state.packages)
