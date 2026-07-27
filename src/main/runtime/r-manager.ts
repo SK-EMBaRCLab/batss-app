@@ -1,6 +1,6 @@
 // src/main/runtime/r-manager.ts
 
-import { spawn, execFile, execSync } from 'child_process'
+import { spawn, execFile } from 'child_process'
 import { promisify } from 'util'
 import fs from 'fs/promises'
 import fsSync from 'fs'
