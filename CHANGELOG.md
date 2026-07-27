@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.3...v1.2.4) (2026-07-23)
+
+
+### Bug Fixes
+
+* issue with not finding rscript on windows path ([c141925](https://github.com/SK-EMBaRCLab/batss-app/commit/c141925f5329da5cd83c11d56b89ca8bc5e2575c))
+
 ## [1.2.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.2...v1.2.3) (2026-07-23)
 
 
