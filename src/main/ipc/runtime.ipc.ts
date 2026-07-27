@@ -15,6 +15,7 @@ export function registerRuntimeIPC(): void {
     }
 
     const sendLog = (line: string): void => {
+      console.log('MAIN LOG:', line)
       event.sender.send('runtime:log', line)
     }
 

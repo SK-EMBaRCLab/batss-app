@@ -118,6 +118,10 @@ app.whenReady().then(() => {
     })
   })
 
+  ipcMain.handle('app-version', () => {
+    return app.getVersion()
+  })
+
   app.setName('albatross')
 
   ipcMain.handle('theme:get', () => ({

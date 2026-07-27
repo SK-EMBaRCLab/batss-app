@@ -11,20 +11,27 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntime } from '@/stores/runtime'
 import { PackageCheck, PackageX } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function About() {
   const status = useRuntime((state) => state.status)
   const checkRuntime = useRuntime((state) => state.checkRuntime)
   const packages = useRuntime((state) => state.packages)
   const logs = useRuntime((state) => state.logs)
+  const appVersion = useRuntime((state) => state.appVersion)
+  const loadAppVersion = useRuntime((state) => state.loadAppVersion)
 
   console.log(packages)
+
+  useEffect(() => {
+    loadAppVersion()
+  }, [loadAppVersion])
 
   return (
     <div className="h-full overflow-y-auto p-6 grid gap-4">
       <h1 className="text-2xl font-semibold">About</h1>
 
-      <p className="text-muted-foreground mt-2">About Albatross</p>
+      <p className="text-muted-foreground">Albatross version {appVersion}</p>
       <Button onClick={() => checkRuntime()} disabled={status === 'checking'} className="max-w-sm">
         Recheck / Install Packages
       </Button>

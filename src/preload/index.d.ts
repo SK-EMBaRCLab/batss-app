@@ -10,6 +10,7 @@ declare global {
       check: () => Promise<RuntimeResult>
       onUpdate: (callback: (update: RuntimeUpdate) => void) => () => void
       onLog: (callback: (line: string) => void) => () => void
+      appVersion: () => string
     }
     batss: {
       runExample: (input: BatssRunInput) => Promise<BatssRunResult>

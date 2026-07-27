@@ -61,7 +61,9 @@ export class PackageManager {
       { [PACKAGES_ENV]: REQUIRED_R_PACKAGES.join(',') }
     )
 
-    return output
+    this.reporter.log(`STATUS RAW OUTPUT: ${JSON.stringify(output)}`)
+
+    const parsed = output
       .split('\n')
       .filter(Boolean)
       .map((line) => {
@@ -74,12 +76,30 @@ export class PackageManager {
           version: installed ? version : undefined
         }
       })
+
+    this.reporter.log(`STATUS PARSED: ${JSON.stringify(parsed)}`)
+
+    return parsed
   }
 
   async checkPackages(): Promise<string[]> {
-    const status = await this.getStatus()
+    try {
+      const status = await this.getStatus()
 
-    return status.filter((pkg) => !pkg.installed).map((pkg) => pkg.name)
+      console.log(`STATUS LENGTH: ${status.length}`)
+
+      this.reporter.log(`STATUS LENGTH: ${status.length}`)
+      this.reporter.log(JSON.stringify(status))
+
+      this.reporter.log(
+        status.map((p) => `${p.name}: installed=${p.installed}, version=${p.version}`).join('\n')
+      )
+
+      return status.filter((pkg) => !pkg.installed).map((pkg) => pkg.name)
+    } catch (error) {
+      this.reporter.log(`CHECK FAILED: ${error}`)
+      throw error
+    }
   }
 
   async installPackages(packages: string[]): Promise<void> {

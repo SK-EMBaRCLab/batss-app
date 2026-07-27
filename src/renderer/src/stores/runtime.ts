@@ -14,6 +14,8 @@ type RuntimeState = {
   logs: string[]
   error?: string
   initialized: boolean
+  appVersion: string
+  loadAppVersion: () => Promise<void>
 
   initialize: () => Promise<void>
   checkRuntime: () => Promise<void>
@@ -27,6 +29,7 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
   packages: [],
   logs: [],
   initialized: false,
+  appVersion: '',
 
   initialize: async () => {
     if (get().initialized) {
@@ -90,5 +93,12 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
     }
   },
 
-  clearLogs: () => set({ logs: [] })
+  clearLogs: () => set({ logs: [] }),
+  loadAppVersion: async () => {
+    const version = await window.runtime.appVersion()
+
+    set({
+      appVersion: version
+    })
+  }
 }))

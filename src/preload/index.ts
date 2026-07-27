@@ -8,6 +8,8 @@ import type { BatssRunInput, BatssRunResult, BatssSavedResult } from '../shared/
 const api = {}
 
 const runtime = {
+  appVersion: () => ipcRenderer.invoke('app-version'),
+
   check: (): Promise<RuntimeResult> => {
     return ipcRenderer.invoke('runtime:check')
   },
