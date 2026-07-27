@@ -20,22 +20,7 @@ export class PackageManager {
       `
         packages <- strsplit(Sys.getenv("${PACKAGES_ENV}"), ",")[[1]]
 
-        for (pkg in packages) {
-          found <- find.package(pkg, quiet = TRUE)
-
-          if (length(found) > 0) {
-            message(paste(pkg, "FOUND:", found))
-          } else {
-            message(paste(pkg, "MISSING"))
-          }
-        }
-
         installed <- installed.packages(lib.loc = .libPaths()[1])
-
-        message("Libraries:")
-        message(paste(.libPaths(), collapse="\n"))
-
-        message("Required: ", paste(packages, collapse=","))
 
         result <- sapply(
           packages,
@@ -44,7 +29,7 @@ export class PackageManager {
             if (requireNamespace(pkg, quietly = TRUE, lib.loc = .libPaths()[1])) {
               as.character(packageVersion(pkg, lib.loc = .libPaths()[1]))
             } else {
-              NA
+              "NA"
             }
 
           }
@@ -61,17 +46,17 @@ export class PackageManager {
       { [PACKAGES_ENV]: REQUIRED_R_PACKAGES.join(',') }
     )
 
-    this.reporter.log(`STATUS RAW OUTPUT: ${JSON.stringify(output)}`)
-
     const parsed = output
-      .split('\n')
+      .split(/\r?\n/)
       .filter(Boolean)
       .map((line) => {
-        const [name, version] = line.split(':')
+        const [name, rawVersion] = line.split(':')
+        const version = rawVersion?.trim()
+
         const installed = Boolean(version && version !== 'NA')
 
         return {
-          name,
+          name: name.trim(),
           installed,
           version: installed ? version : undefined
         }
@@ -85,11 +70,6 @@ export class PackageManager {
   async checkPackages(): Promise<string[]> {
     try {
       const status = await this.getStatus()
-
-      console.log(`STATUS LENGTH: ${status.length}`)
-
-      this.reporter.log(`STATUS LENGTH: ${status.length}`)
-      this.reporter.log(JSON.stringify(status))
 
       this.reporter.log(
         status.map((p) => `${p.name}: installed=${p.installed}, version=${p.version}`).join('\n')
@@ -123,13 +103,6 @@ export class PackageManager {
 
           install_lib <- .libPaths()[1]
 
-          message("ENTERED INSTALL SCRIPT\n")
-          message("pkg=", pkg, "\n", sep="")
-          message("lib=", install_lib, "\n", sep="")
-          message("requireNamespace=",
-              requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib),
-              "\n", sep="")
-
           # On Windows/macOS, prefer precompiled binaries even when a
           # newer source release exists — this repo's binaries commonly
           # lag its source releases, and letting install.packages()
@@ -144,10 +117,6 @@ export class PackageManager {
           } else {
             "source"
           }
-
-          message("lib:", install_lib, "\n")
-          message("available:", requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib), "\n")
-          message("all libs:", paste(.libPaths(), collapse = "\n"), "\n")
 
           if (!requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) {
 
