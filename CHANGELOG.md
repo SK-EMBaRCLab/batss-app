@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.15](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.14...v1.2.15) (2026-07-27)
+
+
+### Bug Fixes
+
+* removed unused import causing failure in linting ([65ae07a](https://github.com/SK-EMBaRCLab/batss-app/commit/65ae07a58c6bd9c1fcde03fc65ebb58767692f47))
+
 ## [1.2.14](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.13...v1.2.14) (2026-07-27)
 
 
