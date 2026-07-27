@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.12](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.11...v1.2.12) (2026-07-27)
+
+
+### Bug Fixes
+
+* issue with cp not on path ([e5995df](https://github.com/SK-EMBaRCLab/batss-app/commit/e5995df897c383db7203aad741c53a7f61f547e3))
+
 ## [1.2.11](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.10...v1.2.11) (2026-07-27)
 
 
