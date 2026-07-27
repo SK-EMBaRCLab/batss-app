@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.11](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.10...v1.2.11) (2026-07-27)
+
+
+### Bug Fixes
+
+* bug related to INLA package and R version ([9f05f1a](https://github.com/SK-EMBaRCLab/batss-app/commit/9f05f1a6272b2da33fe4683eedaa18bc3419dba2))
+
 ## [1.2.10](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.9...v1.2.10) (2026-07-27)
 
 
