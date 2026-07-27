@@ -1,11 +1,13 @@
 // src/main/runtime/r-manager.ts
 
-import { spawn, execFile } from 'child_process'
+import { spawn, execFile, execSync } from 'child_process'
 import { promisify } from 'util'
 import fs from 'fs/promises'
+import fsSync from 'fs'
 import path from 'path'
 
 import { getRLibraryPath } from '../services/filesystem/app-paths'
+import { REQUIRED_R_VERSION } from './r-config'
 
 const execFileAsync = promisify(execFile)
 
@@ -34,12 +36,28 @@ export class RManager {
 
     if (process.platform === 'win32') {
       return [
-        'Rscript.exe', // PATH (only works if "add to PATH" was checked, or rig)
-        ...(await this.getWindowsInstallCandidates())
+        ...(await this.getWindowsInstallCandidates()),
+        'Rscript.exe' // PATH (only works if "add to PATH" was checked, or rig)
       ]
     }
 
     return ['Rscript', '/usr/bin/Rscript', '/usr/local/bin/Rscript']
+  }
+
+  private getWindowsRtoolsPath(): string | undefined {
+    if (process.platform !== 'win32') {
+      return undefined
+    }
+
+    const candidates = [
+      'C:\\rtools46\\usr\\bin',
+      'C:\\rtools45\\usr\\bin',
+      'C:\\rtools44\\usr\\bin'
+    ]
+
+    return candidates.find((p) => {
+      return fsSync.existsSync(path.join(p, 'cp.exe'))
+    })
   }
 
   /**
@@ -66,7 +84,6 @@ export class RManager {
         if (match) {
           const installPath = match[1].trim()
           candidates.push(path.join(installPath, 'bin', 'x64', 'Rscript.exe'))
-          candidates.push(path.join(installPath, 'bin', 'Rscript.exe'))
         }
       } catch {
         // This particular registry key doesn't exist on this machine —
@@ -86,6 +103,10 @@ export class RManager {
 
       try {
         const entries = await fs.readdir(rDir)
+        const preferred = entries.find((v) => v === REQUIRED_R_VERSION)
+        if (preferred) {
+          candidates.push(path.join(rDir, preferred, 'bin', 'x64', 'Rscript.exe'))
+        }
         const versions = entries
           .filter((v) => v.startsWith('R-'))
           .sort()
@@ -93,7 +114,6 @@ export class RManager {
 
         for (const version of versions) {
           candidates.push(path.join(rDir, version, 'bin', 'x64', 'Rscript.exe'))
-          candidates.push(path.join(rDir, version, 'bin', 'Rscript.exe'))
         }
       } catch {
         // No R directory under this Program Files — fine, try the next.
@@ -229,7 +249,22 @@ export class RManager {
   ): Promise<ExecuteResult> {
     const executable = await this.getRExecutable()
     return new Promise((resolve, reject) => {
-      const child = spawn(executable, args, { env })
+      const rtoolsPath = this.getWindowsRtoolsPath()
+
+      const childEnv = {
+        ...env,
+        PATH: [rtoolsPath, env.PATH].filter(Boolean).join(';')
+      }
+
+      try {
+        onOutput?.(`cp=${execSync('where cp', { encoding: 'utf8' })}`, 'stdout')
+      } catch {
+        onOutput?.('cp not found', 'stdout')
+      }
+
+      const child = spawn(executable, args, {
+        env: childEnv
+      })
 
       let stdoutBuffer = ''
       let stderrBuffer = ''
