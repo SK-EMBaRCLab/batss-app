@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.4...v1.2.5) (2026-07-27)
+
+
+### Bug Fixes
+
+* issue related to installing packages on windows ([dbb4500](https://github.com/SK-EMBaRCLab/batss-app/commit/dbb45002d044f08c38bdb4a013cd4833b1488804))
+
 ## [1.2.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.3...v1.2.4) (2026-07-23)
 
 
