@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.10](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.9...v1.2.10) (2026-07-27)
+
+
+### Bug Fixes
+
+* found bug related to windows line endings ([81cf27b](https://github.com/SK-EMBaRCLab/batss-app/commit/81cf27bd3bc3a6e10a7c34ee063632da27662f81))
+
 ## [1.2.9](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.8...v1.2.9) (2026-07-27)
 
 
