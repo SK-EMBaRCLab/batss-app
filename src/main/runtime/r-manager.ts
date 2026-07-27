@@ -51,30 +51,24 @@ export class RManager {
 
     const candidates: string[] = []
 
-    // Rtools' installer writes its location to the registry the same way
-    // R itself does, so check that first — more reliable than guessing a
-    // version-numbered folder name or assuming the default C:\ drive.
-    for (const key of ['HKLM\\SOFTWARE\\R-core\\Rtools', 'HKCU\\SOFTWARE\\R-core\\Rtools']) {
-      try {
-        const stdout = execSync(`reg query "${key}" /s /v InstallPath`, { encoding: 'utf8' })
-        const matches = [...stdout.matchAll(/InstallPath\s+REG_SZ\s+(.+)/g)]
-
-        for (const match of matches) {
-          candidates.push(path.join(match[1].trim(), 'usr', 'bin'))
-        }
-      } catch {
-        // Key doesn't exist — no Rtools registered under this hive.
+    // Rtools' installer sets a persistent RTOOLS<version>_HOME env var
+    // pointing at its install dir — this is the same mechanism pkgbuild/
+    // RStudio use to find it, and is more reliable than guessing a
+    // registry key name.
+    for (const [key, value] of Object.entries(process.env)) {
+      if (/^RTOOLS\d+(_AARCH64)?_HOME$/i.test(key) && value) {
+        candidates.push(path.join(value, 'usr', 'bin'))
       }
     }
 
-    // Fallback: scan the default C:\rtools* install locations directly,
-    // in case the registry lookup above found nothing. Glob rather than
-    // hardcode specific version numbers, since a new Rtools ships nearly
-    // every year alongside a new R release.
+    // Fallback: the documented default install locations. Rtools always
+    // installs to C:\rtools<ver> unless the env var above overrides it,
+    // so glob for whatever version(s) are present rather than hardcoding
+    // one — a new Rtools ships nearly every year alongside a new R release.
     try {
       const entries = fsSync.readdirSync('C:\\')
       const rtoolsDirs = entries
-        .filter((v) => /^rtools\d+$/i.test(v))
+        .filter((v) => /^rtools\d+/i.test(v))
         .sort()
         .reverse()
 
@@ -281,15 +275,17 @@ export class RManager {
     return new Promise((resolve, reject) => {
       const rtoolsPath = this.getWindowsRtoolsPath()
 
-      const childEnv = {
-        ...env,
-        PATH: [rtoolsPath, env.PATH].filter(Boolean).join(';')
-      }
+      // Update whatever casing the PATH key already has (Windows
+      // commonly reports it as "Path", not "PATH") instead of adding a
+      // second, differently-cased key — a Windows env block with both
+      // "Path" and "PATH" present is undefined behavior for which one
+      // the child process actually sees, and silently swallowed this
+      // fix in practice.
+      const childEnv: NodeJS.ProcessEnv = { ...env }
 
-      try {
-        onOutput?.(`cp=${execSync('where cp', { encoding: 'utf8' })}`, 'stdout')
-      } catch {
-        onOutput?.('cp not found', 'stdout')
+      if (rtoolsPath) {
+        const pathKey = Object.keys(childEnv).find((k) => k.toLowerCase() === 'path') ?? 'PATH'
+        childEnv[pathKey] = [rtoolsPath, childEnv[pathKey]].filter(Boolean).join(';')
       }
 
       const child = spawn(executable, args, {
