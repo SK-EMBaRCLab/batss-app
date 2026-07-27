@@ -41,16 +41,10 @@ export class PackageManager {
           packages,
           function(pkg) {
 
-            if (pkg %in% rownames(installed)) {
-
-              as.character(
-                installed[pkg, "Version"]
-              )
-
+            if (requireNamespace(pkg, quietly = TRUE, lib.loc = .libPaths()[1])) {
+              as.character(packageVersion(pkg, lib.loc = .libPaths()[1]))
             } else {
-
               NA
-
             }
 
           }
@@ -72,11 +66,12 @@ export class PackageManager {
       .filter(Boolean)
       .map((line) => {
         const [name, version] = line.split(':')
+        const installed = Boolean(version && version !== 'NA')
 
         return {
           name,
-          installed: version !== 'NA',
-          version: version === 'NA' ? undefined : version
+          installed,
+          version: installed ? version : undefined
         }
       })
   }
