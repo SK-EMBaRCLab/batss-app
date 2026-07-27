@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.14](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.13...v1.2.14) (2026-07-27)
+
+
+### Bug Fixes
+
+* bug in Rtools detection ([a804ccd](https://github.com/SK-EMBaRCLab/batss-app/commit/a804ccd81c8097101ca3baa39e84aac42a177978))
+
 ## [1.2.13](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.12...v1.2.13) (2026-07-27)
 
 
