@@ -8,6 +8,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntime } from '@/stores/runtime'
 import { PackageCheck, PackageX } from 'lucide-react'
 
@@ -15,9 +16,12 @@ export default function About() {
   const status = useRuntime((state) => state.status)
   const checkRuntime = useRuntime((state) => state.checkRuntime)
   const packages = useRuntime((state) => state.packages)
+  const logs = useRuntime((state) => state.logs)
+
+  console.log(packages)
 
   return (
-    <div className="p-6 grid gap-4">
+    <div className="h-full overflow-y-auto p-6 grid gap-4">
       <h1 className="text-2xl font-semibold">About</h1>
 
       <p className="text-muted-foreground mt-2">About Albatross</p>
@@ -45,6 +49,19 @@ export default function About() {
           </Item>
         ))}
       </ItemGroup>
+      {logs.length > 0 && (
+        <ScrollArea className="h-48 rounded-md border border-border bg-black p-3">
+          <div className="font-mono text-xs text-green-400">
+            {logs.map((line, i) => (
+              // Index is stable here since lines only ever get
+              // appended/trimmed from the front, never reordered.
+              <div key={i} className="whitespace-pre-wrap break-all">
+                {line}
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      )}
     </div>
   )
 }

@@ -20,7 +20,22 @@ export class PackageManager {
       `
         packages <- strsplit(Sys.getenv("${PACKAGES_ENV}"), ",")[[1]]
 
-        installed <- installed.packages()
+        for (pkg in packages) {
+          found <- find.package(pkg, quiet = TRUE)
+
+          if (length(found) > 0) {
+            message(paste(pkg, "FOUND:", found))
+          } else {
+            message(paste(pkg, "MISSING"))
+          }
+        }
+
+        installed <- installed.packages(lib.loc = .libPaths()[1])
+
+        message("Libraries:")
+        message(paste(.libPaths(), collapse="\n"))
+
+        message("Required: ", paste(packages, collapse=","))
 
         result <- sapply(
           packages,
@@ -93,10 +108,10 @@ export class PackageManager {
 
           install_lib <- .libPaths()[1]
 
-          cat("ENTERED INSTALL SCRIPT\n")
-          cat("pkg=", pkg, "\n", sep="")
-          cat("lib=", install_lib, "\n", sep="")
-          cat("requireNamespace=",
+          message("ENTERED INSTALL SCRIPT\n")
+          message("pkg=", pkg, "\n", sep="")
+          message("lib=", install_lib, "\n", sep="")
+          message("requireNamespace=",
               requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib),
               "\n", sep="")
 
@@ -115,9 +130,9 @@ export class PackageManager {
             "source"
           }
 
-          cat("lib:", install_lib, "\n")
-          cat("available:", requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib), "\n")
-          cat("all libs:", paste(.libPaths(), collapse = "\n"), "\n")
+          message("lib:", install_lib, "\n")
+          message("available:", requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib), "\n")
+          message("all libs:", paste(.libPaths(), collapse = "\n"), "\n")
 
           if (!requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) {
 
