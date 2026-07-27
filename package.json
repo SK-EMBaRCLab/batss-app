@@ -1,10 +1,10 @@
 {
   "name": "albatross",
   "desktopName": "albatross",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "description": "Facilitating Adaptive Bayesian Clinical (ABC) Trial Design using Integrated Nested Laplace Approximations (INLA): ABC-INLA",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "https://lab.research.sickkids.ca/heath/",
   "homepage": "https://github.com/SK-EMBaRCLab/batss-app",
   "scripts": {
     "format": "prettier --write .",

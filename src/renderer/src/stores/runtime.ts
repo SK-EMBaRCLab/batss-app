@@ -16,6 +16,7 @@ type RuntimeState = {
   initialized: boolean
 
   initialize: () => Promise<void>
+  checkRuntime: () => Promise<void>
   clearLogs: () => void
 }
 
@@ -31,9 +32,12 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
     if (get().initialized) {
       return
     }
+    set({ initialized: true })
+    await get().checkRuntime()
+  },
 
+  checkRuntime: async () => {
     set({
-      initialized: true,
       status: 'checking',
       message: 'Starting runtime check',
       logs: []
@@ -67,7 +71,12 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
         message: result.ready ? 'Runtime ready' : 'One or more packages failed to install',
         progress: 100,
         packages: result.packages,
-        error: result.ready ? undefined : 'R and BATSS are required to run simulations.'
+        error: result.ready
+          ? undefined
+          : `Failed to install: ${result.packages
+              .filter((p) => !p.installed)
+              .map((p) => p.name)
+              .join(', ')}`
       })
     } catch (error) {
       set({
