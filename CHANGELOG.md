@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.7](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.6...v1.2.7) (2026-07-27)
+
+
+### Bug Fixes
+
+* more debugging of install isue ([936f73b](https://github.com/SK-EMBaRCLab/batss-app/commit/936f73bc825e2e1cf9ff9a7fb9fb7376b995494d))
+
 ## [1.2.6](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.2.5...v1.2.6) (2026-07-27)
 
 
