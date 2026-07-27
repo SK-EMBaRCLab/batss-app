@@ -73,10 +73,12 @@ export class PackageManager {
   }
 
   async installPackages(packages: string[]): Promise<void> {
+    this.reporter.log(`Installing ${packages.length} package(s)`)
     const total = packages.length
     const defaultRepo = 'https://cloud.r-project.org'
 
     for (const [index, pkg] of packages.entries()) {
+      this.reporter.log(`Attempting ${pkg}`)
       const progress = 40 + Math.round(((index + 1) / total) * 50)
 
       this.reporter.installing(`Installing ${pkg}`, progress)
@@ -90,6 +92,13 @@ export class PackageManager {
           repos <- strsplit(Sys.getenv("${PACKAGE_REPOS_ENV}"), ",")[[1]]
 
           install_lib <- .libPaths()[1]
+
+          cat("ENTERED INSTALL SCRIPT\n")
+          cat("pkg=", pkg, "\n", sep="")
+          cat("lib=", install_lib, "\n", sep="")
+          cat("requireNamespace=",
+              requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib),
+              "\n", sep="")
 
           # On Windows/macOS, prefer precompiled binaries even when a
           # newer source release exists — this repo's binaries commonly
@@ -105,6 +114,10 @@ export class PackageManager {
           } else {
             "source"
           }
+
+          cat("lib:", install_lib, "\n")
+          cat("available:", requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib), "\n")
+          cat("all libs:", paste(.libPaths(), collapse = "\n"), "\n")
 
           if (!requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) {
 
@@ -129,6 +142,8 @@ export class PackageManager {
     this.reporter.checking('Checking required R packages', 30)
 
     const missing = await this.checkPackages()
+
+    this.reporter.log(`Missing packages: ${JSON.stringify(missing)}`)
 
     if (missing.length > 0) {
       await this.installPackages(missing)
