@@ -288,6 +288,8 @@ export class RManager {
         childEnv[pathKey] = [rtoolsPath, childEnv[pathKey]].filter(Boolean).join(';')
       }
 
+      onOutput?.(`DEBUG rtoolsPath=${rtoolsPath ?? 'undefined'}`, 'stdout')
+
       const child = spawn(executable, args, {
         env: childEnv
       })
