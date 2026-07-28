@@ -128,9 +128,7 @@ export class PackageManager {
           # Rtools is installed correctly. Linux has no binary repo for
           # these packages at all, so it must keep compiling from source
           # there, same as before.
-          pkg_type <- if (pkg == "INLA") {
-            "source"
-          } else if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
+          if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
             "binary"
           } else {
             "source"
@@ -141,7 +139,7 @@ export class PackageManager {
               pkg,
               repos = repos,
               lib = install_lib,
-              dependencies = NA,
+              dependencies = c("Depends", "Imports"),
               type = pkg_type
             )
 
