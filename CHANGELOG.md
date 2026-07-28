@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.3...v1.3.4) (2026-07-28)
+
+
+### Bug Fixes
+
+* remove rtools ([2cd53d7](https://github.com/SK-EMBaRCLab/batss-app/commit/2cd53d783287a711d232e2677e3b467ee5e1db52))
+
 ## [1.3.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.2...v1.3.3) (2026-07-28)
 
 
