@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.4...v1.3.5) (2026-07-28)
+
+
+### Bug Fixes
+
+* remove debug statements ([30cdf96](https://github.com/SK-EMBaRCLab/batss-app/commit/30cdf96cf0a6cf1f4de9ca692af418f1ff3a23ec))
+
 ## [1.3.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.3...v1.3.4) (2026-07-28)
 
 
