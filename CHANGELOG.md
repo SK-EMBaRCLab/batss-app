@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.2...v1.3.3) (2026-07-28)
+
+
+### Bug Fixes
+
+* pkg_type bug ([f7cfd92](https://github.com/SK-EMBaRCLab/batss-app/commit/f7cfd926f91751c0f2ba5d71defc0d1fe16fd453))
+
 ## [1.3.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.1...v1.3.2) (2026-07-28)
 
 
