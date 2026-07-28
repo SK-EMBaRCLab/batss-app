@@ -119,20 +119,12 @@ export class PackageManager {
             }
           }
 
-          # On Windows/macOS, prefer precompiled binaries even when a
-          # newer source release exists — this repo's binaries commonly
-          # lag its source releases, and letting install.packages()
-          # fall back to "both" (its Windows/mac default) means it will
-          # try to compile INLA from source, which reliably fails with
-          # errors like "cp: unknown option -- )" regardless of whether
-          # Rtools is installed correctly. Linux has no binary repo for
-          # these packages at all, so it must keep compiling from source
-          # there, same as before.
-          if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
+          pkg_type <- if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
             "binary"
           } else {
             "source"
           }
+
           if (!requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) {
 
             install.packages(
