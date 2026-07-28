@@ -104,22 +104,6 @@ export class PackageManager {
 
           install_lib <- .libPaths()[1]
 
-          # Temporary diagnostics: confirm what R's own environment sees,
-          # since this is the actual process context where the internal
-          # system("cp -R ...") call during binary-package install
-          # happens — checking on the Node side isn't enough to prove
-          # the child R process inherited it correctly.
-          cat("DEBUG R PATH:", Sys.getenv("PATH"), "\\n")
-          cat("DEBUG Sys.which('cp'):", Sys.which("cp"), "\\n")
-          cat("DEBUG Sys.which('tar'):", Sys.which("tar"), "\\n")
-          cat("DEBUG file.exists cp.exe candidates:\\n")
-          for (p in strsplit(Sys.getenv("PATH"), ";")[[1]]) {
-            candidate <- file.path(p, "cp.exe")
-            if (file.exists(candidate)) {
-              cat("  FOUND:", candidate, "\\n")
-            }
-          }
-
           pkg_type <- if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
             "binary"
           } else {
