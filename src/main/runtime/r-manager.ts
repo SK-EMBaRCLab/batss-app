@@ -286,9 +286,12 @@ export class RManager {
       if (rtoolsPath) {
         const pathKey = Object.keys(childEnv).find((k) => k.toLowerCase() === 'path') ?? 'PATH'
         childEnv[pathKey] = [rtoolsPath, childEnv[pathKey]].filter(Boolean).join(';')
-      }
 
-      onOutput?.(`DEBUG rtoolsPath=${rtoolsPath ?? 'undefined'}`, 'stdout')
+        onOutput?.(`DEBUG rtoolsPath=${rtoolsPath}`, 'stdout')
+        onOutput?.(`DEBUG childEnv[${pathKey}]=${childEnv[pathKey]}`, 'stdout')
+      } else {
+        onOutput?.('DEBUG rtoolsPath=undefined (getWindowsRtoolsPath found nothing)', 'stdout')
+      }
 
       const child = spawn(executable, args, {
         env: childEnv

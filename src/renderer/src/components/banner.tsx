@@ -1,7 +1,7 @@
 import { JSX } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, CheckCircle2, Info, Loader2, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Info, Loader2, Siren, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type BannerVariant = 'info' | 'success' | 'warning' | 'error' | 'loading'
@@ -28,12 +28,12 @@ const variants = {
       'border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950 dark:text-green-200'
   },
   warning: {
-    icon: AlertCircle,
+    icon: AlertTriangle,
     className:
       'border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200'
   },
   error: {
-    icon: AlertCircle,
+    icon: Siren,
     className:
       'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200'
   },
