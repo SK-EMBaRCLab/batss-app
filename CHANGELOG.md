@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.1...v1.3.2) (2026-07-28)
+
+
+### Bug Fixes
+
+* INLA install on windows ([e5b16e1](https://github.com/SK-EMBaRCLab/batss-app/commit/e5b16e1082892dced45cebee4de22820401fe599))
+
 ## [1.3.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.0...v1.3.1) (2026-07-28)
 
 
