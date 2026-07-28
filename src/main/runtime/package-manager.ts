@@ -20,14 +20,15 @@ export class PackageManager {
       `
         packages <- strsplit(Sys.getenv("${PACKAGES_ENV}"), ",")[[1]]
 
-        installed <- installed.packages(lib.loc = .libPaths()[1])
+        install_lib <- .libPaths()[1]
+
+        installed <- installed.packages(lib.loc = install_lib)
 
         result <- sapply(
           packages,
           function(pkg) {
-
-            if (requireNamespace(pkg, quietly = TRUE, lib.loc = .libPaths()[1])) {
-              as.character(packageVersion(pkg, lib.loc = .libPaths()[1]))
+            if (requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) {
+              as.character(packageVersion(pkg, lib.loc = install_lib))
             } else {
               "NA"
             }

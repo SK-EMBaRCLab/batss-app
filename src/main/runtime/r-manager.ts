@@ -3,7 +3,6 @@
 import { spawn, execFile } from 'child_process'
 import { promisify } from 'util'
 import fs from 'fs/promises'
-import fsSync from 'fs'
 import path from 'path'
 
 import { getRLibraryPath } from '../services/filesystem/app-paths'
@@ -42,46 +41,6 @@ export class RManager {
     }
 
     return ['Rscript', '/usr/bin/Rscript', '/usr/local/bin/Rscript']
-  }
-
-  private getWindowsRtoolsPath(): string | undefined {
-    if (process.platform !== 'win32') {
-      return undefined
-    }
-
-    const candidates: string[] = []
-
-    // Rtools' installer sets a persistent RTOOLS<version>_HOME env var
-    // pointing at its install dir — this is the same mechanism pkgbuild/
-    // RStudio use to find it, and is more reliable than guessing a
-    // registry key name.
-    for (const [key, value] of Object.entries(process.env)) {
-      if (/^RTOOLS\d+(_AARCH64)?_HOME$/i.test(key) && value) {
-        candidates.push(path.join(value, 'usr', 'bin'))
-      }
-    }
-
-    // Fallback: the documented default install locations. Rtools always
-    // installs to C:\rtools<ver> unless the env var above overrides it,
-    // so glob for whatever version(s) are present rather than hardcoding
-    // one — a new Rtools ships nearly every year alongside a new R release.
-    try {
-      const entries = fsSync.readdirSync('C:\\')
-      const rtoolsDirs = entries
-        .filter((v) => /^rtools\d+/i.test(v))
-        .sort()
-        .reverse()
-
-      for (const dir of rtoolsDirs) {
-        candidates.push(path.join('C:\\', dir, 'usr', 'bin'))
-      }
-    } catch {
-      // Can't read C:\ root — unlikely, but don't let it crash the check.
-    }
-
-    return candidates.find((p) => {
-      return fsSync.existsSync(path.join(p, 'cp.exe'))
-    })
   }
 
   /**
@@ -273,25 +232,7 @@ export class RManager {
   ): Promise<ExecuteResult> {
     const executable = await this.getRExecutable()
     return new Promise((resolve, reject) => {
-      const rtoolsPath = this.getWindowsRtoolsPath()
-
-      // Update whatever casing the PATH key already has (Windows
-      // commonly reports it as "Path", not "PATH") instead of adding a
-      // second, differently-cased key — a Windows env block with both
-      // "Path" and "PATH" present is undefined behavior for which one
-      // the child process actually sees, and silently swallowed this
-      // fix in practice.
       const childEnv: NodeJS.ProcessEnv = { ...env }
-
-      if (rtoolsPath) {
-        const pathKey = Object.keys(childEnv).find((k) => k.toLowerCase() === 'path') ?? 'PATH'
-        childEnv[pathKey] = [rtoolsPath, childEnv[pathKey]].filter(Boolean).join(';')
-
-        onOutput?.(`DEBUG rtoolsPath=${rtoolsPath}`, 'stdout')
-        onOutput?.(`DEBUG childEnv[${pathKey}]=${childEnv[pathKey]}`, 'stdout')
-      } else {
-        onOutput?.('DEBUG rtoolsPath=undefined (getWindowsRtoolsPath found nothing)', 'stdout')
-      }
 
       const child = spawn(executable, args, {
         env: childEnv
