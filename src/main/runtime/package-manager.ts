@@ -63,8 +63,6 @@ export class PackageManager {
         }
       })
 
-    this.reporter.log(`STATUS PARSED: ${JSON.stringify(parsed)}`)
-
     return parsed
   }
 

@@ -1,4 +1,5 @@
-import { JSX } from 'react'
+import { JSX, useRef } from 'react'
+import { toPng } from 'html-to-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -13,11 +14,27 @@ import { useBatss } from '@/stores/batss'
 import { Button } from '@/components/ui/button'
 import { BatssChart } from '@/components/results/bar-chart'
 import { SummaryTable } from '@/components/results/summary-table'
+import { ImageDown } from 'lucide-react'
 
 export default function Results(): JSX.Element {
   const input = useBatss((state) => state.input)
   const result = useBatss((state) => state.result)
   const loadResults = useBatss((s) => s.loadResults)
+  const chartRef = useRef<HTMLDivElement>(null)
+
+  const download = async (): Promise<void> => {
+    if (!chartRef.current) return
+
+    const dataUrl = await toPng(chartRef.current, {
+      pixelRatio: 2, // higher resolution
+      backgroundColor: '#fff'
+    })
+
+    const link = document.createElement('a')
+    link.download = 'batss-chart.png'
+    link.href = dataUrl
+    link.click()
+  }
 
   if (!result) {
     return (
@@ -98,12 +115,18 @@ export default function Results(): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Chart Data</CardTitle>
+            <Button onClick={download} className="gap-2">
+              <ImageDown className="h-4 w-4" />
+              Export Chart
+            </Button>
           </CardHeader>
 
           <CardContent>
-            <BatssChart data={result.chart} />
+            <div ref={chartRef}>
+              <BatssChart data={result.chart} />
+            </div>
           </CardContent>
         </Card>
       </div>

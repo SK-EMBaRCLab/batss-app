@@ -11,7 +11,7 @@ import { useNavigation } from '@/stores/navigation'
 
 export function AppHeader(): JSX.Element {
   const navigate = useNavigation((state) => state.navigate)
-  const theme = useTheme((state) => state.theme)
+  const isDark = useTheme((state) => state.isDark)
   const setTheme = useTheme((state) => state.setTheme)
   const saveResults = useBatss((s) => s.saveResults)
   const loadResults = useBatss((s) => s.loadResults)
@@ -45,12 +45,8 @@ export function AppHeader(): JSX.Element {
           </Button>
         )}
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        >
-          {theme === 'dark' ? <Sun /> : <Moon />}
+        <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
+          {isDark ? <Sun /> : <Moon />}
         </Button>
         <Button variant="ghost" size="icon" onClick={() => navigate('settings')}>
           <Settings />

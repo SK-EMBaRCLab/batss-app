@@ -1,3 +1,5 @@
+import { JSX } from 'react'
+
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
 import {
@@ -9,7 +11,6 @@ import {
   ChartTooltipContent
 } from '@/components/ui/chart'
 import { BatssChartRow } from '@shared/batss-types'
-import type { JSX } from 'react'
 
 const chartConfig = {
   superior: {

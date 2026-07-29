@@ -36,5 +36,14 @@ export const useTheme = create<ThemeState>((set) => ({
 
   setTheme: async (theme) => {
     await window.theme.set(theme)
+
+    const { dark } = await window.theme.get()
+
+    set({
+      theme,
+      isDark: dark
+    })
+
+    document.documentElement.classList.toggle('dark', dark)
   }
 }))
