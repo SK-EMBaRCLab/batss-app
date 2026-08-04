@@ -33,13 +33,17 @@ export default function About(): JSX.Element {
       <h1 className="text-2xl font-semibold">About</h1>
 
       <p className="text-muted-foreground">Albatross version {appVersion}</p>
+      <p>
+        A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design using
+        Integrated Nested Laplace Approximations (INLA): ABC-INLA
+      </p>
       <Button onClick={() => checkRuntime()} disabled={status === 'checking'} className="max-w-sm">
         Recheck / Install Packages
       </Button>
       <h3>R Packages status:</h3>
-      <ItemGroup className="max-w-sm">
+      <ItemGroup className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 content-center">
         {packages.map((pkg) => (
-          <Item key={pkg.name} variant="outline" size="xs">
+          <Item key={pkg.name} variant="outline" size="xs" className="min-w-0 items-start">
             <ItemMedia>
               {pkg.installed ? (
                 <PackageCheck className="text-primary" />
@@ -47,11 +51,11 @@ export default function About(): JSX.Element {
                 <PackageX className="text-destructive" />
               )}
             </ItemMedia>
-            <ItemContent className="gap-1">
+            <ItemContent className="min-w-0 gap-1">
               <ItemTitle>{pkg.name}</ItemTitle>
               <ItemDescription>{pkg.installed ? 'installed' : 'not installed'}</ItemDescription>
             </ItemContent>
-            <ItemActions>
+            <ItemActions className="self-center">
               <span>v{pkg.version}</span>
             </ItemActions>
           </Item>

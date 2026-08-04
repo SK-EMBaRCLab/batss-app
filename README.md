@@ -66,7 +66,7 @@ TODO
 - npm
 - [R](https://www.r-project.org/) (required for BATSS; detected automatically)
 - On Linux: check docker file
-R packages (`BATSS` and dependencies) are installed automatically on first launch.
+  R packages (`BATSS` and dependencies) are installed automatically on first launch.
 
 ---
 
@@ -132,11 +132,11 @@ albatros/
 
 Commits follow the [Conventional Commits](https://www.conventionalcommits.org/) spec. [Release Please](https://github.com/googleapis/release-please) automatically generates changelogs and bumps versions:
 
-| Commit prefix | Version bump |
-|---|---|
-| `feat:` | Minor |
-| `fix:` | Patch |
-| `feat!:` / `BREAKING CHANGE` | Major |
+| Commit prefix                | Version bump |
+| ---------------------------- | ------------ |
+| `feat:`                      | Minor        |
+| `fix:`                       | Patch        |
+| `feat!:` / `BREAKING CHANGE` | Major        |
 
 Examples:
 

@@ -2,21 +2,27 @@ import { JSX } from 'react'
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarRail
 } from '@/components/ui/sidebar'
 
 import { useNavigation } from '@/stores/navigation'
 import { navigationItems } from '@/config/navigation'
 import { GalleryVerticalEnd } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { useBatss } from '@/stores/batss'
 
 export function AppSidebar(): JSX.Element {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
+  const isRunning = useBatss((s) => s.isRunning)
 
   return (
     <Sidebar collapsible="icon" variant="floating">
@@ -56,6 +62,15 @@ export function AppSidebar(): JSX.Element {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        {isRunning && (
+          <Badge>
+            <Spinner data-icon="inline-start" />
+            Running
+          </Badge>
+        )}
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

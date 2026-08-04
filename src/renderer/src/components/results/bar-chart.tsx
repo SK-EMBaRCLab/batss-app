@@ -23,7 +23,13 @@ const chartConfig = {
   }
 } satisfies ChartConfig
 
-export function BatssChart({ data }: { data: BatssChartRow[] }): JSX.Element {
+export function BatssChart({
+  data,
+  showRefLines
+}: {
+  data: BatssChartRow[]
+  showRefLines: boolean
+}): JSX.Element {
   const chartData = ['H0', 'H1'].map((scenario) => ({
     scenario,
     superior:
@@ -58,31 +64,34 @@ export function BatssChart({ data }: { data: BatssChartRow[] }): JSX.Element {
 
         <ChartLegend content={<ChartLegendContent />} />
 
-        <ReferenceLine
-          y={0.05}
-          stroke="var(--destructive)"
-          strokeWidth={2}
-          strokeDasharray="6 3"
-          label={{
-            value: 'Type I Error Target (5%)',
-            position: 'insideTopRight',
-            fill: 'var(--destructive)',
-            fontSize: 12
-          }}
-        />
-
-        <ReferenceLine
-          y={0.8}
-          stroke="var(--chart-3)"
-          strokeWidth={2}
-          strokeDasharray="6 3"
-          label={{
-            value: 'Power Target (80%)',
-            position: 'insideTopRight',
-            fill: 'var(--chart-3)',
-            fontSize: 12
-          }}
-        />
+        {showRefLines && (
+          <>
+            <ReferenceLine
+              y={0.05}
+              stroke="var(--destructive)"
+              strokeWidth={2}
+              strokeDasharray="6 3"
+              label={{
+                value: 'Type I Error Target (5%)',
+                position: 'insideTopRight',
+                fill: 'var(--destructive)',
+                fontSize: 12
+              }}
+            />
+            <ReferenceLine
+              y={0.8}
+              stroke="var(--chart-3)"
+              strokeWidth={2}
+              strokeDasharray="6 3"
+              label={{
+                value: 'Power Target (80%)',
+                position: 'insideTopRight',
+                fill: 'var(--chart-3)',
+                fontSize: 12
+              }}
+            />
+          </>
+        )}
 
         <Bar dataKey="superior" stackId="a" fill="var(--color-superior)" />
 

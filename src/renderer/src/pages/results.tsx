@@ -1,4 +1,4 @@
-import { JSX, useRef } from 'react'
+import { JSX, useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,9 +14,22 @@ import { useBatss } from '@/stores/batss'
 import { Button } from '@/components/ui/button'
 import { BatssChart } from '@/components/results/bar-chart'
 import { SummaryTable } from '@/components/results/summary-table'
-import { ImageDown } from 'lucide-react'
+import { ImageDown, Minus, MoreHorizontal } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
 export default function Results(): JSX.Element {
+  const [options, setOptions] = useState({
+    reference: true
+  })
   const input = useBatss((state) => state.input)
   const result = useBatss((state) => state.result)
   const loadResults = useBatss((s) => s.loadResults)
@@ -117,15 +130,43 @@ export default function Results(): JSX.Element {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Chart Data</CardTitle>
-            <Button onClick={download} className="gap-2">
-              <ImageDown className="h-4 w-4" />
-              Export Chart
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Chart</DropdownMenuLabel>
+
+                  <DropdownMenuItem onClick={download}>
+                    <ImageDown className="h-4 w-4" />
+                    Export Chart
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
+                  <DropdownMenuCheckboxItem
+                    checked={options.reference}
+                    onCheckedChange={(checked) =>
+                      setOptions({ ...options, reference: checked === true })
+                    }
+                  >
+                    <Minus />
+                    Reference Line
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </CardHeader>
 
           <CardContent>
             <div ref={chartRef}>
-              <BatssChart data={result.chart} />
+              <BatssChart data={result.chart} showRefLines={options.reference} />
             </div>
           </CardContent>
         </Card>
