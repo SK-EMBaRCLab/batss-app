@@ -1,6 +1,10 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
-import type { BatssRunInput, BatssRunResult, BatssSavedResult } from '../shared/batss-types'
+import type {
+  SimulationRunInput,
+  SimulationRunResult,
+  StudyDesign
+} from '../shared/simulation-types'
 
 declare global {
   interface Window {
@@ -12,10 +16,10 @@ declare global {
       onLog: (callback: (line: string) => void) => () => void
       appVersion: () => string
     }
-    batss: {
-      runExample: (input: BatssRunInput) => Promise<BatssRunResult>
-      saveResult: (data: BatssSavedResult) => Promise<boolean>
-      loadResult: () => Promise<BatssSavedResult | null>
+    simulation: {
+      runExample: (input: SimulationRunInput) => Promise<SimulationRunResult>
+      saveResult: (data: StudyDesign) => Promise<boolean>
+      loadResult: () => Promise<StudyDesign | null>
       onLog: (callback: (line: string) => void) => () => void
     }
     theme: {

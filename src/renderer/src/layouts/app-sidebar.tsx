@@ -17,12 +17,12 @@ import { navigationItems } from '@/config/navigation'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
-import { useBatss } from '@/stores/batss'
+import { useDesign } from '@/stores/design'
 
 export function AppSidebar(): JSX.Element {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
-  const isRunning = useBatss((s) => s.isRunning)
+  const isRunning = useDesign((s) => s.isRunning)
 
   return (
     <Sidebar collapsible="icon" variant="floating">

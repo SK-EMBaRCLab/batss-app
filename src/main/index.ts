@@ -6,10 +6,10 @@ import icon from '../../resources/icon.png?asset'
 
 import { registerRuntimeIPC } from './ipc/runtime.ipc'
 import { registerSettingsIPC } from './ipc/settings.ipc'
-import { BatssService } from './services/batss.service'
+import { SimulationService } from './services/simulation.service'
 import { settingsService } from './services/settings.service'
-import { BatssRunInput } from '../shared/batss-types'
-import { registerBatssFilesIPC } from './ipc/batss-files.ipc'
+import { SimulationRunInput } from '../shared/simulation-types'
+import { registerAlbatrossFilesIPC } from './ipc/albatross-files.ipc'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -29,7 +29,7 @@ app.commandLine.appendSwitch('use-gl', 'swiftshader')
 app.commandLine.appendSwitch('use-angle', 'swiftshader')
 app.commandLine.appendSwitch('enable-unsafe-swiftshader')
 
-const batssService = new BatssService()
+const simulationService = new SimulationService()
 
 function createWindow(): void {
   const { workAreaSize } = screen.getPrimaryDisplay()
@@ -107,14 +107,14 @@ app.whenReady().then(() => {
   // Settings IPC (output folder, etc.)
   registerSettingsIPC()
 
-  // Batts save load results
-  registerBatssFilesIPC()
+  // Albatross save load results
+  registerAlbatrossFilesIPC()
 
-  ipcMain.removeHandler('batss:example')
+  ipcMain.removeHandler('simulation:example')
 
-  ipcMain.handle('batss:example', async (event, input: BatssRunInput) => {
-    return await batssService.runExample(input, (line) => {
-      event.sender.send('batss:log', line)
+  ipcMain.handle('simulation:example', async (event, input: SimulationRunInput) => {
+    return await simulationService.runExample(input, (line) => {
+      event.sender.send('simulation:log', line)
     })
   })
 

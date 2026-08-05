@@ -1,9 +1,9 @@
 import { OutputListener, RManager } from '../runtime/r-manager'
-import type { BatssRunInput, BatssRunResult } from '../../shared/batss-types'
+import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
 
 const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
 
-export class BatssService {
+export class SimulationService {
   private readonly r = new RManager()
 
   /**
@@ -22,7 +22,10 @@ export class BatssService {
    * `onOutput`, if provided, receives each line of R/INLA output as it
    * streams, so the caller can forward it to the GUI live.
    */
-  async runExample(input: BatssRunInput, onOutput?: OutputListener): Promise<BatssRunResult> {
+  async runExample(
+    input: SimulationRunInput,
+    onOutput?: OutputListener
+  ): Promise<SimulationRunResult> {
     const alternative = input.primaryOutcome === 'A' ? 'greater' : 'less'
 
     const script = `
@@ -123,11 +126,11 @@ export class BatssService {
         onOutput
       )
 
-      return JSON.parse(output) as BatssRunResult
+      return JSON.parse(output) as SimulationRunResult
     } catch (error) {
       return {
         status: 'error',
-        message: error instanceof Error ? error.message : 'BATSS run failed'
+        message: error instanceof Error ? error.message : 'Simulation run failed'
       }
     }
   }

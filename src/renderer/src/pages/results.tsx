@@ -1,4 +1,4 @@
-import { JSX, useRef, useState } from 'react'
+import { JSX, useMemo, useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,11 +10,11 @@ import {
   EmptyTitle
 } from '@/components/ui/empty'
 
-import { useBatss } from '@/stores/batss'
+import { useDesign } from '@/stores/design'
 import { Button } from '@/components/ui/button'
-import { BatssChart } from '@/components/results/bar-chart'
+import { ResultsBarChart } from '@/components/results/bar-chart'
 import { SummaryTable } from '@/components/results/summary-table'
-import { ImageDown, Minus, MoreHorizontal } from 'lucide-react'
+import { ImageDown, Minus, MoreHorizontal, Play } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,15 +25,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useNavigation } from '@/stores/navigation'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
 
 export default function Results(): JSX.Element {
   const [options, setOptions] = useState({
     reference: true
   })
-  const input = useBatss((state) => state.input)
-  const result = useBatss((state) => state.result)
-  const loadResults = useBatss((s) => s.loadResults)
+  const design = useDesign((state) => state.design)
+  const selectedResultId = useDesign((state) => state.selectedResultId)
+  const selectResult = useDesign((state) => state.selectResult)
+  const loadDesign = useDesign((state) => state.loadDesign)
+  const navigate = useNavigation((state) => state.navigate)
   const chartRef = useRef<HTMLDivElement>(null)
+
+  const selectedEntry = useMemo(
+    () => design?.results.find((entry) => entry.id === selectedResultId) ?? design?.results.at(-1),
+    [design, selectedResultId]
+  )
 
   const download = async (): Promise<void> => {
     if (!chartRef.current) return
@@ -44,58 +54,84 @@ export default function Results(): JSX.Element {
     })
 
     const link = document.createElement('a')
-    link.download = 'batss-chart.png'
+    link.download = 'results-chart.png'
     link.href = dataUrl
     link.click()
   }
 
-  if (!result) {
+  if (!design || design.results.length === 0) {
     return (
       <div className="flex h-full items-center justify-center p-6">
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>No Results</EmptyTitle>
+            <EmptyTitle>No Results Yet</EmptyTitle>
             <EmptyDescription>
-              Run a BATSS simulation or load a saved result to view results.
+              Run a BATSS simulation for this design, or load a saved design to view its results.
             </EmptyDescription>
           </EmptyHeader>
 
-          <EmptyContent>
-            <Button onClick={loadResults}>Load Result</Button>
+          <EmptyContent className="flex-row gap-2 justify-center">
+            <Button onClick={() => navigate('simulation')}>
+              <Play className="mr-2 h-4 w-4" />
+              Run Simulation
+            </Button>
+            <Button variant="outline" onClick={loadDesign}>
+              Load Design
+            </Button>
           </EmptyContent>
         </Empty>
       </div>
     )
   }
 
-  if (result.status === 'error') {
-    return (
-      <div className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Simulation Error</CardTitle>
-          </CardHeader>
-          <CardContent>{result.message}</CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  const version = result.package ? `BATSS v${result.package}` : 'BATSS'
+  const result = selectedEntry?.result
 
   return (
-    <div className="h-full min-h-0 overflow-auto p-6">
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Results</h1>
-            <p className="text-muted-foreground">Posterior summaries, diagnostics, and plots.</p>
+    <div className="flex h-full min-h-0">
+      {/* Run history for this design */}
+      <div className="w-64 shrink-0 border-r border-border p-4">
+        <h2 className="mb-1 truncate text-sm font-semibold">{design.name}</h2>
+        <p className="mb-4 text-xs text-muted-foreground">
+          {design.results.length} run{design.results.length === 1 ? '' : 's'}
+        </p>
+
+        <ScrollArea className="h-[calc(100%-3rem)]">
+          <div className="flex flex-col gap-2 pr-2">
+            {[...design.results].reverse().map((entry) => (
+              <button
+                key={entry.id}
+                onClick={() => selectResult(entry.id)}
+                className={cn(
+                  'rounded-md border border-border p-2 text-left text-xs transition-colors hover:bg-muted',
+                  entry.id === selectedEntry?.id && 'border-primary bg-accent'
+                )}
+              >
+                <div className="font-medium">{new Date(entry.createdAt).toLocaleString()}</div>
+                <div className="text-muted-foreground">
+                  {entry.result.status === 'success' ? 'Success' : 'Error'}
+                </div>
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* Selected run detail */}
+      <div className="h-full min-h-0 flex-1 overflow-auto p-6">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Results</h1>
+              <p className="text-muted-foreground">Posterior summaries, diagnostics, and plots.</p>
+            </div>
+
+            {result?.status === 'success' && (
+              <Badge variant="secondary">
+                {result.package ? `BATSS v${result.package}` : 'BATSS'}
+              </Badge>
+            )}
           </div>
 
-          <Badge variant="secondary">{version}</Badge>
-        </div>
-
-        {input && (
           <Card>
             <CardHeader>
               <CardTitle>Simulation Design</CardTitle>
@@ -103,73 +139,86 @@ export default function Results(): JSX.Element {
 
             <CardContent>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <Parameter label="Primary Outcome" value={input.primaryOutcome} />
-                <Parameter label="Probability" value={input.probability} />
-                <Parameter label="Log Odds" value={input.logOdds} />
-                <Parameter label="Delta Eff" value={input.deltaEff} />
-                <Parameter label="Decision Rule (b)" value={input.b} />
-                <Parameter label="N" value={input.N} />
-                <Parameter label="m0" value={input.m0} />
-                <Parameter label="m" value={input.m} />
-                <Parameter label="R" value={input.R} />
+                <Parameter label="Primary Outcome" value={design.input.primaryOutcome} />
+                <Parameter label="Probability" value={design.input.probability} />
+                <Parameter label="Log Odds" value={design.input.logOdds} />
+                <Parameter label="Delta Eff" value={design.input.deltaEff} />
+                <Parameter label="Decision Rule (b)" value={design.input.b} />
+                <Parameter label="N" value={design.input.N} />
+                <Parameter label="m0" value={design.input.m0} />
+                <Parameter label="m" value={design.input.m} />
+                <Parameter label="R" value={design.input.R} />
               </div>
             </CardContent>
           </Card>
-        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
+          {result?.status === 'error' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Simulation Error</CardTitle>
+              </CardHeader>
+              <CardContent>{result.message}</CardContent>
+            </Card>
+          )}
 
-          <CardContent>
-            <SummaryTable rows={result.table} />
-          </CardContent>
-        </Card>
+          {result?.status === 'success' && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Summary</CardTitle>
+                </CardHeader>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Chart Data</CardTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Chart</DropdownMenuLabel>
+                <CardContent>
+                  <SummaryTable rows={result.table} />
+                </CardContent>
+              </Card>
 
-                  <DropdownMenuItem onClick={download}>
-                    <ImageDown className="h-4 w-4" />
-                    Export Chart
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={options.reference}
-                    onCheckedChange={(checked) =>
-                      setOptions({ ...options, reference: checked === true })
-                    }
-                  >
-                    <Minus />
-                    Reference Line
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </CardHeader>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Chart Data</CardTitle>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal />
+                        </Button>
+                      }
+                    />
+                    <DropdownMenuContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel>Chart</DropdownMenuLabel>
 
-          <CardContent>
-            <div ref={chartRef}>
-              <BatssChart data={result.chart} showRefLines={options.reference} />
-            </div>
-          </CardContent>
-        </Card>
+                        <DropdownMenuItem onClick={download}>
+                          <ImageDown className="h-4 w-4" />
+                          Export Chart
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
+                        <DropdownMenuCheckboxItem
+                          checked={options.reference}
+                          onCheckedChange={(checked) =>
+                            setOptions({ ...options, reference: checked === true })
+                          }
+                        >
+                          <Minus />
+                          Reference Line
+                        </DropdownMenuCheckboxItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+
+                <CardContent>
+                  <div ref={chartRef}>
+                    <ResultsBarChart data={result.chart} showRefLines={options.reference} />
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -14,7 +14,7 @@ import {
 import { FormSection } from '../form-section'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Input } from '../ui/input'
-import { BatssFormStore } from '../types'
+import { SimulationFormStore } from '../types'
 
 const primaryOutcomes = [
   {
@@ -29,7 +29,7 @@ const primaryOutcomes = [
   }
 ]
 
-export function StudyDesignSection({ form }: { form: BatssFormStore }): JSX.Element {
+export function StudyDesignSection({ form }: { form: SimulationFormStore }): JSX.Element {
   const outcome = useField(form, { path: ['primaryOutcome'] })
   const probability = useField(form, { path: ['probability'] })
   const logOdds = useField(form, { path: ['logOdds'] })

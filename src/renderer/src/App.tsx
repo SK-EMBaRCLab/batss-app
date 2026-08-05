@@ -7,12 +7,16 @@ import { useNavigation } from '@/stores/navigation'
 import { useRuntime } from '@/stores/runtime'
 
 import { RuntimeScreen } from '@/components/runtime-screen'
+import { WelcomeScreen } from '@/components/welcome-screen'
 import { useTheme } from '@/stores/theme'
+import { useDesign } from './stores/design'
 
 export default function App(): JSX.Element {
   const currentView = useNavigation((state) => state.currentView)
 
   const status = useRuntime((state) => state.status)
+
+  const design = useDesign((state) => state.design)
 
   const initialize = useRuntime((state) => state.initialize)
 
@@ -28,6 +32,10 @@ export default function App(): JSX.Element {
 
   if (status === 'checking' || status === 'installing') {
     return <RuntimeScreen />
+  }
+
+  if (!design) {
+    return <WelcomeScreen />
   }
 
   return (

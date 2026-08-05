@@ -3,9 +3,9 @@ import { Field as FormischField, useField } from '@formisch/react'
 import { FormSection } from '../form-section'
 import { NumberInputField } from '../number-input-field'
 import type { JSX } from 'react'
-import { BatssFormStore } from '../types'
+import { SimulationFormStore } from '../types'
 
-export function DecisionRuleSection({ form }: { form: BatssFormStore }): JSX.Element {
+export function DecisionRuleSection({ form }: { form: SimulationFormStore }): JSX.Element {
   const deltaEff = useField(form, { path: ['deltaEff'] })
   const b = useField(form, { path: ['b'] })
 

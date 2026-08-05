@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Form, useForm } from '@formisch/react'
 import type { SubmitHandler } from '@formisch/react'
 
-import type { BatssRunInput } from '@shared/batss-types'
+import type { SimulationRunInput } from '@shared/simulation-types'
 
 import { StudyDesignSection } from '@/components/simulation/study-design-section'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
@@ -10,15 +10,16 @@ import { SimulationSettingsSection } from '@/components/simulation/simulation-se
 import { designSchema, initialDesignInput } from '@/lib/schema'
 
 type BatssFormProps = {
-  onRun: (input: BatssRunInput) => Promise<void>
+  onRun: (input: SimulationRunInput) => Promise<void>
+  initialInput?: SimulationRunInput
 }
 
-export function BatssForm({ onRun }: BatssFormProps): JSX.Element {
+export function SimulationForm({ onRun, initialInput }: BatssFormProps): JSX.Element {
   const form = useForm({
     schema: designSchema,
     validate: 'blur',
     revalidate: 'input',
-    initialInput: initialDesignInput
+    initialInput: initialInput ?? initialDesignInput
   })
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
@@ -37,7 +38,7 @@ export function BatssForm({ onRun }: BatssFormProps): JSX.Element {
 
   return (
     <Form
-      id="batss-form"
+      id="simulation-form"
       of={form}
       onSubmit={handleSubmit}
       className="flex h-full min-h-0 flex-col"

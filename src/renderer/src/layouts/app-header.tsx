@@ -1,24 +1,34 @@
 import { JSX } from 'react'
-import { FolderOpen, Moon, Save, Settings, Sun } from 'lucide-react'
+import { FilePlus2, FolderOpen, Moon, Save, Settings, Sun } from 'lucide-react'
 
 import { SidebarTrigger } from '@/components/ui/sidebar'
 
 import { Button } from '@/components/ui/button'
 import { AppBreadcrumb } from './app-breadcrumb'
 import { useTheme } from '@/stores/theme'
-import { useBatss } from '@/stores/batss'
+import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
+import { initialDesignInput } from '@/lib/schema'
+import { Separator } from '@/components/ui/separator'
+import { EditableDesignName } from '@/components/editable-design-name'
 
 export function AppHeader(): JSX.Element {
   const navigate = useNavigation((state) => state.navigate)
   const isDark = useTheme((state) => state.isDark)
   const setTheme = useTheme((state) => state.setTheme)
-  const saveResults = useBatss((s) => s.saveResults)
-  const loadResults = useBatss((s) => s.loadResults)
-  const result = useBatss((s) => s.result)
+  const design = useDesign((s) => s.design)
+  const renameDesign = useDesign((s) => s.renameDesign)
+  const startNewDesign = useDesign((s) => s.startNewDesign)
+  const saveDesign = useDesign((s) => s.saveDesign)
+  const loadDesign = useDesign((s) => s.loadDesign)
+
+  const handleNew = (): void => {
+    startNewDesign(initialDesignInput)
+    navigate('simulation')
+  }
 
   const handleLoad = async (): Promise<void> => {
-    const isLoaded = await loadResults()
+    const isLoaded = await loadDesign()
     if (isLoaded) {
       navigate('results')
     }
@@ -28,18 +38,29 @@ export function AppHeader(): JSX.Element {
     <header className="flex h-14 items-center border-b px-4 text-foreground">
       <div className="flex items-center gap-3">
         <SidebarTrigger />
-
         <AppBreadcrumb />
+
+        {design && (
+          <>
+            <Separator orientation="vertical" className="h-5" />
+            <EditableDesignName name={design.name} onRename={renameDesign} />
+          </>
+        )}
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={handleNew}>
+          <FilePlus2 />
+          New
+        </Button>
+
         <Button variant="ghost" size="sm" onClick={handleLoad}>
           <FolderOpen />
           Load
         </Button>
 
-        {result && (
-          <Button variant="destructive" size="sm" onClick={saveResults} disabled={!result}>
+        {design && design.results.length > 0 && (
+          <Button variant="destructive" size="sm" onClick={saveDesign}>
             <Save />
             Save
           </Button>

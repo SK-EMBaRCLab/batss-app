@@ -6,4 +6,4 @@ build
 .eslintcache
 *.log*
 .env
-*.batss
+*.design

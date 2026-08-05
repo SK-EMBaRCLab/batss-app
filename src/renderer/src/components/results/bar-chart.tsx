@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart'
-import { BatssChartRow } from '@shared/batss-types'
+import { SimulationChartRow } from '@shared/simulation-types'
 
 const chartConfig = {
   superior: {
@@ -23,11 +23,11 @@ const chartConfig = {
   }
 } satisfies ChartConfig
 
-export function BatssChart({
+export function ResultsBarChart({
   data,
   showRefLines
 }: {
-  data: BatssChartRow[]
+  data: SimulationChartRow[]
   showRefLines: boolean
 }): JSX.Element {
   const chartData = ['H0', 'H1'].map((scenario) => ({

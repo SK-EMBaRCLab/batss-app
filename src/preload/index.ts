@@ -3,7 +3,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
-import type { BatssRunInput, BatssRunResult, BatssSavedResult } from '../shared/batss-types'
+import type {
+  SimulationRunInput,
+  SimulationRunResult,
+  StudyDesign
+} from '../shared/simulation-types'
 
 const api = {}
 
@@ -41,16 +45,16 @@ const runtime = {
   }
 }
 
-const batss = {
-  runExample: (input: BatssRunInput): Promise<BatssRunResult> => {
-    return ipcRenderer.invoke('batss:example', input)
+const simulation = {
+  runExample: (input: SimulationRunInput): Promise<SimulationRunResult> => {
+    return ipcRenderer.invoke('simulation:example', input)
   },
 
-  saveResult: (data: BatssSavedResult): Promise<boolean> =>
-    ipcRenderer.invoke('batss:saveResult', data),
+  saveResult: (data: StudyDesign): Promise<boolean> =>
+    ipcRenderer.invoke('albatross:saveResult', data),
 
-  loadResult: (): Promise<BatssSavedResult | null> => {
-    return ipcRenderer.invoke('batss:loadResult')
+  loadResult: (): Promise<StudyDesign | null> => {
+    return ipcRenderer.invoke('albatross:loadResult')
   },
 
   // Streamed raw R/INLA output from a batss.glm() run, as it happens.
@@ -59,10 +63,10 @@ const batss = {
       callback(line)
     }
 
-    ipcRenderer.on('batss:log', listener)
+    ipcRenderer.on('simulation:log', listener)
 
     return () => {
-      ipcRenderer.removeListener('batss:log', listener)
+      ipcRenderer.removeListener('simulation:log', listener)
     }
   }
 }
@@ -107,7 +111,7 @@ if (process.contextIsolated) {
 
     contextBridge.exposeInMainWorld('runtime', runtime)
 
-    contextBridge.exposeInMainWorld('batss', batss)
+    contextBridge.exposeInMainWorld('simulation', simulation)
 
     contextBridge.exposeInMainWorld('theme', theme)
 
@@ -126,7 +130,7 @@ if (process.contextIsolated) {
   window.runtime = runtime
 
   // @ts-ignore
-  window.batss = batss
+  window.simulation = simulation
 
   // @ts-ignore
   window.theme = theme

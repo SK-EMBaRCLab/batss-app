@@ -6,10 +6,10 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { BatssSummaryRow } from '@shared/batss-types'
+import { SimulationSummaryRow } from '@shared/simulation-types'
 import type { JSX } from 'react'
 
-export function SummaryTable({ rows }: { rows: BatssSummaryRow[] }): JSX.Element {
+export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): JSX.Element {
   return (
     <Table>
       <TableHeader>
