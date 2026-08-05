@@ -11,9 +11,15 @@ import type {
 
 const api = {}
 
-const runtime = {
-  appVersion: () => ipcRenderer.invoke('app-version'),
+const app = {
+  version: () => ipcRenderer.invoke('app:version'),
 
+  reload: () => ipcRenderer.invoke('app:reload'),
+
+  quit: () => ipcRenderer.invoke('app:quit')
+}
+
+const runtime = {
   check: (): Promise<RuntimeResult> => {
     return ipcRenderer.invoke('runtime:check')
   },
@@ -105,6 +111,8 @@ const settings = {
 
 if (process.contextIsolated) {
   try {
+    contextBridge.exposeInMainWorld('app', app)
+
     contextBridge.exposeInMainWorld('electron', electronAPI)
 
     contextBridge.exposeInMainWorld('api', api)
@@ -120,6 +128,9 @@ if (process.contextIsolated) {
     console.error(error)
   }
 } else {
+  // @ts-ignore
+  window.app = app
+
   // @ts-ignore
   window.electron = electronAPI
 

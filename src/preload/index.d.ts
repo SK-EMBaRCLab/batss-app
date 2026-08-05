@@ -10,11 +10,15 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: unknown
+    app: {
+      version: () => string
+      reload: () => Promise<void>
+      quit: () => Promise<void>
+    }
     runtime: {
       check: () => Promise<RuntimeResult>
       onUpdate: (callback: (update: RuntimeUpdate) => void) => () => void
       onLog: (callback: (line: string) => void) => () => void
-      appVersion: () => string
     }
     simulation: {
       runExample: (input: SimulationRunInput) => Promise<SimulationRunResult>

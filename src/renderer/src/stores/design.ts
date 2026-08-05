@@ -64,6 +64,7 @@ export const useDesign = create<DesignState>((set, get) => ({
         const entry: SimulationResultEntry = {
           id: makeId(),
           createdAt: new Date().toISOString(),
+          input,
           result: response
         }
 

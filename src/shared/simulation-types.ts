@@ -40,6 +40,7 @@ export type SimulationRunResult =
 export interface SimulationResultEntry {
   id: string
   createdAt: string
+  input: SimulationRunInput
   result: SimulationRunResult
 }
 

@@ -85,6 +85,7 @@ export default function Results(): JSX.Element {
   }
 
   const result = selectedEntry?.result
+  const input = selectedEntry?.input
 
   return (
     <div className="flex h-full min-h-0">
@@ -132,25 +133,27 @@ export default function Results(): JSX.Element {
             )}
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Simulation Design</CardTitle>
-            </CardHeader>
+          {input && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Simulation Design</CardTitle>
+              </CardHeader>
 
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <Parameter label="Primary Outcome" value={design.input.primaryOutcome} />
-                <Parameter label="Probability" value={design.input.probability} />
-                <Parameter label="Log Odds" value={design.input.logOdds} />
-                <Parameter label="Delta Eff" value={design.input.deltaEff} />
-                <Parameter label="Decision Rule (b)" value={design.input.b} />
-                <Parameter label="N" value={design.input.N} />
-                <Parameter label="m0" value={design.input.m0} />
-                <Parameter label="m" value={design.input.m} />
-                <Parameter label="R" value={design.input.R} />
-              </div>
-            </CardContent>
-          </Card>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <Parameter label="Primary Outcome" value={input.primaryOutcome} />
+                  <Parameter label="Probability" value={input.probability} />
+                  <Parameter label="Log Odds" value={input.logOdds} />
+                  <Parameter label="Delta Eff" value={input.deltaEff} />
+                  <Parameter label="Decision Rule (b)" value={input.b} />
+                  <Parameter label="N" value={input.N} />
+                  <Parameter label="m0" value={input.m0} />
+                  <Parameter label="m" value={input.m} />
+                  <Parameter label="R" value={input.R} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {result?.status === 'error' && (
             <Card>

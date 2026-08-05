@@ -95,7 +95,7 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
 
   clearLogs: () => set({ logs: [] }),
   loadAppVersion: async () => {
-    const version = await window.runtime.appVersion()
+    const version = await window.app.version()
 
     set({
       appVersion: version

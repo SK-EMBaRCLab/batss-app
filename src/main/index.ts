@@ -10,6 +10,7 @@ import { SimulationService } from './services/simulation.service'
 import { settingsService } from './services/settings.service'
 import { SimulationRunInput } from '../shared/simulation-types'
 import { registerAlbatrossFilesIPC } from './ipc/albatross-files.ipc'
+import { registerAppIPC } from './ipc/app.ipc'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -101,6 +102,9 @@ app.whenReady().then(() => {
 
   ipcMain.on('ping', () => console.log('pong'))
 
+  // App IPC
+  registerAppIPC()
+
   // Runtime bootstrap IPC
   registerRuntimeIPC()
 
@@ -116,10 +120,6 @@ app.whenReady().then(() => {
     return await simulationService.runExample(input, (line) => {
       event.sender.send('simulation:log', line)
     })
-  })
-
-  ipcMain.handle('app-version', () => {
-    return app.getVersion()
   })
 
   app.setName('albatross')

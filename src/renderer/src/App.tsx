@@ -10,6 +10,7 @@ import { RuntimeScreen } from '@/components/runtime-screen'
 import { WelcomeScreen } from '@/components/welcome-screen'
 import { useTheme } from '@/stores/theme'
 import { useDesign } from './stores/design'
+import { ViewErrorBoundary } from './components/view-error-boundary'
 
 export default function App(): JSX.Element {
   const currentView = useNavigation((state) => state.currentView)
@@ -40,18 +41,20 @@ export default function App(): JSX.Element {
 
   return (
     <AppLayout>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentView}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.12 }}
-          className="flex h-full min-h-0 flex-1 flex-col"
-        >
-          {views[currentView]}
-        </motion.div>
-      </AnimatePresence>
+      <ViewErrorBoundary resetKeys={[currentView]}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.12 }}
+            className="flex h-full min-h-0 flex-1 flex-col"
+          >
+            {views[currentView]}
+          </motion.div>
+        </AnimatePresence>
+      </ViewErrorBoundary>
     </AppLayout>
   )
 }
