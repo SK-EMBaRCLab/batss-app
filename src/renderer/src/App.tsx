@@ -31,6 +31,16 @@ export default function App(): JSX.Element {
     initializeTheme()
   }, [initializeTheme])
 
+  useEffect(() => {
+    const cleanup = window.design.onSaveRequested(async () => {
+      await useDesign.getState().saveDesign()
+
+      window.design.closeConfirmed()
+    })
+
+    return cleanup
+  }, [])
+
   if (status === 'checking' || status === 'installing') {
     return <RuntimeScreen />
   }

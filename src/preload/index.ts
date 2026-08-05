@@ -1,5 +1,3 @@
-// src/preload/index.ts
-
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
@@ -51,16 +49,42 @@ const runtime = {
   }
 }
 
-const simulation = {
-  runExample: (input: SimulationRunInput): Promise<SimulationRunResult> => {
-    return ipcRenderer.invoke('simulation:example', input)
+const design = {
+  setDirty: (dirty: boolean) => {
+    ipcRenderer.send('design:dirty', dirty)
   },
 
   saveResult: (data: StudyDesign): Promise<boolean> =>
-    ipcRenderer.invoke('albatross:saveResult', data),
+    ipcRenderer.invoke('design:saveResult', data),
 
   loadResult: (): Promise<StudyDesign | null> => {
-    return ipcRenderer.invoke('albatross:loadResult')
+    return ipcRenderer.invoke('design:loadResult')
+  },
+
+  onSaveRequested: (callback: () => void) => {
+    const listener = (): void => {
+      callback()
+    }
+
+    ipcRenderer.on('design:save-requested', listener)
+
+    return () => {
+      ipcRenderer.removeListener('design:save-requested', listener)
+    }
+  },
+
+  closeConfirmed: () => {
+    ipcRenderer.send('design:close-confirmed')
+  },
+
+  canLeave: (): Promise<boolean | 'save'> => {
+    return ipcRenderer.invoke('design:can-leave')
+  }
+}
+
+const simulation = {
+  runSimulation: (input: SimulationRunInput): Promise<SimulationRunResult> => {
+    return ipcRenderer.invoke('simulation:run', input)
   },
 
   // Streamed raw R/INLA output from a batss.glm() run, as it happens.
@@ -119,6 +143,8 @@ if (process.contextIsolated) {
 
     contextBridge.exposeInMainWorld('runtime', runtime)
 
+    contextBridge.exposeInMainWorld('design', design)
+
     contextBridge.exposeInMainWorld('simulation', simulation)
 
     contextBridge.exposeInMainWorld('theme', theme)
@@ -139,6 +165,9 @@ if (process.contextIsolated) {
 
   // @ts-ignore
   window.runtime = runtime
+
+  // @ts-ignore
+  window.design = design
 
   // @ts-ignore
   window.simulation = simulation

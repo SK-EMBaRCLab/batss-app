@@ -10,7 +10,7 @@ import { Field, FieldContent, FieldError, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 
 export function WelcomeScreen(): JSX.Element {
-  const startNewDesign = useDesign((s) => s.startNewDesign)
+  const newDesign = useDesign((s) => s.newDesign)
   const loadDesign = useDesign((s) => s.loadDesign)
   const navigate = useNavigation((s) => s.navigate)
 
@@ -26,7 +26,7 @@ export function WelcomeScreen(): JSX.Element {
       return
     }
 
-    startNewDesign(initialDesignInput, trimmed)
+    newDesign(initialDesignInput, trimmed)
     navigate('simulation')
   }
   const handleLoad = async (): Promise<void> => {

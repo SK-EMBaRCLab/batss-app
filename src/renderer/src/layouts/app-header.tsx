@@ -18,12 +18,13 @@ export function AppHeader(): JSX.Element {
   const setTheme = useTheme((state) => state.setTheme)
   const design = useDesign((s) => s.design)
   const renameDesign = useDesign((s) => s.renameDesign)
-  const startNewDesign = useDesign((s) => s.startNewDesign)
+  const newDesign = useDesign((s) => s.newDesign)
   const saveDesign = useDesign((s) => s.saveDesign)
   const loadDesign = useDesign((s) => s.loadDesign)
+  const isDirty = useDesign((state) => state.isDirty)
 
-  const handleNew = (): void => {
-    startNewDesign(initialDesignInput)
+  const handleNew = async (): Promise<void> => {
+    await newDesign(initialDesignInput)
     navigate('simulation')
   }
 
@@ -44,6 +45,7 @@ export function AppHeader(): JSX.Element {
           <>
             <Separator orientation="vertical" className="h-5" />
             <EditableDesignName name={design.name} onRename={renameDesign} />
+            {isDirty && <span className="size-2 rounded-full bg-primary" title="Unsaved changes" />}
           </>
         )}
       </div>
@@ -59,8 +61,8 @@ export function AppHeader(): JSX.Element {
           Load
         </Button>
 
-        {design && design.results.length > 0 && (
-          <Button variant="destructive" size="sm" onClick={saveDesign}>
+        {design && (
+          <Button variant="ghost" size="sm" onClick={saveDesign} disabled={!isDirty}>
             <Save />
             Save
           </Button>

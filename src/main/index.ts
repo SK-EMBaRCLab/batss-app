@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, screen, nativeTheme } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen, nativeTheme, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
@@ -9,10 +9,15 @@ import { registerSettingsIPC } from './ipc/settings.ipc'
 import { SimulationService } from './services/simulation.service'
 import { settingsService } from './services/settings.service'
 import { SimulationRunInput } from '../shared/simulation-types'
-import { registerAlbatrossFilesIPC } from './ipc/albatross-files.ipc'
+import {
+  clearUnsavedDesignChanges,
+  hasUnsavedDesignChanges,
+  registerAlbatrossFilesIPC
+} from './ipc/albatross-files.ipc'
 import { registerAppIPC } from './ipc/app.ipc'
 
 let mainWindow: BrowserWindow | null = null
+let forceClose = false
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('ozone-platform', 'x11')
@@ -60,6 +65,39 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
+  })
+
+  mainWindow.on('close', async (event) => {
+    if (forceClose) {
+      return
+    }
+
+    if (!hasUnsavedDesignChanges()) {
+      return
+    }
+
+    event.preventDefault()
+
+    const result = await dialog.showMessageBox(mainWindow!, {
+      type: 'warning',
+      title: 'Unsaved Design',
+      message: 'Your design has unsaved changes.',
+      detail: 'Do you want to save before closing?',
+      buttons: ['Save', 'Discard', 'Cancel'],
+      cancelId: 2
+    })
+
+    switch (result.response) {
+      case 0:
+        mainWindow?.webContents.send('design:save-requested')
+        break
+
+      case 1:
+        clearUnsavedDesignChanges()
+        forceClose = true
+        mainWindow?.close()
+        break
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -114,9 +152,17 @@ app.whenReady().then(() => {
   // Albatross save load results
   registerAlbatrossFilesIPC()
 
-  ipcMain.removeHandler('simulation:example')
+  ipcMain.on('design:close-confirmed', () => {
+    clearUnsavedDesignChanges()
 
-  ipcMain.handle('simulation:example', async (event, input: SimulationRunInput) => {
+    forceClose = true
+
+    mainWindow?.close()
+  })
+
+  ipcMain.removeHandler('simulation:run')
+
+  ipcMain.handle('simulation:run', async (event, input: SimulationRunInput) => {
     return await simulationService.runExample(input, (line) => {
       event.sender.send('simulation:log', line)
     })

@@ -38,6 +38,7 @@ export default function Dashboard(): JSX.Element {
   const saveDesign = useDesign((s) => s.saveDesign)
   const selectResult = useDesign((s) => s.selectResult)
   const navigate = useNavigation((s) => s.navigate)
+  const isDirty = useDesign((state) => state.isDirty)
 
   const recentRuns = useMemo(() => [...(design?.results ?? [])].reverse().slice(0, 5), [design])
 
@@ -73,7 +74,7 @@ export default function Dashboard(): JSX.Element {
             <Badge variant="secondary">
               {design.results.length} run{design.results.length === 1 ? '' : 's'}
             </Badge>
-            <Button size="sm" onClick={saveDesign}>
+            <Button size="sm" onClick={saveDesign} disabled={!isDirty}>
               <Save className="mr-1.5 h-4 w-4" />
               Save
             </Button>

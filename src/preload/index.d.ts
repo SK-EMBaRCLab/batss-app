@@ -20,10 +20,16 @@ declare global {
       onUpdate: (callback: (update: RuntimeUpdate) => void) => () => void
       onLog: (callback: (line: string) => void) => () => void
     }
-    simulation: {
-      runExample: (input: SimulationRunInput) => Promise<SimulationRunResult>
+    design: {
+      setDirty: (dirty: boolean) => void
       saveResult: (data: StudyDesign) => Promise<boolean>
       loadResult: () => Promise<StudyDesign | null>
+      onSaveRequested: (callback: () => void) => () => void
+      closeConfirmed: () => void
+      canLeave: () => Promise<boolean | 'save'>
+    }
+    simulation: {
+      runSimulation: (input: SimulationRunInput) => Promise<SimulationRunResult>
       onLog: (callback: (line: string) => void) => () => void
     }
     theme: {

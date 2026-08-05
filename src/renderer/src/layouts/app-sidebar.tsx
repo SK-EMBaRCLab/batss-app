@@ -15,7 +15,6 @@ import {
 import { useNavigation } from '@/stores/navigation'
 import { navigationItems } from '@/config/navigation'
 import { GalleryVerticalEnd } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { useDesign } from '@/stores/design'
 
@@ -63,12 +62,16 @@ export function AppSidebar(): JSX.Element {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {isRunning && (
-          <Badge>
-            <Spinner data-icon="inline-start" />
-            Running
-          </Badge>
-        )}
+        <SidebarMenu>
+          {isRunning && (
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip="Simulation running">
+                <Spinner />
+                <span>Running</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
