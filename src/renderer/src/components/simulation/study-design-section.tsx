@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { Field as FormischField, useField } from '@formisch/react'
 import {
   Field as ShadcnField,
@@ -29,7 +29,7 @@ const primaryOutcomes = [
   }
 ]
 
-export function StudyDesignSection({ form }: { form: SimulationFormStore }): JSX.Element {
+export function StudyDesignSection({ form }: { form: SimulationFormStore }): ReactElement {
   const outcome = useField(form, { path: ['primaryOutcome'] })
   const probability = useField(form, { path: ['probability'] })
   const logOdds = useField(form, { path: ['logOdds'] })

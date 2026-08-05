@@ -1,4 +1,4 @@
-import { JSX, useEffect, useRef } from 'react'
+import { type ReactElement, useEffect, useRef } from 'react'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatDuration } from '@/lib/utils'
@@ -9,7 +9,7 @@ type LogPanelProps = {
   elapsedSeconds: number
 }
 
-export function LogPanel({ logs, isRunning, elapsedSeconds }: LogPanelProps): JSX.Element {
+export function LogPanel({ logs, isRunning, elapsedSeconds }: LogPanelProps): ReactElement {
   const logScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

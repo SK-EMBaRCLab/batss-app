@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
@@ -15,7 +15,7 @@ export function FormSection({
   summary?: string
   children: React.ReactNode
   defaultOpen?: boolean
-}): JSX.Element {
+}): ReactElement {
   const [open, setOpen] = useState(defaultOpen)
 
   return (

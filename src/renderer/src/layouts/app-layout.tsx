@@ -1,11 +1,11 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 import { AppSidebar } from '@/layouts/app-sidebar'
 import { AppHeader } from '@/layouts/app-header'
 import { AppBanner } from '@/layouts/app-banner'
 
-export function AppLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export function AppLayout({ children }: { children: React.ReactNode }): ReactElement {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -15,7 +15,7 @@ export function AppLayout({ children }: { children: React.ReactNode }): JSX.Elem
 
         <AppBanner />
 
-        <main className="min-h-0 flex-1 overflow-hidden p-6">{children}</main>
+        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )

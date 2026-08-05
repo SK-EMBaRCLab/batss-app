@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import type { ReactElement } from 'react'
 import { Field as ShadcnField, FieldError, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 
@@ -11,7 +11,7 @@ export function NumberInputField({
   label: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field: any
-}): JSX.Element {
+}): ReactElement {
   return (
     <ShadcnField data-invalid={field.errors !== null}>
       <FieldLabel>{label}</FieldLabel>

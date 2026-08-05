@@ -1,4 +1,4 @@
-import { JSX, useEffect, useRef } from 'react'
+import { type ReactElement, useEffect, useRef } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -10,7 +10,7 @@ import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
 
 import { useRuntime } from '@/stores/runtime'
 
-export function RuntimeScreen(): JSX.Element {
+export function RuntimeScreen(): ReactElement {
   const status = useRuntime((state) => state.status)
 
   const message = useRuntime((state) => state.message)

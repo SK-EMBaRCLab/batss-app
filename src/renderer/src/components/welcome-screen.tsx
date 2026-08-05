@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 import { FilePlus2, FolderOpen } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import { initialDesignInput } from '@/lib/schema'
 import { Field, FieldContent, FieldError, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 
-export function WelcomeScreen(): JSX.Element {
+export function WelcomeScreen(): ReactElement {
   const newDesign = useDesign((s) => s.newDesign)
   const loadDesign = useDesign((s) => s.loadDesign)
   const navigate = useNavigation((s) => s.navigate)

@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +11,7 @@ import {
 import { navigationItems } from '@/config/navigation'
 import { useNavigation } from '@/stores/navigation'
 
-export function AppBreadcrumb(): JSX.Element {
+export function AppBreadcrumb(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
 
@@ -21,14 +21,18 @@ export function AppBreadcrumb(): JSX.Element {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink render={<a onClick={() => navigate('dashboard')} />}>Home</BreadcrumbLink>
+          <BreadcrumbLink render={<a onClick={() => navigate('dashboard')} />}>
+            Dashboard
+          </BreadcrumbLink>
         </BreadcrumbItem>
-
-        <BreadcrumbSeparator />
-
-        <BreadcrumbItem>
-          <BreadcrumbPage>{currentItem?.title}</BreadcrumbPage>
-        </BreadcrumbItem>
+        {currentItem?.title !== 'Dashboard' && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{currentItem?.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </>
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   )

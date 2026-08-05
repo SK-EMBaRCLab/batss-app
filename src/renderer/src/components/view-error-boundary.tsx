@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ViewError } from './view-error'
 
@@ -7,7 +7,7 @@ type Props = {
   resetKeys?: unknown[]
 }
 
-export function ViewErrorBoundary({ children, resetKeys }: Props): JSX.Element {
+export function ViewErrorBoundary({ children, resetKeys }: Props): ReactElement {
   return (
     <ErrorBoundary
       FallbackComponent={ViewError}

@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { Form, useForm } from '@formisch/react'
 import type { SubmitHandler } from '@formisch/react'
 
@@ -14,7 +14,7 @@ type BatssFormProps = {
   initialInput?: SimulationRunInput
 }
 
-export function SimulationForm({ onRun, initialInput }: BatssFormProps): JSX.Element {
+export function SimulationForm({ onRun, initialInput }: BatssFormProps): ReactElement {
   const form = useForm({
     schema: designSchema,
     validate: 'blur',

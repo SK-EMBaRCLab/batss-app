@@ -1,11 +1,11 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-export function ViewError({ error, resetErrorBoundary }: FallbackProps): JSX.Element {
+export function ViewError({ error, resetErrorBoundary }: FallbackProps): ReactElement {
   return (
     <div className="flex h-full items-center justify-center p-8">
       <Card className="w-full max-w-lg">

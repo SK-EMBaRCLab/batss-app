@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
@@ -12,7 +12,7 @@ import { useNavigation } from '@/stores/navigation'
 import { Button } from '@/components/ui/button'
 import { Play } from 'lucide-react'
 
-export default function Simulation(): JSX.Element {
+export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const design = useDesign((s) => s.design)
   const isRunning = useDesign((s) => s.isRunning)

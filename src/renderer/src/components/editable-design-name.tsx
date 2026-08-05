@@ -1,4 +1,4 @@
-import { JSX, useCallback, useState } from 'react'
+import { type ReactElement, useCallback, useState } from 'react'
 import { Pencil } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ export function EditableDesignName({
   name: string
   onRename: (name: string) => void
   className?: string
-}): JSX.Element {
+}): ReactElement {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(name)
 

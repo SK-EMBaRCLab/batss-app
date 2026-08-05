@@ -2,10 +2,10 @@ import { Field as FormischField, useField } from '@formisch/react'
 
 import { FormSection } from '../form-section'
 import { NumberInputField } from '../number-input-field'
-import type { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { SimulationFormStore } from '../types'
 
-export function DecisionRuleSection({ form }: { form: SimulationFormStore }): JSX.Element {
+export function DecisionRuleSection({ form }: { form: SimulationFormStore }): ReactElement {
   const deltaEff = useField(form, { path: ['deltaEff'] })
   const b = useField(form, { path: ['b'] })
 

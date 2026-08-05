@@ -1,4 +1,4 @@
-import { JSX, useEffect } from 'react'
+import { type ReactElement, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 import { AppLayout } from '@/layouts/app-layout'
@@ -11,8 +11,10 @@ import { WelcomeScreen } from '@/components/welcome-screen'
 import { useTheme } from '@/stores/theme'
 import { useDesign } from './stores/design'
 import { ViewErrorBoundary } from './components/view-error-boundary'
+import { CommandPalette } from './components/command-palette'
+import { useCommandShortcuts } from './hooks/use-command-shortcuts'
 
-export default function App(): JSX.Element {
+export default function App(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
 
   const status = useRuntime((state) => state.status)
@@ -22,6 +24,8 @@ export default function App(): JSX.Element {
   const initialize = useRuntime((state) => state.initialize)
 
   const initializeTheme = useTheme((state) => state.initialize)
+
+  useCommandShortcuts()
 
   useEffect(() => {
     initialize()
@@ -50,21 +54,24 @@ export default function App(): JSX.Element {
   }
 
   return (
-    <AppLayout>
-      <ViewErrorBoundary resetKeys={[currentView]}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentView}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.12 }}
-            className="flex h-full min-h-0 flex-1 flex-col"
-          >
-            {views[currentView]}
-          </motion.div>
-        </AnimatePresence>
-      </ViewErrorBoundary>
-    </AppLayout>
+    <>
+      <CommandPalette />
+      <AppLayout>
+        <ViewErrorBoundary resetKeys={[currentView]}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.12 }}
+              className="flex h-full min-h-0 flex-1 flex-col"
+            >
+              {views[currentView]}
+            </motion.div>
+          </AnimatePresence>
+        </ViewErrorBoundary>
+      </AppLayout>
+    </>
   )
 }

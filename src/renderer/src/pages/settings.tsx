@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 import { FolderOpen } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -6,7 +6,7 @@ import { Field, FieldLabel, FieldDescription, FieldContent } from '@/components/
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-export default function Settings(): JSX.Element {
+export default function Settings(): ReactElement {
   const [outputPath, setOutputPath] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)

@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, CheckCircle2, Info, Loader2, Siren, X } from 'lucide-react'
@@ -52,7 +52,7 @@ export function Banner({
   dismissible,
   onDismiss,
   className
-}: BannerProps): JSX.Element {
+}: BannerProps): ReactElement {
   const Icon = variants[variant].icon
 
   return (

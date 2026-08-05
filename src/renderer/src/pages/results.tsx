@@ -1,4 +1,4 @@
-import { JSX, useMemo, useRef, useState } from 'react'
+import { type ReactElement, useMemo, useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,7 +29,7 @@ import { useNavigation } from '@/stores/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
-export default function Results(): JSX.Element {
+export default function Results(): ReactElement {
   const [options, setOptions] = useState({
     reference: true
   })
@@ -88,15 +88,15 @@ export default function Results(): JSX.Element {
   const input = selectedEntry?.input
 
   return (
-    <div className="flex h-full min-h-0">
+    <div className="flex h-full min-h-0 overflow-hidden p-6">
       {/* Run history for this design */}
-      <div className="w-64 shrink-0 border-r border-border p-4">
+      <div className="flex h-full w-64 shrink-0 flex-col border-r border-border p-4">
         <h2 className="mb-1 truncate text-sm font-semibold">{design.name}</h2>
         <p className="mb-4 text-xs text-muted-foreground">
           {design.results.length} run{design.results.length === 1 ? '' : 's'}
         </p>
 
-        <ScrollArea className="h-[calc(100%-3rem)]">
+        <ScrollArea className="min-h-0 flex-1">
           <div className="flex flex-col gap-2 pr-2">
             {[...design.results].reverse().map((entry) => (
               <button
@@ -118,7 +118,7 @@ export default function Results(): JSX.Element {
       </div>
 
       {/* Selected run detail */}
-      <div className="h-full min-h-0 flex-1 overflow-auto p-6">
+      <div className="min-h-0 flex-1 overflow-y-auto p-6">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
@@ -227,7 +227,7 @@ export default function Results(): JSX.Element {
   )
 }
 
-function Parameter({ label, value }: { label: string; value: string | number }): JSX.Element {
+function Parameter({ label, value }: { label: string; value: string | number }): ReactElement {
   return (
     <div>
       <p className="text-sm text-muted-foreground">{label}</p>

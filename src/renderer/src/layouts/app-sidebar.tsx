@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import {
   Sidebar,
   SidebarContent,
@@ -18,7 +18,7 @@ import { GalleryVerticalEnd } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { useDesign } from '@/stores/design'
 
-export function AppSidebar(): JSX.Element {
+export function AppSidebar(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
   const isRunning = useDesign((s) => s.isRunning)

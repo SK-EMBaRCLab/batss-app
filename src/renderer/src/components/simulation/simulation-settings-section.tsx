@@ -1,10 +1,10 @@
 import { Field as FormischField, useField } from '@formisch/react'
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import { NumberInputField } from '../number-input-field'
 import { SimulationFormStore } from '../types'
 import { FormSection } from '../form-section'
 
-export function SimulationSettingsSection({ form }: { form: SimulationFormStore }): JSX.Element {
+export function SimulationSettingsSection({ form }: { form: SimulationFormStore }): ReactElement {
   const N = useField(form, { path: ['N'] })
   const m0 = useField(form, { path: ['m0'] })
   const m = useField(form, { path: ['m'] })

@@ -7,9 +7,9 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { SimulationSummaryRow } from '@shared/simulation-types'
-import type { JSX } from 'react'
+import type { ReactElement } from 'react'
 
-export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): JSX.Element {
+export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactElement {
   return (
     <Table>
       <TableHeader>

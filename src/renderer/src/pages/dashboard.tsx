@@ -1,4 +1,4 @@
-import { JSX, useMemo } from 'react'
+import { type ReactElement, useMemo } from 'react'
 import {
   BarChart3,
   CheckCircle2,
@@ -33,7 +33,7 @@ import {
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 
-export default function Dashboard(): JSX.Element {
+export default function Dashboard(): ReactElement {
   const design = useDesign((s) => s.design)
   const saveDesign = useDesign((s) => s.saveDesign)
   const selectResult = useDesign((s) => s.selectResult)
@@ -242,7 +242,7 @@ export default function Dashboard(): JSX.Element {
   )
 }
 
-function Parameter({ label, value }: { label: string; value: string | number }): JSX.Element {
+function Parameter({ label, value }: { label: string; value: string | number }): ReactElement {
   return (
     <div>
       <p className="text-sm text-muted-foreground">{label}</p>

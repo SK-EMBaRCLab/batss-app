@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
@@ -29,7 +29,7 @@ export function ResultsBarChart({
 }: {
   data: SimulationChartRow[]
   showRefLines: boolean
-}): JSX.Element {
+}): ReactElement {
   const chartData = ['H0', 'H1'].map((scenario) => ({
     scenario,
     superior:

@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import { type ReactElement } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import { AlertTriangle, Copy, RefreshCw } from 'lucide-react'
 
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
 
-export function AppError({ error, resetErrorBoundary }: FallbackProps): JSX.Element {
+export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactElement {
   const copy = async (): Promise<void> => {
     await navigator.clipboard.writeText(
       `${error.name}

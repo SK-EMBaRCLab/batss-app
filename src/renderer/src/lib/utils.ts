@@ -20,3 +20,32 @@ export function formatDuration(seconds: number): string {
 
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
+
+export function formatShortcut(binding: string): string {
+  const isMac = navigator.userAgent.includes('Mac')
+
+  const parts = binding.split('+')
+
+  const formatted = parts.map((part) => {
+    switch (part) {
+      case 'mod':
+        return isMac ? '⌘' : 'Ctrl'
+      case 'shift':
+        return isMac ? '⇧' : 'Shift'
+      case 'alt':
+        return isMac ? '⌥' : 'Alt'
+      case 'enter':
+        return isMac ? '↵' : 'Enter'
+      case 'backspace':
+        return isMac ? '⌫' : 'Backspace'
+      case 'delete':
+        return isMac ? '⌦' : 'Delete'
+      case 'escape':
+        return isMac ? '⎋' : 'Esc'
+      default:
+        return part.length === 1 ? part.toUpperCase() : part
+    }
+  })
+
+  return isMac ? formatted.join('') : formatted.join('+')
+}
