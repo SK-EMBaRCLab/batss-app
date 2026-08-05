@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.5...v2.0.0) (2026-08-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* add design concept that can have multiple simulation results. renamed from batss to more generic simulation for files.
+
+### Features
+
+* add ability to export and save chart as png ([b646539](https://github.com/SK-EMBaRCLab/batss-app/commit/b646539ab500c41e36cd2485c3aab527db8177b6))
+* add chart options ([95e56ca](https://github.com/SK-EMBaRCLab/batss-app/commit/95e56ca7ef8ebf0266c037e0d23ef4852d7b10e1))
+* add design concept that can have multiple simulation results. renamed from batss to more generic simulation for files. ([0765352](https://github.com/SK-EMBaRCLab/batss-app/commit/0765352e670fc6a35449e6b83f1f2a8657f1206b))
+
 ## [1.3.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.4...v1.3.5) (2026-07-28)
 
 ### Bug Fixes
