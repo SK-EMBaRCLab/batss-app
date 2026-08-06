@@ -1,4 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, screen, nativeTheme, dialog } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
@@ -134,6 +135,40 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.albatross')
 
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for updates...')
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    console.log(`Update available: ${info.version}`)
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('No updates available.')
+  })
+
+  autoUpdater.on('download-progress', (progress) => {
+    console.log(`Download: ${progress.percent.toFixed(1)}%`)
+  })
+
+  autoUpdater.on('update-downloaded', async () => {
+    const result = await dialog.showMessageBox({
+      type: 'info',
+      title: 'Update Ready',
+      message: 'A new version has been downloaded.',
+      buttons: ['Restart Now', 'Later'],
+      defaultId: 0
+    })
+
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall()
+    }
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.error('Auto updater error:', err)
+  })
+
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
@@ -196,6 +231,10 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+
+  if (!is.dev) {
+    autoUpdater.checkForUpdatesAndNotify()
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

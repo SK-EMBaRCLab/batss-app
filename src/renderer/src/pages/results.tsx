@@ -88,7 +88,7 @@ export default function Results(): ReactElement {
   const input = selectedEntry?.input
 
   return (
-    <div className="flex h-full min-h-0 overflow-hidden p-6">
+    <div className="flex h-full min-h-0 min-w-0 overflow-hidden p-6">
       {/* Run history for this design */}
       <div className="flex h-full w-64 shrink-0 flex-col border-r border-border p-4">
         <h2 className="mb-1 truncate text-sm font-semibold">{design.name}</h2>
@@ -118,7 +118,7 @@ export default function Results(): ReactElement {
       </div>
 
       {/* Selected run detail */}
-      <div className="min-h-0 flex-1 overflow-y-auto p-6">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
@@ -140,7 +140,7 @@ export default function Results(): ReactElement {
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-3">
                   <Parameter label="Primary Outcome" value={input.primaryOutcome} />
                   <Parameter label="Probability" value={input.probability} />
                   <Parameter label="Log Odds" value={input.logOdds} />

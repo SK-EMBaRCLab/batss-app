@@ -38,12 +38,6 @@ function isEditable(target: EventTarget | null): boolean {
 export function useCommandShortcuts(): void {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
-      console.log({
-        key: event.key,
-        ctrl: event.ctrlKey,
-        meta: event.metaKey,
-        shortcut: eventToShortcut(event)
-      })
       // Ignore normal typing immediately.
       if (!event.metaKey && !event.ctrlKey && !event.altKey) {
         return

@@ -10,12 +10,12 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset className="flex h-screen flex-col">
+      <SidebarInset className="flex min-w-0 h-screen flex-col">
         <AppHeader />
 
         <AppBanner />
 
-        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-hidden">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )

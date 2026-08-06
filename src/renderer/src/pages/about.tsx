@@ -22,8 +22,6 @@ export default function About(): ReactElement {
   const appVersion = useRuntime((state) => state.appVersion)
   const loadAppVersion = useRuntime((state) => state.loadAppVersion)
 
-  console.log(packages)
-
   useEffect(() => {
     loadAppVersion()
   }, [loadAppVersion])
