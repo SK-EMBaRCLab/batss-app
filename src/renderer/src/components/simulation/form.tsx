@@ -117,7 +117,9 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       }}
       className="flex h-full min-h-0 flex-col"
     >
-      <Stepper steps={steps} currentStep={step} />
+      <div className="shrink-0 pb-6">
+        <Stepper steps={steps} currentStep={step} onStepClick={setStep} className="shrink-0 pb-4" />
+      </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-6">{renderStep()}</div>
 
       <div className="flex justify-between border-t pt-4">
