@@ -14,7 +14,7 @@ import { SimulationChartRow } from '@shared/simulation-types'
 
 const chartConfig = {
   superior: {
-    label: 'B Superior',
+    label: 'Experimental Superior',
     color: 'var(--chart-2)'
   },
   inconclusive: {
@@ -30,17 +30,26 @@ export function ResultsBarChart({
   data: SimulationChartRow[]
   showRefLines: boolean
 }): ReactElement {
-  const chartData = ['H0', 'H1'].map((scenario) => ({
+  const chartData = ['Null Effect', 'Target Effect'].map((scenario) => ({
     scenario,
     superior:
-      data.find((x) => x.Scenario === scenario && x.Outcome === 'B Superior')?.Proportion ?? 0,
+      data.find((x) => x.Scenario === scenario && x.Outcome === 'Experimental Superior')
+        ?.Proportion ?? 0,
     inconclusive:
       data.find((x) => x.Scenario === scenario && x.Outcome === 'Inconclusive')?.Proportion ?? 0
   }))
 
   return (
     <ChartContainer config={chartConfig} className="min-h-87.5 w-full">
-      <BarChart data={chartData}>
+      <BarChart
+        data={chartData}
+        margin={{
+          top: 20,
+          right: 160,
+          left: 20,
+          bottom: 20
+        }}
+      >
         <CartesianGrid vertical={false} />
 
         <XAxis dataKey="scenario" />
@@ -73,7 +82,7 @@ export function ResultsBarChart({
               strokeDasharray="6 3"
               label={{
                 value: 'Type I Error Target (5%)',
-                position: 'insideTopRight',
+                position: 'right',
                 fill: 'var(--destructive)',
                 fontSize: 12
               }}
@@ -85,7 +94,7 @@ export function ResultsBarChart({
               strokeDasharray="6 3"
               label={{
                 value: 'Power Target (80%)',
-                position: 'insideTopRight',
+                position: 'right',
                 fill: 'var(--chart-3)',
                 fontSize: 12
               }}

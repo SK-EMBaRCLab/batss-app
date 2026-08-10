@@ -1,16 +1,17 @@
 import { type ReactElement, useEffect, useState } from 'react'
+import * as v from 'valibot'
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-
-import type { SimulationRunInput } from '@shared/simulation-types'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDuration } from '@/lib/utils'
 import { SimulationForm } from '@/components/simulation/form'
 import { LogPanel } from '@/components/simulation/log-panel'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 import { Button } from '@/components/ui/button'
-import { Play } from 'lucide-react'
+import { CollapsibleContent, Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { ChevronDown } from 'lucide-react'
+import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
+import { runnableDesignSchema } from '@/lib/schema'
 
 export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
@@ -18,6 +19,7 @@ export default function Simulation(): ReactElement {
   const isRunning = useDesign((s) => s.isRunning)
   const runSimulation = useDesign((s) => s.runSimulation)
   const [logs, setLogs] = useState<string[]>([])
+  const [logsOpen, setLogsOpen] = useState(false)
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
 
@@ -29,15 +31,26 @@ export default function Simulation(): ReactElement {
     return unsubscribe
   }, [])
 
-  const handleRun = async (input: SimulationRunInput): Promise<void> => {
+  const handleRun = async (input: DesignInput): Promise<void> => {
+    setLogsOpen(true)
     setLogs([])
     setElapsedSeconds(0)
 
+    const parsed = v.safeParse(runnableDesignSchema, input)
+    if (!parsed.success) {
+      // Handle validation errors here
+      setLogs(['> Cannot run simulation', '> Please complete all required fields.'])
+      return
+    }
+
+    const runnableInput: SimulationRunInput = parsed.output
+
     setLogs([
       '> Starting BATSS simulation',
-      `> Parameters: N=${input.N}, R=${input.R}, m0=${input.m0}, m=${input.m}`,
-      `> Probability=${input.probability}, logOdds=${input.logOdds}`,
-      `> Decision rule: b=${input.b}, deltaEff=${input.deltaEff}`,
+      `> Outcome: ${runnableInput.outcomeType}`,
+      `> Sample size: N=${runnableInput.N}, m0=${runnableInput.m0}, m=${runnableInput.m}`,
+      `> Simulation runs: ${runnableInput.R}`,
+      `> Decision rules: ${runnableInput.decisionRules.length}`,
       ''
     ])
 
@@ -48,7 +61,7 @@ export default function Simulation(): ReactElement {
     }, 100)
 
     try {
-      const response = await runSimulation(input)
+      const response = await runSimulation(runnableInput)
 
       if (response.status === 'success') {
         navigate('results')
@@ -64,54 +77,45 @@ export default function Simulation(): ReactElement {
   }
 
   return (
-    <div className="relative h-full min-h-0">
-      <ResizablePanelGroup orientation="vertical" className="h-full">
-        <ResizablePanel defaultSize="50%" minSize="20%">
-          <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden p-6">
-            <Card className="min-h-0 flex-1 overflow-hidden flex flex-col">
-              <CardHeader>
-                <CardTitle>
-                  {design?.name ?? 'BATSS Simulation Design'}
-                  {design && design.results.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-muted-foreground">
-                      · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="min-h-0 flex-1 overflow-hidden">
-                <SimulationForm onRun={handleRun} initialInput={design?.input} />
-              </CardContent>
-              <CardFooter>
-                <Button
-                  type="submit"
-                  form="simulation-form"
-                  disabled={isRunning}
-                  className="w-full"
-                >
-                  <Play
-                    className={`mr-2 h-5 w-5 transition-transform ${
-                      isRunning ? 'animate-pulse scale-110' : ''
-                    }`}
+    <div className="flex h-full min-h-0 flex-col gap-4 p-6">
+      <Card className="flex min-h-0 flex-1 flex-col">
+        <CardHeader className="shrink-0">
+          <CardTitle>
+            {design?.name ?? 'BATSS Simulation Design'}
+            {design && design.results.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="min-h-0 flex-1 overflow-hidden">
+          <SimulationForm onRun={handleRun} initialInput={design?.input} />
+        </CardContent>
+      </Card>
+      <Card className="shrink-0">
+        <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Simulation Log</CardTitle>
+
+            <CollapsibleTrigger
+              render={
+                <Button variant="ghost" size="icon">
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${logsOpen ? 'rotate-180' : ''}`}
                   />
-                  {isRunning ? `Running… ${elapsedSeconds.toFixed(1)} s` : `Run Simulation`}
                 </Button>
-              </CardFooter>
-            </Card>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel minSize="10%" defaultSize="20%">
-          <div className="flex h-full min-h-0 flex-col gap-4 p-4">
-            <div className="flex justify-between">
-              <h2 className="text-lg font-semibold">Simulation Log</h2>
-            </div>
-            <div className="min-h-0 flex-1">
+              }
+            ></CollapsibleTrigger>
+          </CardHeader>
+
+          <CollapsibleContent>
+            <CardContent className="h-64 overflow-hidden">
               <LogPanel logs={logs} isRunning={isRunning} elapsedSeconds={elapsedSeconds} />
-            </div>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </Card>
     </div>
   )
 }

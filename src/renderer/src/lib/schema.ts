@@ -1,5 +1,7 @@
+import { DesignInput } from '@shared/simulation-types'
 import * as v from 'valibot'
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const requiredNumber = (label: string) =>
   v.pipe(
     v.union([v.string(), v.number()]),
@@ -17,38 +19,117 @@ export const requiredNumber = (label: string) =>
     v.number(`${label} must be a number.`)
   )
 
-export const designSchema = v.object({
-  primaryOutcome: v.picklist(['A', 'B'], 'Please select A (positive) or B (negative).'),
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const positiveInteger = (label: string) =>
+  v.pipe(
+    requiredNumber(label),
+    v.integer(`${label} must be a whole number.`),
+    v.minValue(1, `${label} must be greater than 0.`)
+  )
 
-  probability: v.pipe(
-    requiredNumber('Probability'),
-    v.minValue(0, 'Probability must be at least 0.'),
-    v.maxValue(1, 'Probability must be at most 1.')
-  ),
+/**
+ * Decision rules
+ */
+const decisionRuleSchema = v.object({
+  type: v.picklist(['superiority', 'futility'], 'Select a decision rule type.'),
 
-  logOdds: requiredNumber('logOdds'),
+  direction: v.picklist(['greater', 'less'], 'Select greater than or less than.'),
 
-  deltaEff: requiredNumber('Delta efficiency'),
+  margin: v.pipe(requiredNumber('Superiority margin'), v.minValue(0, 'Margin must be positive.')),
 
-  b: requiredNumber('b'),
-
-  N: v.pipe(requiredNumber('Maximum sample size'), v.integer(), v.minValue(1), v.maxValue(1000)),
-
-  m0: v.pipe(requiredNumber('Burn-in'), v.integer(), v.minValue(1)),
-
-  m: v.pipe(requiredNumber('Patients between interim analyses'), v.integer(), v.minValue(1)),
-
-  R: v.pipe(requiredNumber('Number of simulations'), v.integer(), v.minValue(1))
+  threshold: v.pipe(
+    requiredNumber('Decision threshold'),
+    v.minValue(0, 'Threshold must be at least 0.'),
+    v.maxValue(1, 'Threshold must be at most 1.')
+  )
 })
 
-export const initialDesignInput = {
-  primaryOutcome: 'A',
-  probability: 0.1,
-  logOdds: 0.2,
-  deltaEff: 0.05,
-  b: 0.2,
+export const designSchema = v.pipe(
+  v.object({
+    /**
+     * Outcome definition
+     */
+    outcomeType: v.optional(
+      v.picklist(['binary', 'continuous', 'ordinal'], 'Select an outcome type.')
+    ),
+
+    /**
+     * Binary outcome fields
+     */
+    probability: v.optional(
+      v.pipe(
+        requiredNumber('Control arm probability'),
+        v.minValue(0, 'Probability must be at least 0.'),
+        v.maxValue(1, 'Probability must be at most 1.')
+      )
+    ),
+
+    treatmentEffectType: v.optional(v.picklist(['oddsRatio', 'riskDifference', 'riskRatio'])),
+
+    treatmentEffect: v.optional(requiredNumber('Treatment effect')),
+
+    /**
+     * Sample size
+     */
+    N: positiveInteger('Maximum sample size'),
+
+    m0: positiveInteger('Burn-in'),
+
+    m: positiveInteger('Patients between interim analyses'),
+
+    /**
+     * Simulation
+     */
+    R: positiveInteger('Number of simulations'),
+
+    /**
+     * Decision rules
+     */
+    decisionRules: v.array(decisionRuleSchema)
+  }),
+
+  /**
+   * Cross-field validation
+   */
+  v.forward(
+    v.check((data) => data.N > data.m0, 'Maximum sample size must be greater than burn-in.'),
+    ['N']
+  )
+)
+
+export const runnableDesignSchema = v.object({
+  outcomeType: v.picklist(['binary', 'continuous', 'ordinal']),
+
+  probability: v.number(),
+
+  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+
+  treatmentEffect: v.number(),
+
+  N: positiveInteger('Maximum sample size'),
+
+  m0: positiveInteger('Burn-in'),
+
+  m: positiveInteger('Patients between interim analyses'),
+
+  R: positiveInteger('Number of simulations'),
+
+  decisionRules: v.array(decisionRuleSchema)
+})
+
+export const initialDesignInput: DesignInput = {
+  outcomeType: undefined,
+
+  probability: undefined,
+
+  treatmentEffectType: undefined,
+  treatmentEffect: undefined,
+
   N: 216,
   m0: 60,
   m: 12,
-  R: 3
-} as const
+
+  R: 10,
+
+  decisionRules: []
+}

@@ -14,20 +14,20 @@ export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactE
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Outcome</TableHead>
-          <TableHead>H0 proportions</TableHead>
-          <TableHead>H1 proportions</TableHead>
+          <TableHead>Trial Outcome</TableHead>
+          <TableHead>Null Effect Scenario</TableHead>
+          <TableHead>Target Effect Scenario</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.Outcome}>
-            <TableCell className="font-medium">{row.Outcome}</TableCell>
+            <TableCell className="font-bold">{row.Outcome}</TableCell>
 
-            <TableCell>{row.H0.toFixed(3)}</TableCell>
+            <TableCell>{row['Null Effect'].toFixed(3)}</TableCell>
 
-            <TableCell>{row.H1.toFixed(3)}</TableCell>
+            <TableCell>{row['Target Effect'].toFixed(3)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

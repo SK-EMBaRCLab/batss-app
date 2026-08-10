@@ -28,6 +28,7 @@ import {
 import { useNavigation } from '@/stores/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { SampleSizeTable } from '@/components/results/sample-size-table'
 
 export default function Results(): ReactElement {
   const [options, setOptions] = useState({
@@ -87,6 +88,13 @@ export default function Results(): ReactElement {
   const result = selectedEntry?.result
   const input = selectedEntry?.input
 
+  const probabilitySymbol = input?.decisionRules[0].direction === 'greater' ? '>' : '<'
+
+  const formula =
+    input?.decisionRules[0].type === 'futility'
+      ? `P(OR ${probabilitySymbol} ${input?.decisionRules[0].margin ?? '1'}) < ${input?.decisionRules[0].threshold ?? '0.05'}`
+      : `P(OR ${probabilitySymbol} ${input?.decisionRules[0].margin ?? '1'}) > ${input?.decisionRules[0].threshold ?? '0.95'}`
+
   return (
     <div className="flex h-full min-h-0 min-w-0 overflow-hidden p-6">
       {/* Run history for this design */}
@@ -136,20 +144,22 @@ export default function Results(): ReactElement {
           {input && (
             <Card>
               <CardHeader>
-                <CardTitle>Simulation Design</CardTitle>
+                <CardTitle>Simulation Design Parameters</CardTitle>
               </CardHeader>
 
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-3">
-                  <Parameter label="Primary Outcome" value={input.primaryOutcome} />
-                  <Parameter label="Probability" value={input.probability} />
-                  <Parameter label="Log Odds" value={input.logOdds} />
-                  <Parameter label="Delta Eff" value={input.deltaEff} />
-                  <Parameter label="Decision Rule (b)" value={input.b} />
-                  <Parameter label="N" value={input.N} />
-                  <Parameter label="m0" value={input.m0} />
-                  <Parameter label="m" value={input.m} />
-                  <Parameter label="R" value={input.R} />
+                  <Parameter label="Outcome Type" value={input.outcomeType} />
+                  <Parameter
+                    label="Probability of outcome in control arm"
+                    value={input.probability}
+                  />
+                  <Parameter label="Odds Ratio" value={input.treatmentEffect} />
+                  <Parameter label="Burn-in (m0)" value={input.m0} />
+                  <Parameter label="Patients between interims" value={input.m} />
+                  <Parameter label="Maximum sample size" value={input.N} />
+                  <Parameter label="Decision Rule" value={formula} />
+                  <Parameter label="Number of simulations" value={input.R} />
                 </div>
               </CardContent>
             </Card>
@@ -168,7 +178,7 @@ export default function Results(): ReactElement {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle>Summary</CardTitle>
+                  <CardTitle>Simulated Trial Outcome Probability Summary by Scenario</CardTitle>
                 </CardHeader>
 
                 <CardContent>
@@ -178,7 +188,9 @@ export default function Results(): ReactElement {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Chart Data</CardTitle>
+                  <CardTitle>
+                    Graphical Summary of Simulated Trial Outcome Probabilities by Scenario
+                  </CardTitle>
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={
@@ -217,6 +229,16 @@ export default function Results(): ReactElement {
                   <div ref={chartRef}>
                     <ResultsBarChart data={result.chart} showRefLines={options.reference} />
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Simulated Sample Size Summary by Scenario</CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                  <SampleSizeTable sampleSize={result.sampleSize} />
                 </CardContent>
               </Card>
             </>

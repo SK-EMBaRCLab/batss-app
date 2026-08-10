@@ -26,7 +26,7 @@ export class SimulationService {
     input: SimulationRunInput,
     onOutput?: OutputListener
   ): Promise<SimulationRunResult> {
-    const alternative = input.primaryOutcome === 'A' ? 'greater' : 'less'
+    const alternative = input.decisionRules[0]?.direction ?? 'greater'
 
     const script = `
       library(BATSS)
@@ -46,8 +46,12 @@ export class SimulationService {
       # logit is a helper function
       logit <- function(p) { log(p / (1 - p)) }
 
-      input <- jsonlite::fromJSON(Sys.getenv("${BATSS_INPUT_ENV}"))
+      input <- jsonlite::fromJSON(Sys.getenv("${BATSS_INPUT_ENV}"), simplifyVector = FALSE)
 
+      rule <- input$decisionRules[[1]]
+
+      delta.eff <- log(rule$margin)
+      b <- rule$threshold
 
       trials <- batss.glm(
         model = y ~ group,
@@ -55,13 +59,13 @@ export class SimulationService {
         link = "logit",
         var = list(y = rbinom, group = alloc.balanced),
         var.control = list(y = list(size = 1)),
-        prob0 = c(A = 1, B = 1),
+        prob0 = c(Control = 1, Experimental = 1),
         alternative = input$alternative,
-        beta = c(logit(input$probability), input$logOdds),
+        beta = c(logit(input$probability), log(input$treatmentEffect)),
         which = 2,
         eff.arm = eff.arm.simple,
-        eff.arm.control = list(b = input$b),
-        delta.eff = input$deltaEff,
+        eff.arm.control = list(b = b),
+        delta.eff = delta.eff,
         fut.arm = NULL,
         N = input$N,
         interim = list(recruited = list(m0 = input$m0, m = input$m)),
@@ -74,13 +78,13 @@ export class SimulationService {
 
       df <- rbind(
         data.frame(
-          Scenario = "H0",
-          Outcome = summary1$H0$scenario$groupB,
+          Scenario = "Null Effect",
+          Outcome = summary1$H0$scenario$groupExperimental,
           Proportion = summary1$H0$scenario$overall
         ),
         data.frame(
-          Scenario = "H1",
-          Outcome = summary1$H1$scenario$groupB,
+          Scenario = "Target Effect",
+          Outcome = summary1$H1$scenario$groupExperimental,
           Proportion = summary1$H1$scenario$overall
         )
       )
@@ -88,12 +92,12 @@ export class SimulationService {
       df$Outcome <- factor(
         df$Outcome,
         levels = c(0, 1),
-        labels = c("Inconclusive", "B Superior")
+        labels = c("Inconclusive", "Experimental Superior")
       )
 
 
       # reshape to frontend table:
-      # Outcome | H0 proportions | H1 proportions
+      # Outcome | Null Effect proportions | Target Effect proportions
 
       wide <- reshape(
         df,
@@ -104,8 +108,8 @@ export class SimulationService {
 
       names(wide) <- c(
         "Outcome",
-        "H0",
-        "H1"
+        "Null Effect",
+        "Target Effect"
       )
 
 
@@ -113,7 +117,17 @@ export class SimulationService {
         status = "success",
         package = as.character(packageVersion("BATSS")),
         table = wide,
-        chart = df
+        chart = df,
+        sampleSize = list(
+          H0 = list(
+            control = trials$H0$sample$Control,
+            experimental = trials$H0$sample$Experimental
+          ),
+          H1 = list(
+            control = trials$H1$sample$Control,
+            experimental = trials$H1$sample$Experimental
+          )
+        )
       )
 
       cat(jsonlite::toJSON(result, auto_unbox = TRUE, force = TRUE, null = "null"))

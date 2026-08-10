@@ -6,15 +6,17 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
+import { toError } from '@/lib/utils'
 
 export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactElement {
+  const err = toError(error)
   const copy = async (): Promise<void> => {
     await navigator.clipboard.writeText(
-      `${error.name}
+      `${err.name}
 
-      ${error.message}
+      ${err.message}
 
-      ${error.stack ?? ''}`
+      ${err.stack ?? ''}`
     )
   }
 
@@ -43,9 +45,9 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
 
         <CardContent className="space-y-6 pt-6">
           <div className="rounded-lg border bg-muted/50 p-4">
-            <p className="font-medium">{error.name}</p>
+            <p className="font-medium">{err.name}</p>
 
-            <p className="mt-1 text-sm text-muted-foreground">{error.message}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{err.message}</p>
           </div>
 
           <div className="flex gap-2">
@@ -71,7 +73,7 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
 
             <CollapsibleContent>
               <pre className="mt-3 max-h-72 overflow-auto rounded-md border bg-muted p-4 font-mono text-xs">
-                {error.stack}
+                {err.stack}
               </pre>
             </CollapsibleContent>
           </Collapsible>

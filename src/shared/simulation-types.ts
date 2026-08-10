@@ -1,26 +1,36 @@
 export type SimulationRunInput = {
-  // 'A' = positive primary outcome -> alternative = "greater"
-  // 'B' = negative primary outcome -> alternative = "less"
-  primaryOutcome: 'A' | 'B'
+  outcomeType: 'binary' | 'continuous' | 'ordinal'
+
   probability: number
-  logOdds: number
-  deltaEff: number
-  b: number
+
+  treatmentEffectType: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+
+  treatmentEffect: number
+
   N: number
   m0: number
   m: number
   R: number
+
+  decisionRules: DecisionRule[]
+}
+
+export type DecisionRule = {
+  type: 'superiority' | 'futility'
+  direction: 'greater' | 'less'
+  margin: number
+  threshold: number
 }
 
 export interface SimulationSummaryRow {
-  Outcome: 'B Superior' | 'Inconclusive'
-  H0: number
-  H1: number
+  Outcome: 'Experimental Superior' | 'Inconclusive'
+  'Null Effect': number
+  'Target Effect': number
 }
 
 export interface SimulationChartRow {
-  Scenario: 'H0' | 'H1'
-  Outcome: 'B Superior' | 'Inconclusive'
+  Scenario: 'Null Effect' | 'Target Effect'
+  Outcome: 'Experimental Superior' | 'Inconclusive'
   Proportion: number
 }
 
@@ -30,6 +40,7 @@ export type SimulationRunResult =
       package: string
       table: SimulationSummaryRow[]
       chart: SimulationChartRow[]
+      sampleSize: SampleSizeData
     }
   | {
       status: 'error'
@@ -44,6 +55,20 @@ export interface SimulationResultEntry {
   result: SimulationRunResult
 }
 
+export type DesignInput = {
+  outcomeType?: 'binary' | 'continuous' | 'ordinal'
+  probability?: number
+  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+  treatmentEffect?: number
+
+  N: number
+  m0: number
+  m: number
+  R: number
+
+  decisionRules: DecisionRule[]
+}
+
 /**
  * A study design is the persistent unit of work: the design parameters
  * plus every result that has ever been produced by running them. A
@@ -51,10 +76,20 @@ export interface SimulationResultEntry {
  * R, or just re-checking variance) without losing prior runs.
  */
 export interface StudyDesign {
-  version: 1
+  version: 2
   id: string
   name: string
   createdAt: string
-  input: SimulationRunInput
+  input: DesignInput
   results: SimulationResultEntry[]
+}
+
+export type SampleSizeScenario = {
+  control: number[]
+  experimental: number[]
+}
+
+export type SampleSizeData = {
+  H0: SampleSizeScenario
+  H1: SampleSizeScenario
 }

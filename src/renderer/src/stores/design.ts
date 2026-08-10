@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 import type {
+  DesignInput,
   SimulationResultEntry,
   SimulationRunInput,
   SimulationRunResult,
@@ -19,8 +20,8 @@ interface DesignState {
   isRunning: boolean
   isDirty: boolean
 
-  newDesign: (input: SimulationRunInput, name?: string) => Promise<void>
-  startNewDesign: (input: SimulationRunInput, name?: string) => void
+  newDesign: (input: DesignInput, name?: string) => Promise<void>
+  startNewDesign: (input: DesignInput, name?: string) => void
   renameDesign: (name: string) => void
   runSimulation: (input: SimulationRunInput) => Promise<SimulationRunResult>
   selectResult: (id: string) => void
@@ -61,7 +62,7 @@ export const useDesign = create<DesignState>((set, get) => {
 
     startNewDesign: (input, name = 'Untitled Design') => {
       const design: StudyDesign = {
-        version: 1,
+        version: 2,
         id: makeId(),
         name: name.trim() || 'Untitled Design',
         createdAt: new Date().toISOString(),

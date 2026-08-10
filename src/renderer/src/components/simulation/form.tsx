@@ -1,20 +1,50 @@
-import { type ReactElement } from 'react'
-import { Form, useForm } from '@formisch/react'
+import { useState, type ReactElement } from 'react'
+import { Form, submit, useForm } from '@formisch/react'
 import type { SubmitHandler } from '@formisch/react'
-
-import type { SimulationRunInput } from '@shared/simulation-types'
-
-import { StudyDesignSection } from '@/components/simulation/study-design-section'
+import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
-import { SimulationSettingsSection } from '@/components/simulation/simulation-settings-section'
 import { designSchema, initialDesignInput } from '@/lib/schema'
+import { OutcomeTypeSection } from './outcome-type-section'
+import { OutcomeParametersSection } from './outcome-parameters-section'
+import { Stepper } from '../stepper'
+import { Button } from '../ui/button'
+import { SampleSizeSection } from './sample-size-section'
+import { ReviewSection } from './review-section'
+import { toSimulationInput } from '@/lib/simulation-mapper'
+import { useDesign } from '@/stores/design'
+import { Play } from 'lucide-react'
 
-type BatssFormProps = {
+type SimulationFormProps = {
   onRun: (input: SimulationRunInput) => Promise<void>
-  initialInput?: SimulationRunInput
+  initialInput?: DesignInput
 }
 
-export function SimulationForm({ onRun, initialInput }: BatssFormProps): ReactElement {
+const steps = [
+  {
+    id: 'outcome',
+    title: 'Outcome Type'
+  },
+  {
+    id: 'parameters',
+    title: 'Outcome Parameters'
+  },
+  {
+    id: 'sample-size',
+    title: 'Sample Size'
+  },
+  {
+    id: 'rules',
+    title: 'Decision Rules'
+  },
+  {
+    id: 'review',
+    title: 'Review'
+  }
+]
+
+export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
+  const isRunning = useDesign((s) => s.isRunning)
+  const [step, setStep] = useState(0)
   const form = useForm({
     schema: designSchema,
     validate: 'blur',
@@ -23,32 +53,81 @@ export function SimulationForm({ onRun, initialInput }: BatssFormProps): ReactEl
   })
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
-    await onRun({
-      primaryOutcome: output.primaryOutcome,
-      probability: output.probability,
-      logOdds: output.logOdds,
-      deltaEff: output.deltaEff,
-      b: output.b,
-      N: output.N,
-      m0: output.m0,
-      m: output.m,
-      R: output.R
-    })
+    const input = toSimulationInput(output)
+
+    await onRun(input)
+  }
+
+  const handleBack = (): void => {
+    setStep((current) => Math.max(current - 1, 0))
+  }
+
+  const handlePrimaryAction = (): void => {
+    if (step < steps.length - 1) {
+      setStep((current) => current + 1)
+      return
+    }
+
+    submit(form)
+  }
+
+  const renderStep = (): ReactElement | null => {
+    switch (step) {
+      case 0:
+        return <OutcomeTypeSection form={form} />
+
+      case 1:
+        return <OutcomeParametersSection form={form} />
+
+      case 2:
+        return <SampleSizeSection form={form} />
+
+      case 3:
+        return <DecisionRuleSection form={form} />
+
+      case 4:
+        return <ReviewSection form={form} />
+
+      default:
+        return null
+    }
+  }
+
+  const runButton = (): ReactElement => {
+    if (isRunning) {
+      return (
+        <>
+          <Play className="mr-2 h-5 w-5 transition-transform animate-pulse scale-110" /> Running
+        </>
+      )
+    }
+    return (
+      <>
+        <Play className="mr-2 h-5 w-5 transition-transform" /> Run Simulation
+      </>
+    )
   }
 
   return (
     <Form
       id="simulation-form"
       of={form}
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        handleSubmit(e)
+      }}
       className="flex h-full min-h-0 flex-col"
     >
-      <div className="min-h-0 flex-1 overflow-auto">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <StudyDesignSection form={form} />
-          <DecisionRuleSection form={form} />
-          <SimulationSettingsSection form={form} />
-        </div>
+      <Stepper steps={steps} currentStep={step} />
+      <div className="min-h-0 flex-1 overflow-y-auto p-6">{renderStep()}</div>
+
+      <div className="flex justify-between border-t pt-4">
+        <Button type="button" variant="outline" disabled={step === 0} onClick={handleBack}>
+          Back
+        </Button>
+
+        <Button type="button" onClick={handlePrimaryAction} disabled={isRunning}>
+          {step === steps.length - 1 ? runButton() : 'Next'}
+        </Button>
       </div>
     </Form>
   )

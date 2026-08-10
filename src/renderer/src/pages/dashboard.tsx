@@ -58,6 +58,13 @@ export default function Dashboard(): ReactElement {
     navigate('results')
   }
 
+  const probabilitySymbol = design.input?.decisionRules[0].direction === 'greater' ? '>' : '<'
+
+  const formula =
+    design.input?.decisionRules[0].type === 'futility'
+      ? `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0].margin ?? '1'}) < ${design.input?.decisionRules[0].threshold ?? '0.05'}`
+      : `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0].margin ?? '1'}) > ${design.input?.decisionRules[0].threshold ?? '0.95'}`
+
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="flex flex-col gap-6">
@@ -163,15 +170,17 @@ export default function Dashboard(): ReactElement {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
-                    <Parameter label="Primary Outcome" value={design.input.primaryOutcome} />
-                    <Parameter label="Probability" value={design.input.probability} />
-                    <Parameter label="Log Odds" value={design.input.logOdds} />
-                    <Parameter label="Delta Eff" value={design.input.deltaEff} />
-                    <Parameter label="Decision Rule (b)" value={design.input.b} />
-                    <Parameter label="N" value={design.input.N} />
-                    <Parameter label="m0" value={design.input.m0} />
-                    <Parameter label="m" value={design.input.m} />
-                    <Parameter label="R" value={design.input.R} />
+                    <Parameter label="Outcome Type" value={design.input.outcomeType} />
+                    <Parameter
+                      label="Probability of outcome in control arm"
+                      value={design.input.probability}
+                    />
+                    <Parameter label="Odds Ratio" value={design.input.treatmentEffect} />
+                    <Parameter label="Burn-in (m0)" value={design.input.m0} />
+                    <Parameter label="Patients between interims" value={design.input.m} />
+                    <Parameter label="Maximum sample size" value={design.input.N} />
+                    <Parameter label="Decision Rule" value={formula} />
+                    <Parameter label="Number of simulations" value={design.input.R} />
                   </div>
                 </CardContent>
               </Card>
@@ -242,7 +251,13 @@ export default function Dashboard(): ReactElement {
   )
 }
 
-function Parameter({ label, value }: { label: string; value: string | number }): ReactElement {
+function Parameter({
+  label,
+  value
+}: {
+  label: string
+  value: string | number | undefined
+}): ReactElement {
   return (
     <div>
       <p className="text-sm text-muted-foreground">{label}</p>

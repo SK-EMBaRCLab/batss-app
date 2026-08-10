@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
@@ -48,4 +48,12 @@ export function formatShortcut(binding: string): string {
   })
 
   return isMac ? formatted.join('') : formatted.join('+')
+}
+
+export function toError(error: unknown): Error {
+  if (error instanceof Error) {
+    return error
+  }
+
+  return new Error(typeof error === 'string' ? error : JSON.stringify(error))
 }
