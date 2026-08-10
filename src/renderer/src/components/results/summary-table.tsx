@@ -25,9 +25,9 @@ export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactE
           <TableRow key={row.Outcome}>
             <TableCell className="font-bold">{row.Outcome}</TableCell>
 
-            <TableCell>{row['Null Effect'].toFixed(3)}</TableCell>
+            <TableCell>{row['Null Effect']?.toFixed(3)}</TableCell>
 
-            <TableCell>{row['Target Effect'].toFixed(3)}</TableCell>
+            <TableCell>{row['Target Effect']?.toFixed(3)}</TableCell>
           </TableRow>
         ))}
       </TableBody>
