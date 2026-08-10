@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v2.1.0...v3.0.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* rebuild results and simulation to match updated input and output model
+
+### Features
+
+* rebuild results and simulation to match updated input and output model ([cd6b765](https://github.com/SK-EMBaRCLab/batss-app/commit/cd6b7654bb729db3234d9a49f150a6d50bbb51a2))
+
 ## [2.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v2.0.0...v2.1.0) (2026-08-06)
 
 
