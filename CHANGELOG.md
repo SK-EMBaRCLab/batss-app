@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.0...v3.0.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* improve stepper and  form layout ([91861f9](https://github.com/SK-EMBaRCLab/batss-app/commit/91861f999e35d3cc2a50e1bde47b23f0b0391b2c))
+* scenario with null data causing table to crash ([a4bc042](https://github.com/SK-EMBaRCLab/batss-app/commit/a4bc042331a5b7d758c4fd883e2e5c036b2f1550))
+
 ## [3.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v2.1.0...v3.0.0) (2026-08-10)
 
 
