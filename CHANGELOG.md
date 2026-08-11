@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.1...v3.0.2) (2026-08-11)
+
+
+### Bug Fixes
+
+* bug on dashboard when its a new design with undefined input ([97a0910](https://github.com/SK-EMBaRCLab/batss-app/commit/97a09107c10ca6c75d6b6152b6989459b487a967))
+
 ## [3.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.0...v3.0.1) (2026-08-10)
 
 
