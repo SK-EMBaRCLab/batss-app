@@ -58,12 +58,12 @@ export default function Dashboard(): ReactElement {
     navigate('results')
   }
 
-  const probabilitySymbol = design.input?.decisionRules[0].direction === 'greater' ? '>' : '<'
+  const probabilitySymbol = design.input?.decisionRules[0]?.direction === 'greater' ? '>' : '<'
 
   const formula =
-    design.input?.decisionRules[0].type === 'futility'
-      ? `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0].margin ?? '1'}) < ${design.input?.decisionRules[0].threshold ?? '0.05'}`
-      : `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0].margin ?? '1'}) > ${design.input?.decisionRules[0].threshold ?? '0.95'}`
+    design.input?.decisionRules[0]?.type === 'futility'
+      ? `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0]?.margin ?? '1'}) < ${design.input?.decisionRules[0]?.threshold ?? '0.05'}`
+      : `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0]?.margin ?? '1'}) > ${design.input?.decisionRules[0]?.threshold ?? '0.95'}`
 
   return (
     <div className="h-full overflow-y-auto p-6">
