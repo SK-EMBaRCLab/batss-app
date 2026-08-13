@@ -24,6 +24,8 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
     ])
   }
 
+  console.log(rules)
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-6">
       <div className="flex shrink-0 items-center justify-between">
@@ -33,6 +35,7 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
           Add decision rule
         </Button>
       </div>
+      <p className="text-red-500">{rules.errors && rules.errors[0]}</p>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-2">
         {(rules.input ?? []).map((_, index) => (

@@ -17,6 +17,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/componen
 import { Button } from '../ui/button'
 import { Trash2 } from 'lucide-react'
 import { Input } from '../ui/input'
+import { decisionRuleFormula } from '@/lib/utils'
 
 type DecisionRuleCardProps = {
   form: SimulationFormStore
@@ -41,12 +42,17 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     path: ['decisionRules', index, 'threshold']
   })
 
-  const probabilitySymbol = directionField.input === 'greater' ? '>' : '<'
+  const treatmentEffectType = useField(form, {
+    path: ['treatmentEffectType']
+  })
 
-  const formula =
-    typeField.input === 'futility'
-      ? `P(OR ${probabilitySymbol} ${marginField.input ?? '1'}) < ${thresholdField.input ?? '0.05'}`
-      : `P(OR ${probabilitySymbol} ${marginField.input ?? '1'}) > ${thresholdField.input ?? '0.95'}`
+  const formula = decisionRuleFormula({
+    type: typeField.input,
+    direction: directionField.input,
+    margin: marginField.input,
+    threshold: thresholdField.input,
+    treatmentEffectType: treatmentEffectType.input
+  })
 
   return (
     <Card>
@@ -72,7 +78,6 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
           </div>
 
           <div className="mt-2 font-mono font-semibold">{formula}</div>
-          <p>OR is odds ratio but should be based on what was selected for treatement effect</p>
         </div>
         <Field>
           <FieldLabel>Decision rule type</FieldLabel>
@@ -134,7 +139,7 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
         </Field>
         <Field>
           <FieldLabel>Superiority margin (SM)</FieldLabel>
-          <FieldDescription>Denotes what meets clinacly meaningful margin </FieldDescription>
+          <FieldDescription>Denotes what meets a clinicly meaningful margin </FieldDescription>
 
           <Input
             type="number"

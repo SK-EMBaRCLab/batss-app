@@ -1,6 +1,8 @@
 import { useState, type ReactElement } from 'react'
-import { Form, submit, useForm } from '@formisch/react'
+import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
 import type { SubmitHandler } from '@formisch/react'
+import * as v from 'valibot'
+
 import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
 import { designSchema, initialDesignInput } from '@/lib/schema'
@@ -52,17 +54,88 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
     initialInput: initialInput ?? initialDesignInput
   })
 
-  const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
-    const input = toSimulationInput(output)
+  const validateStep = async (): Promise<boolean> => {
+    await validate(form)
 
-    await onRun(input)
+    const errors = getDeepErrorEntries(form)
+
+    console.log(errors)
+
+    const hasOutcomeTypeError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'outcomeType'
+    )
+
+    const hasProbabilityError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'probability'
+    )
+
+    const hasTreatmentEffectTypeError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'treatmentEffectType'
+    )
+
+    const hasTreatmentEffectError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'treatmentEffect'
+    )
+
+    const hasMaxSampleSizeError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'N'
+    )
+    const hasBurnInError = errors.some((error) => error.path.length === 1 && error.path[0] === 'm0')
+    const hasInterimSampleError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'm'
+    )
+
+    const hasNumOfSimulationsError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'R'
+    )
+
+    const hasDecisionRulesError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'decisionRules'
+    )
+
+    switch (step) {
+      case 0:
+        return !hasOutcomeTypeError
+      case 1:
+        return !hasProbabilityError && !hasTreatmentEffectTypeError && !hasTreatmentEffectError
+      case 2:
+        return (
+          !hasMaxSampleSizeError &&
+          !hasBurnInError &&
+          !hasInterimSampleError &&
+          !hasNumOfSimulationsError
+        )
+      case 3:
+        return !hasDecisionRulesError
+      case 4:
+        return true
+      default:
+        return false
+    }
+  }
+
+  const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
+    try {
+      const input = toSimulationInput(output)
+
+      await onRun(input)
+    } catch (error) {
+      if (v.isValiError(error)) {
+        console.error('Invalid simulation input:', error.issues)
+        return
+      }
+      throw error
+    }
   }
 
   const handleBack = (): void => {
     setStep((current) => Math.max(current - 1, 0))
   }
 
-  const handlePrimaryAction = (): void => {
+  const handlePrimaryAction = async (): Promise<void> => {
+    const valid = await validateStep()
+    console.log(valid)
+    if (!valid) return
     if (step < steps.length - 1) {
       setStep((current) => current + 1)
       return

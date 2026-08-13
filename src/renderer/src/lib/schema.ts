@@ -4,8 +4,11 @@ import * as v from 'valibot'
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const requiredNumber = (label: string) =>
   v.pipe(
-    v.union([v.string(), v.number()]),
+    v.union([v.string(), v.number(), v.undefined()]),
     v.transform((value) => {
+      if (value === undefined) {
+        return NaN
+      }
       if (typeof value === 'number') return value
 
       const trimmed = value.trim()
@@ -49,24 +52,20 @@ export const designSchema = v.pipe(
     /**
      * Outcome definition
      */
-    outcomeType: v.optional(
-      v.picklist(['binary', 'continuous', 'ordinal'], 'Select an outcome type.')
-    ),
+    outcomeType: v.picklist(['binary', 'continuous', 'ordinal'], 'Select an outcome type.'),
 
     /**
      * Binary outcome fields
      */
-    probability: v.optional(
-      v.pipe(
-        requiredNumber('Control arm probability'),
-        v.minValue(0, 'Probability must be at least 0.'),
-        v.maxValue(1, 'Probability must be at most 1.')
-      )
+    probability: v.pipe(
+      requiredNumber('Control arm probability'),
+      v.minValue(0, 'Probability must be at least 0.'),
+      v.maxValue(1, 'Probability must be at most 1.')
     ),
 
-    treatmentEffectType: v.optional(v.picklist(['oddsRatio', 'riskDifference', 'riskRatio'])),
+    treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
 
-    treatmentEffect: v.optional(requiredNumber('Treatment effect')),
+    treatmentEffect: requiredNumber('Treatment effect'),
 
     /**
      * Sample size
@@ -85,7 +84,10 @@ export const designSchema = v.pipe(
     /**
      * Decision rules
      */
-    decisionRules: v.array(decisionRuleSchema)
+    decisionRules: v.pipe(
+      v.array(decisionRuleSchema),
+      v.minLength(1, 'Add at least one decision rule.')
+    )
   }),
 
   /**
@@ -94,6 +96,14 @@ export const designSchema = v.pipe(
   v.forward(
     v.check((data) => data.N > data.m0, 'Maximum sample size must be greater than burn-in.'),
     ['N']
+  ),
+
+  v.forward(
+    v.check(
+      (data) => data.m < data.N - data.m0,
+      'Number of intermim patients must be less than the difference between max sample size and burn-in'
+    ),
+    ['m']
   )
 )
 

@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useNavigation } from '@/stores/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
+import { cn, decisionRuleFormula } from '@/lib/utils'
 import { SampleSizeTable } from '@/components/results/sample-size-table'
 
 export default function Results(): ReactElement {
@@ -88,12 +88,11 @@ export default function Results(): ReactElement {
   const result = selectedEntry?.result
   const input = selectedEntry?.input
 
-  const probabilitySymbol = input?.decisionRules[0].direction === 'greater' ? '>' : '<'
-
-  const formula =
-    input?.decisionRules[0].type === 'futility'
-      ? `P(OR ${probabilitySymbol} ${input?.decisionRules[0].margin ?? '1'}) < ${input?.decisionRules[0].threshold ?? '0.05'}`
-      : `P(OR ${probabilitySymbol} ${input?.decisionRules[0].margin ?? '1'}) > ${input?.decisionRules[0].threshold ?? '0.95'}`
+  const rule = input?.decisionRules[0]
+  const formula = decisionRuleFormula({
+    ...rule,
+    treatmentEffectType: input?.treatmentEffectType
+  })
 
   return (
     <div className="flex h-full min-h-0 min-w-0 overflow-hidden p-6">

@@ -13,21 +13,7 @@ import {
 } from '@/components/ui/select'
 
 import type { SimulationFormStore } from '@/components/types'
-
-const treatmentEffects = [
-  {
-    value: 'oddsRatio',
-    label: 'Odds Ratio'
-  },
-  {
-    value: 'riskDifference',
-    label: 'Risk Difference'
-  },
-  {
-    value: 'riskRatio',
-    label: 'Risk Ratio'
-  }
-] as const
+import { treatmentEffects } from './utils'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (
@@ -85,6 +71,13 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                 ))}
               </SelectContent>
             </Select>
+            {field.errors && (
+              <FieldError
+                errors={field.errors.map((message) => ({
+                  message
+                }))}
+              />
+            )}
           </Field>
         )}
       </FormischField>
@@ -100,6 +93,13 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
               value={field.input ?? ''}
               onChange={(e) => field.onChange(e.target.value)}
             />
+            {field.errors && (
+              <FieldError
+                errors={field.errors.map((message) => ({
+                  message
+                }))}
+              />
+            )}
           </Field>
         )}
       </FormischField>

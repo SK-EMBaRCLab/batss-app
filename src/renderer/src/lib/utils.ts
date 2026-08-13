@@ -1,3 +1,4 @@
+import { treatmentEffects } from '@/components/simulation/utils'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -56,4 +57,26 @@ export function toError(error: unknown): Error {
   }
 
   return new Error(typeof error === 'string' ? error : JSON.stringify(error))
+}
+
+export function decisionRuleFormula({
+  type,
+  direction,
+  margin,
+  threshold,
+  treatmentEffectType
+}: {
+  type?: 'superiority' | 'futility'
+  direction?: 'greater' | 'less'
+  margin?: string | number
+  threshold?: string | number
+  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+}): string {
+  const probabilitySymbol = direction === 'greater' ? '>' : '<'
+  const treatmentEffect =
+    treatmentEffects.find(({ value }) => value === treatmentEffectType)?.symbol ?? 'OR'
+  const isFutility = type === 'futility'
+  const comparison = isFutility ? '<' : '>'
+  const defaultThreshold = isFutility ? '0.05' : '0.95'
+  return `P(${treatmentEffect} ${probabilitySymbol} ${margin ?? '1'}) ${comparison} ${threshold ?? defaultThreshold}`
 }

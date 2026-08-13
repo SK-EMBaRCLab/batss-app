@@ -18,8 +18,8 @@ export function SampleSizeSection({ form }: { form: SimulationFormStore }): Reac
             <Field data-invalid={field.errors !== null}>
               <FieldLabel>Burn-in (m0)</FieldLabel>
               <FieldDescription>
-                The number of patients need to have recruited before analyzing data. The larger the
-                sample size the more accurate
+                The minimum number of patients that need to have been recruited before analysis can
+                begin.
               </FieldDescription>
               <Input
                 {...field.props}

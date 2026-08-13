@@ -32,6 +32,7 @@ import {
 
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
+import { decisionRuleFormula } from '@/lib/utils'
 
 export default function Dashboard(): ReactElement {
   const design = useDesign((s) => s.design)
@@ -58,12 +59,11 @@ export default function Dashboard(): ReactElement {
     navigate('results')
   }
 
-  const probabilitySymbol = design.input?.decisionRules[0]?.direction === 'greater' ? '>' : '<'
-
-  const formula =
-    design.input?.decisionRules[0]?.type === 'futility'
-      ? `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0]?.margin ?? '1'}) < ${design.input?.decisionRules[0]?.threshold ?? '0.05'}`
-      : `P(OR ${probabilitySymbol} ${design.input?.decisionRules[0]?.margin ?? '1'}) > ${design.input?.decisionRules[0]?.threshold ?? '0.95'}`
+  const rule = design.input?.decisionRules[0]
+  const formula = decisionRuleFormula({
+    ...rule,
+    treatmentEffectType: design.input?.treatmentEffectType
+  })
 
   return (
     <div className="h-full overflow-y-auto p-6">

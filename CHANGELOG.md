@@ -2,36 +2,32 @@
 
 ## [3.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.0...v3.0.1) (2026-08-10)
 
-
 ### Bug Fixes
 
-* improve stepper and  form layout ([91861f9](https://github.com/SK-EMBaRCLab/batss-app/commit/91861f999e35d3cc2a50e1bde47b23f0b0391b2c))
-* scenario with null data causing table to crash ([a4bc042](https://github.com/SK-EMBaRCLab/batss-app/commit/a4bc042331a5b7d758c4fd883e2e5c036b2f1550))
+- improve stepper and form layout ([91861f9](https://github.com/SK-EMBaRCLab/batss-app/commit/91861f999e35d3cc2a50e1bde47b23f0b0391b2c))
+- scenario with null data causing table to crash ([a4bc042](https://github.com/SK-EMBaRCLab/batss-app/commit/a4bc042331a5b7d758c4fd883e2e5c036b2f1550))
 
 ## [3.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v2.1.0...v3.0.0) (2026-08-10)
 
-
 ### ⚠ BREAKING CHANGES
 
-* rebuild results and simulation to match updated input and output model
+- rebuild results and simulation to match updated input and output model
 
 ### Features
 
-* rebuild results and simulation to match updated input and output model ([cd6b765](https://github.com/SK-EMBaRCLab/batss-app/commit/cd6b7654bb729db3234d9a49f150a6d50bbb51a2))
+- rebuild results and simulation to match updated input and output model ([cd6b765](https://github.com/SK-EMBaRCLab/batss-app/commit/cd6b7654bb729db3234d9a49f150a6d50bbb51a2))
 
 ## [2.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v2.0.0...v2.1.0) (2026-08-06)
 
-
 ### Features
 
-* add ability to check if saved or not and prompt user with dialog to save ([f7941d1](https://github.com/SK-EMBaRCLab/batss-app/commit/f7941d141ea17d4777e9795789d86f2e3a698cfe))
-* add keyboard shortcuts and commands ([8188864](https://github.com/SK-EMBaRCLab/batss-app/commit/818886426fd3796d7060acccbc0415ad13f36670))
-* added error boundaries and fixed save file so that input is stored per result as well ([ae12890](https://github.com/SK-EMBaRCLab/batss-app/commit/ae12890b4c9fe94b1eb2657af8e243d93dd986eb))
-
+- add ability to check if saved or not and prompt user with dialog to save ([f7941d1](https://github.com/SK-EMBaRCLab/batss-app/commit/f7941d141ea17d4777e9795789d86f2e3a698cfe))
+- add keyboard shortcuts and commands ([8188864](https://github.com/SK-EMBaRCLab/batss-app/commit/818886426fd3796d7060acccbc0415ad13f36670))
+- added error boundaries and fixed save file so that input is stored per result as well ([ae12890](https://github.com/SK-EMBaRCLab/batss-app/commit/ae12890b4c9fe94b1eb2657af8e243d93dd986eb))
 
 ### Bug Fixes
 
-* remove console logs and fix bug in results page layout ([75df8eb](https://github.com/SK-EMBaRCLab/batss-app/commit/75df8eb135e1f624272b0434b159a36e0bb6f043))
+- remove console logs and fix bug in results page layout ([75df8eb](https://github.com/SK-EMBaRCLab/batss-app/commit/75df8eb135e1f624272b0434b159a36e0bb6f043))
 
 ## [2.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v1.3.5...v2.0.0) (2026-08-05)
 
