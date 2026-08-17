@@ -1,19 +1,37 @@
-export type SimulationRunInput = {
-  outcomeType: 'binary' | 'continuous' | 'ordinal'
+type SimulationRunCommon = {
+  N: number
+  m0: number
+  m: number
+  R: number
+  decisionRules: DecisionRule[]
+}
+
+type BinarySimulationRunInput = {
+  outcomeType: 'binary'
 
   probability: number
 
   treatmentEffectType: 'oddsRatio' | 'riskDifference' | 'riskRatio'
 
   treatmentEffect: number
+} & SimulationRunCommon
 
-  N: number
-  m0: number
-  m: number
-  R: number
+type ContinuousSimulationRunInput = {
+  outcomeType: 'continuous'
 
-  decisionRules: DecisionRule[]
-}
+  meanOutcome: number
+  meanDiff: number
+  sd: number
+} & SimulationRunCommon
+
+type OrdinalSimulationRunInput = {
+  outcomeType: 'ordinal'
+
+  // Add ordinal-specific fields here when you define them.
+} & SimulationRunCommon
+
+export type SimulationRunInput =
+  BinarySimulationRunInput | ContinuousSimulationRunInput | OrdinalSimulationRunInput
 
 export type DecisionRule = {
   type: 'superiority' | 'futility'
@@ -56,16 +74,20 @@ export interface SimulationResultEntry {
 }
 
 export type DesignInput = {
-  outcomeType?: 'binary' | 'continuous' | 'ordinal'
-  probability?: number
-  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
-  treatmentEffect?: number
+  outcomeType: 'binary' | 'continuous' | 'ordinal' | undefined
+
+  probability: number | undefined
+  treatmentEffectType: 'oddsRatio' | 'riskDifference' | 'riskRatio' | undefined
+  treatmentEffect: number | undefined
+
+  meanOutcome: number | undefined
+  meanDiff: number | undefined
+  sd: number | undefined
 
   N: number
   m0: number
   m: number
   R: number
-
   decisionRules: DecisionRule[]
 }
 

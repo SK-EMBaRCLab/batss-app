@@ -29,7 +29,6 @@ const positiveInteger = (label: string) =>
     v.integer(`${label} must be a whole number.`),
     v.minValue(1, `${label} must be greater than 0.`)
   )
-
 /**
  * Decision rules
  */
@@ -47,49 +46,66 @@ const decisionRuleSchema = v.object({
   )
 })
 
+const commonDesignFields = {
+  N: positiveInteger('Maximum sample size'),
+
+  m0: positiveInteger('Burn-in'),
+
+  m: positiveInteger('Patients between interim analyses'),
+
+  R: positiveInteger('Number of simulations'),
+
+  decisionRules: v.pipe(
+    v.array(decisionRuleSchema),
+    v.minLength(1, 'Add at least one decision rule.')
+  )
+}
+
+const binaryDesignSchema = v.object({
+  outcomeType: v.literal('binary'),
+
+  probability: v.pipe(
+    requiredNumber('Control arm probability'),
+    v.minValue(0, 'Probability must be at least 0.'),
+    v.maxValue(1, 'Probability must be at most 1.')
+  ),
+
+  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+
+  treatmentEffect: requiredNumber('Treatment effect'),
+
+  ...commonDesignFields
+})
+
+const continuousDesignSchema = v.object({
+  outcomeType: v.literal('continuous'),
+
+  meanOutcome: requiredNumber('Mean outcome'),
+
+  meanDiff: requiredNumber('Mean difference'),
+
+  sd: v.pipe(
+    requiredNumber('Standard deviation'),
+    v.minValue(0, 'Standard deviation must be greater than 0.')
+  ),
+
+  ...commonDesignFields
+})
+
+const ordinalDesignSchema = v.object({
+  outcomeType: v.literal('ordinal'),
+
+  probability: requiredNumber('Control arm probability'),
+
+  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+
+  treatmentEffect: requiredNumber('Treatment effect'),
+
+  ...commonDesignFields
+})
+
 export const designSchema = v.pipe(
-  v.object({
-    /**
-     * Outcome definition
-     */
-    outcomeType: v.picklist(['binary', 'continuous', 'ordinal'], 'Select an outcome type.'),
-
-    /**
-     * Binary outcome fields
-     */
-    probability: v.pipe(
-      requiredNumber('Control arm probability'),
-      v.minValue(0, 'Probability must be at least 0.'),
-      v.maxValue(1, 'Probability must be at most 1.')
-    ),
-
-    treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
-
-    treatmentEffect: requiredNumber('Treatment effect'),
-
-    /**
-     * Sample size
-     */
-    N: positiveInteger('Maximum sample size'),
-
-    m0: positiveInteger('Burn-in'),
-
-    m: positiveInteger('Patients between interim analyses'),
-
-    /**
-     * Simulation
-     */
-    R: positiveInteger('Number of simulations'),
-
-    /**
-     * Decision rules
-     */
-    decisionRules: v.pipe(
-      v.array(decisionRuleSchema),
-      v.minLength(1, 'Add at least one decision rule.')
-    )
-  }),
-
+  v.variant('outcomeType', [binaryDesignSchema, continuousDesignSchema, ordinalDesignSchema]),
   /**
    * Cross-field validation
    */
@@ -107,15 +123,7 @@ export const designSchema = v.pipe(
   )
 )
 
-export const runnableDesignSchema = v.object({
-  outcomeType: v.picklist(['binary', 'continuous', 'ordinal']),
-
-  probability: v.number(),
-
-  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
-
-  treatmentEffect: v.number(),
-
+const runnableCommonSchema = {
   N: positiveInteger('Maximum sample size'),
 
   m0: positiveInteger('Burn-in'),
@@ -125,15 +133,58 @@ export const runnableDesignSchema = v.object({
   R: positiveInteger('Number of simulations'),
 
   decisionRules: v.array(decisionRuleSchema)
+}
+
+const runnableBinarySchema = v.object({
+  outcomeType: v.literal('binary'),
+
+  probability: v.number(),
+
+  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+
+  treatmentEffect: v.number(),
+
+  ...runnableCommonSchema
 })
+
+const runnableContinuousSchema = v.object({
+  outcomeType: v.literal('continuous'),
+
+  meanOutcome: v.number(),
+
+  meanDiff: v.number(),
+
+  sd: v.pipe(v.number(), v.minValue(0, 'Standard deviation must be greater than 0.')),
+
+  ...runnableCommonSchema
+})
+
+const runnableOrdinalSchema = v.object({
+  outcomeType: v.literal('ordinal'),
+
+  // Add ordinal-specific fields here
+
+  ...runnableCommonSchema
+})
+
+export const runnableDesignSchema = v.variant('outcomeType', [
+  runnableBinarySchema,
+  runnableContinuousSchema,
+  runnableOrdinalSchema
+])
 
 export const initialDesignInput: DesignInput = {
   outcomeType: undefined,
 
+  // Binary
   probability: undefined,
-
   treatmentEffectType: undefined,
   treatmentEffect: undefined,
+
+  // Continuous
+  meanOutcome: undefined,
+  meanDiff: undefined,
+  sd: undefined,
 
   N: 216,
   m0: 60,

@@ -106,7 +106,6 @@ export const useDesign = create<DesignState>((set, get) => {
           return {
             design: {
               ...state.design,
-              input,
               results: [...state.design.results, entry]
             },
             selectedResultId: entry.id

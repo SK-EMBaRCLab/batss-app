@@ -153,28 +153,4 @@ if (process.contextIsolated) {
   } catch (error) {
     console.error(error)
   }
-} else {
-  // @ts-ignore
-  window.app = app
-
-  // @ts-ignore
-  window.electron = electronAPI
-
-  // @ts-ignore
-  window.api = api
-
-  // @ts-ignore
-  window.runtime = runtime
-
-  // @ts-ignore
-  window.design = design
-
-  // @ts-ignore
-  window.simulation = simulation
-
-  // @ts-ignore
-  window.theme = theme
-
-  // @ts-ignore
-  window.settings = settings
 }

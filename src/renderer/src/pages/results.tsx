@@ -29,6 +29,53 @@ import { useNavigation } from '@/stores/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn, decisionRuleFormula } from '@/lib/utils'
 import { SampleSizeTable } from '@/components/results/sample-size-table'
+import { SimulationRunInput } from '@shared/simulation-types'
+
+function getDesignParams(input: SimulationRunInput): ReactElement | null {
+  const rule = input?.decisionRules[0]
+  let formula = ''
+  if (input?.outcomeType === 'binary') {
+    formula = decisionRuleFormula({
+      ...rule,
+      treatmentEffectType: input?.treatmentEffectType
+    })
+  } else if (input?.outcomeType === 'continuous') {
+    formula = decisionRuleFormula({
+      ...rule,
+      treatmentEffectType: 'meanDifference'
+    })
+  }
+  if (input?.outcomeType === 'binary') {
+    return (
+      <>
+        <Parameter label="Outcome Type" value={input.outcomeType} />
+        <Parameter label="Probability of outcome in control arm" value={input.probability} />
+        <Parameter label="Odds Ratio" value={input.treatmentEffect} />
+        <Parameter label="Burn-in (m0)" value={input.m0} />
+        <Parameter label="Patients between interims" value={input.m} />
+        <Parameter label="Maximum sample size" value={input.N} />
+        <Parameter label="Decision Rule" value={formula} />
+        <Parameter label="Number of simulations" value={input.R} />
+      </>
+    )
+  } else if (input?.outcomeType === 'continuous') {
+    return (
+      <>
+        <Parameter label="Outcome Type" value={input.outcomeType} />
+        <Parameter label="Mean outcome in control arm" value={input.meanOutcome} />
+        <Parameter label="Standard Deviation" value={input.sd} />
+        <Parameter label="Mean Difference for the treatment effect" value={input.meanDiff} />
+        <Parameter label="Burn-in (m0)" value={input.m0} />
+        <Parameter label="Patients between interims" value={input.m} />
+        <Parameter label="Maximum sample size" value={input.N} />
+        <Parameter label="Decision Rule" value={formula} />
+        <Parameter label="Number of simulations" value={input.R} />
+      </>
+    )
+  }
+
+  return null
+}
 
 export default function Results(): ReactElement {
   const [options, setOptions] = useState({
@@ -88,12 +135,6 @@ export default function Results(): ReactElement {
   const result = selectedEntry?.result
   const input = selectedEntry?.input
 
-  const rule = input?.decisionRules[0]
-  const formula = decisionRuleFormula({
-    ...rule,
-    treatmentEffectType: input?.treatmentEffectType
-  })
-
   return (
     <div className="flex h-full min-h-0 min-w-0 overflow-hidden p-6">
       {/* Run history for this design */}
@@ -148,17 +189,7 @@ export default function Results(): ReactElement {
 
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-3">
-                  <Parameter label="Outcome Type" value={input.outcomeType} />
-                  <Parameter
-                    label="Probability of outcome in control arm"
-                    value={input.probability}
-                  />
-                  <Parameter label="Odds Ratio" value={input.treatmentEffect} />
-                  <Parameter label="Burn-in (m0)" value={input.m0} />
-                  <Parameter label="Patients between interims" value={input.m} />
-                  <Parameter label="Maximum sample size" value={input.N} />
-                  <Parameter label="Decision Rule" value={formula} />
-                  <Parameter label="Number of simulations" value={input.R} />
+                  {getDesignParams(input)}
                 </div>
               </CardContent>
             </Card>
@@ -252,7 +283,7 @@ function Parameter({ label, value }: { label: string; value: string | number }):
   return (
     <div>
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="font-medium">{value}</p>
+      <p className="font-semibold">{value}</p>
     </div>
   )
 }

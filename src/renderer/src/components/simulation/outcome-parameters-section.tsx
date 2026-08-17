@@ -3,6 +3,7 @@ import { useField } from '@formisch/react'
 
 import type { SimulationFormStore } from '@/components/types'
 import { BinaryOutcomeSection } from './binary-outcome-section'
+import { ContinuousOutcomeSection } from './continuous-outcome-section'
 
 export function OutcomeParametersSection({
   form
@@ -15,6 +16,8 @@ export function OutcomeParametersSection({
 
   if (outcomeType.input === 'binary') {
     return <BinaryOutcomeSection form={form} />
+  } else if (outcomeType.input === 'continuous') {
+    return <ContinuousOutcomeSection form={form} />
   }
 
   return null

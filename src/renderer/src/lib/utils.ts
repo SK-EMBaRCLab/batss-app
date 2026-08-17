@@ -70,11 +70,17 @@ export function decisionRuleFormula({
   direction?: 'greater' | 'less'
   margin?: string | number
   threshold?: string | number
-  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio' | 'meanDifference'
 }): string {
   const probabilitySymbol = direction === 'greater' ? '>' : '<'
-  const treatmentEffect =
-    treatmentEffects.find(({ value }) => value === treatmentEffectType)?.symbol ?? 'OR'
+  let treatmentEffect = 'OR'
+  if (treatmentEffectType === 'meanDifference') {
+    treatmentEffect = 'MD'
+  } else {
+    treatmentEffect =
+      treatmentEffects.find(({ value }) => value === treatmentEffectType)?.symbol ?? 'OR'
+  }
+
   const isFutility = type === 'futility'
   const comparison = isFutility ? '<' : '>'
   const defaultThreshold = isFutility ? '0.05' : '0.95'

@@ -26,7 +26,6 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
   return (
     <FormischField of={form} path={['outcomeType']}>
       {(field) => {
-        console.log(field)
         return (
           <ShadcnField data-invalid={field.errors !== null}>
             <FieldLabel>Primary outcome type</FieldLabel>

@@ -19,6 +19,12 @@ type SampleSizeStats = {
   maximum: number
 }
 
+type ScenarioStats = {
+  total: SampleSizeStats
+  control: SampleSizeStats
+  experimental: SampleSizeStats
+}
+
 function calculateStats(values: number[], q: number): SampleSizeStats {
   if (values.length === 0) {
     return {
@@ -50,7 +56,7 @@ function calculateStats(values: number[], q: number): SampleSizeStats {
   }
 }
 
-function calculateScenarioStats(scenario: SampleSizeScenario, q: number) {
+function calculateScenarioStats(scenario: SampleSizeScenario, q: number): ScenarioStats {
   const total = scenario.control.map((value, index) => value + scenario.experimental[index])
   return {
     total: calculateStats(total, q),
@@ -82,7 +88,7 @@ function ScenarioTable({
             <TableRow>
               <TableHead className="px-4" />
               <TableHead className="text-right"> Mean </TableHead>
-              <TableHead className="text-right"> {quantile.toFixed(1)} Quantile </TableHead>
+              <TableHead className="text-right"> {quantile.toFixed(2)} Quantile </TableHead>
               <TableHead className="text-right"> Minimum </TableHead>
               <TableHead className="px-4 text-right"> Maximum </TableHead>
             </TableRow>
@@ -133,7 +139,7 @@ export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }):
             <p className="text-xs text-muted-foreground">Select the quantile to display</p>
           </div>
 
-          <span className="text-sm font-medium tabular-nums">{quantile.toFixed(1)}</span>
+          <span className="text-sm font-medium tabular-nums">{quantile.toFixed(2)}</span>
         </div>
 
         <Slider
@@ -142,7 +148,7 @@ export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }):
           onValueChange={(value) => setQuantile(value as number)}
           min={0}
           max={1}
-          step={0.1}
+          step={0.05}
         />
 
         <div className="flex justify-between text-xs text-muted-foreground">

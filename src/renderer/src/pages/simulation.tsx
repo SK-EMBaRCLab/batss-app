@@ -10,7 +10,7 @@ import { useNavigation } from '@/stores/navigation'
 import { Button } from '@/components/ui/button'
 import { CollapsibleContent, Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDown } from 'lucide-react'
-import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
+import { SimulationRunInput } from '@shared/simulation-types'
 import { runnableDesignSchema } from '@/lib/schema'
 
 export default function Simulation(): ReactElement {
@@ -31,7 +31,7 @@ export default function Simulation(): ReactElement {
     return unsubscribe
   }, [])
 
-  const handleRun = async (input: DesignInput): Promise<void> => {
+  const handleRun = async (input: SimulationRunInput): Promise<void> => {
     setLogsOpen(true)
     setLogs([])
     setElapsedSeconds(0)

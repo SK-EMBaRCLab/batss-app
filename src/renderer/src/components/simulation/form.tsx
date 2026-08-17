@@ -59,8 +59,6 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
 
     const errors = getDeepErrorEntries(form)
 
-    console.log(errors)
-
     const hasOutcomeTypeError = errors.some(
       (error) => error.path.length === 1 && error.path[0] === 'outcomeType'
     )
@@ -93,11 +91,28 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       (error) => error.path.length === 1 && error.path[0] === 'decisionRules'
     )
 
+    const hasMeanOutcomeError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'meanOutcome'
+    )
+
+    const hasStandardDeviationError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'sd'
+    )
+
+    const hasMeanDifferenceError = errors.some(
+      (error) => error.path.length === 1 && error.path[0] === 'meanDiff'
+    )
+
+    const hasBinaryOutcomeParamsErrors =
+      hasProbabilityError || hasTreatmentEffectTypeError || hasTreatmentEffectError
+    const hasContinuousOutcomeParamsErrors =
+      hasMeanOutcomeError || hasStandardDeviationError || hasMeanDifferenceError
+
     switch (step) {
       case 0:
         return !hasOutcomeTypeError
       case 1:
-        return !hasProbabilityError && !hasTreatmentEffectTypeError && !hasTreatmentEffectError
+        return !hasBinaryOutcomeParamsErrors && !hasContinuousOutcomeParamsErrors
       case 2:
         return (
           !hasMaxSampleSizeError &&
@@ -134,7 +149,6 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
 
   const handlePrimaryAction = async (): Promise<void> => {
     const valid = await validateStep()
-    console.log(valid)
     if (!valid) return
     if (step < steps.length - 1) {
       setStep((current) => current + 1)

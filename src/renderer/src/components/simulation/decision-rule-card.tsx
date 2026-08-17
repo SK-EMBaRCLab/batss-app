@@ -46,13 +46,29 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     path: ['treatmentEffectType']
   })
 
-  const formula = decisionRuleFormula({
-    type: typeField.input,
-    direction: directionField.input,
-    margin: marginField.input,
-    threshold: thresholdField.input,
-    treatmentEffectType: treatmentEffectType.input
+  const outcomeType = useField(form, {
+    path: ['outcomeType']
   })
+
+  let formula = ''
+
+  if (outcomeType.input === 'binary') {
+    formula = decisionRuleFormula({
+      type: typeField.input,
+      direction: directionField.input,
+      margin: marginField.input,
+      threshold: thresholdField.input,
+      treatmentEffectType: treatmentEffectType.input
+    })
+  } else if (outcomeType.input === 'continuous') {
+    formula = decisionRuleFormula({
+      type: typeField.input,
+      direction: directionField.input,
+      margin: marginField.input,
+      threshold: thresholdField.input,
+      treatmentEffectType: 'meanDifference'
+    })
+  }
 
   return (
     <Card>

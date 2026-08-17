@@ -28,6 +28,33 @@ export class SimulationService {
   ): Promise<SimulationRunResult> {
     const alternative = input.decisionRules[0]?.direction ?? 'greater'
 
+    let family = ''
+    let link = ''
+    let varY = ''
+
+    switch (input.outcomeType) {
+      case 'binary':
+        family = 'binomial'
+        link = 'logit'
+        varY = 'rbinom'
+        break
+      case 'continuous':
+        family = 'gaussian'
+        link = 'identity'
+        varY = 'rnorm'
+        break
+      case 'ordinal':
+        family = 'binomial'
+        link = 'logit'
+        varY = 'rbinom'
+        break
+      default:
+        family = 'binomial'
+        link = 'logit'
+        varY = 'rbinom'
+        break
+    }
+
     const script = `
       library(BATSS)
       library(INLA)
@@ -48,20 +75,36 @@ export class SimulationService {
 
       input <- jsonlite::fromJSON(Sys.getenv("${BATSS_INPUT_ENV}"), simplifyVector = FALSE)
 
+      varY <- switch(
+        input$varY,
+        rbinom = rbinom,
+        rnorm = rnorm,
+        stop("Unsupported outcome distribution")
+      )
+
       rule <- input$decisionRules[[1]]
 
-      delta.eff <- log(rule$margin)
       b <- rule$threshold
+
+      if(input$outcomeType == 'binary') {
+        varControl <- list(y = list(size = 1))
+        beta <- c(logit(input$probability), log(input$treatmentEffect))
+        delta.eff <- log(rule$margin)
+      } else if(input$outcomeType == 'continuous') {
+        varControl <- list(y = list(sd = input$sd))
+        beta <- c(input$meanOutcome, input$meanDiff)
+        delta.eff <- 0
+      }
 
       trials <- batss.glm(
         model = y ~ group,
-        family = "binomial",
-        link = "logit",
-        var = list(y = rbinom, group = alloc.balanced),
-        var.control = list(y = list(size = 1)),
+        family = input$family,
+        link = input$link,
+        var = list(y = varY, group = alloc.balanced),
+        var.control = varControl,
         prob0 = c(Control = 1, Experimental = 1),
         alternative = input$alternative,
-        beta = c(logit(input$probability), log(input$treatmentEffect)),
+        beta = beta,
         which = 2,
         eff.arm = eff.arm.simple,
         eff.arm.control = list(b = b),
@@ -136,7 +179,7 @@ export class SimulationService {
     try {
       const output = await this.r.execute(
         script,
-        { [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative }) },
+        { [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }) },
         onOutput
       )
 
