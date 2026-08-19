@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.2...v3.1.0) (2026-08-19)
+
+
+### Features
+
+* add validation and support for continuous outcome type simulation ([9cb9674](https://github.com/SK-EMBaRCLab/batss-app/commit/9cb9674631bdb14e924b4f30a04e52558ea8ccf6))
+* add validation to simulation form ([10c204e](https://github.com/SK-EMBaRCLab/batss-app/commit/10c204e7e939801250a18349677b2204d749f0b1))
+* **results:** add a results table and cleanup some components ([907e6ec](https://github.com/SK-EMBaRCLab/batss-app/commit/907e6ecf277ecda1ddd7a37d7169be3f258ba84a)), closes [#37](https://github.com/SK-EMBaRCLab/batss-app/issues/37) [#36](https://github.com/SK-EMBaRCLab/batss-app/issues/36)
+
 ## [3.0.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.1...v3.0.2) (2026-08-11)
 
 ### Bug Fixes
