@@ -1,8 +1,8 @@
 import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { type ReactNode, type ReactElement } from 'react'
+import { type ReactElement, type ReactNode } from 'react'
 
-import { decisionRuleFormula } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
+import { decisionRuleFormula } from '@/lib/utils'
 
 export function DesignParams({
   input
@@ -30,7 +30,7 @@ export function DesignParams({
           <Parameter label="Probability of outcome in control arm" value={input.probability} />
           <Parameter label="Odds Ratio" value={input.treatmentEffect} />
         </ParameterSection>
-        <Separator className="h-0.5" />
+        <Separator className="h-px" />
 
         <ParameterSection title="Simulation Design">
           <Parameter label="Burn-in (m0)" value={input.m0} />
@@ -38,7 +38,7 @@ export function DesignParams({
           <Parameter label="Maximum sample size" value={input.N} />
         </ParameterSection>
 
-        <Separator className="h-0.5" />
+        <Separator className="h-px" />
 
         <ParameterSection title="Decision & Simulation">
           <Parameter label="Decision Rule" value={formula} />
@@ -55,13 +55,13 @@ export function DesignParams({
           <Parameter label="Standard Deviation" value={input.sd} />
           <Parameter label="Mean Difference for the treatment effect" value={input.meanDiff} />
         </ParameterSection>
-        <Separator className="h-0.5" />
+        <Separator className="h-px" />
         <ParameterSection title="Simulation Design">
           <Parameter label="Burn-in (m0)" value={input.m0} />
           <Parameter label="Patients between interims" value={input.m} />
           <Parameter label="Maximum sample size" value={input.N} />
         </ParameterSection>
-        <Separator className="h-0.5" />
+        <Separator className="h-px" />
         <ParameterSection title="Decision & Simulation">
           <Parameter label="Decision Rule" value={formula} />
           <Parameter label="Number of simulations" value={input.R} />
@@ -98,7 +98,7 @@ function Parameter({
   return (
     <div>
       <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="font-semibold">{value}</dd>
+      <dd className="font-medium">{value}</dd>
     </div>
   )
 }

@@ -2,7 +2,6 @@ import { type ReactTable } from '@tanstack/react-table'
 import { FileChartColumn, X } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import { outcomeTypes } from '@/components/results/columns'
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,11 +48,7 @@ export function DataTableToolbar<TData extends DataTableRow>({
           className="h-8 w-37.5 lg:w-62.5"
         />
         {table.getColumn('outcomeType') && (
-          <DataTableFacetedFilter
-            column={table.getColumn('outcomeType')}
-            title="Outcome Type"
-            options={outcomeTypes}
-          />
+          <DataTableFacetedFilter column={table.getColumn('outcomeType')} title="Outcome Type" />
         )}
         {isFiltered && (
           <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>

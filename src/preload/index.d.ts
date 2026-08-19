@@ -18,6 +18,7 @@ declare global {
     }
     runtime: {
       check: () => Promise<RuntimeResult>
+      update: (packageNames: string[]) => Promise<RuntimeResult>
       onUpdate: (callback: (update: RuntimeUpdate) => void) => () => void
       onLog: (callback: (line: string) => void) => () => void
     }

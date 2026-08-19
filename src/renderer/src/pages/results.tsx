@@ -4,6 +4,7 @@ import { type ReactElement, useMemo, useRef, useState } from 'react'
 
 import { DesignParams } from '@/components/design-parameters'
 import { ResultsBarChart } from '@/components/results/bar-chart'
+import { outcomeTypes } from '@/components/results/columns'
 import { SampleSizeTable } from '@/components/results/sample-size-table'
 import { SummaryTable } from '@/components/results/summary-table'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +27,7 @@ import {
   EmptyHeader,
   EmptyTitle
 } from '@/components/ui/empty'
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
@@ -107,21 +109,31 @@ export default function Results(): ReactElement {
 
         <ScrollArea className="min-h-0 flex-1">
           <div className="flex flex-col gap-2 pr-2">
-            {[...list].reverse().map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => selectResult(entry.id)}
-                className={cn(
-                  'rounded-md border border-border p-2 text-left text-xs transition-colors hover:bg-muted',
-                  entry.id === selectedEntry?.id && 'border-primary bg-accent'
-                )}
-              >
-                <div className="font-medium">{new Date(entry.createdAt).toLocaleString()}</div>
-                <div className="text-muted-foreground">
-                  {entry.result.status === 'success' ? 'Success' : 'Error'}
-                </div>
-              </button>
-            ))}
+            {[...list].reverse().map((entry) => {
+              const Icon = outcomeTypes.find((type) => type.value === entry.input.outcomeType)?.icon
+              return (
+                <Item
+                  key={entry.id}
+                  render={
+                    <a href="#">
+                      <ItemContent>
+                        <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
+                        <ItemDescription>
+                          {entry.result.status === 'success' ? 'Success' : 'Error'}
+                        </ItemDescription>
+                      </ItemContent>
+                      <ItemActions>{Icon ? <Icon /> : null}</ItemActions>
+                    </a>
+                  }
+                  variant={entry.id === selectedEntry?.id ? 'outline' : 'muted'}
+                  className={cn(
+                    'border-border',
+                    entry.id === selectedEntry?.id && 'border-primary'
+                  )}
+                  onClick={() => selectResult(entry.id)}
+                />
+              )
+            })}
           </div>
         </ScrollArea>
       </div>

@@ -10,10 +10,13 @@ export type RuntimePackage = {
   name: string
   installed: boolean
   version?: string
+  latestVersion?: string
+  updateAvailable: boolean
 }
 
 export type RuntimeResult = {
   ready: boolean
   r: boolean
+  rVersion?: string
   packages: RuntimePackage[]
 }

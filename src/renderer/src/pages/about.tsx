@@ -22,13 +22,16 @@ export default function About(): ReactElement {
   const logs = useRuntime((state) => state.logs)
   const appVersion = useRuntime((state) => state.appVersion)
   const loadAppVersion = useRuntime((state) => state.loadAppVersion)
+  const updatePackages = useRuntime((state) => state.updatePackages)
+
+  const hasUpdates = packages.some((pkg) => pkg.updateAvailable)
 
   useEffect(() => {
     loadAppVersion()
   }, [loadAppVersion])
 
   return (
-    <div className="h-full overflow-y-auto p-6 grid gap-4">
+    <div className="overflow-y-auto p-6 grid gap-6">
       <h1 className="text-2xl font-semibold">About</h1>
 
       <p className="text-muted-foreground">Albatross version {appVersion}</p>
@@ -36,8 +39,15 @@ export default function About(): ReactElement {
         A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design using
         Integrated Nested Laplace Approximations (INLA): ABC-INLA
       </p>
-      <Button onClick={() => checkRuntime()} disabled={status === 'checking'} className="max-w-sm">
-        Recheck / Install Packages
+      <Button onClick={() => checkRuntime()} disabled={status === 'checking'} className="max-w-xs">
+        Recheck / Install Missing Packages
+      </Button>
+      <Button
+        onClick={() => updatePackages()}
+        disabled={status === 'checking' || status === 'installing' || !hasUpdates}
+        className="max-w-xs"
+      >
+        {hasUpdates ? 'Update Packages' : 'Packages Up to Date'}
       </Button>
       <h3>R Packages status:</h3>
       <ItemGroup className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 content-center">
@@ -52,10 +62,26 @@ export default function About(): ReactElement {
             </ItemMedia>
             <ItemContent className="min-w-0 gap-1">
               <ItemTitle>{pkg.name}</ItemTitle>
-              <ItemDescription>{pkg.installed ? 'installed' : 'not installed'}</ItemDescription>
+
+              <ItemDescription>
+                {pkg.installed ? (
+                  <>
+                    Installed · v{pkg.version}
+                    {pkg.updateAvailable && (
+                      <span className="text-yellow-600"> · Update available</span>
+                    )}
+                  </>
+                ) : (
+                  'Not installed'
+                )}
+              </ItemDescription>
             </ItemContent>
             <ItemActions className="self-center">
-              <span>v{pkg.version}</span>
+              {pkg.updateAvailable ? (
+                <span className="text-sm text-yellow-600">v{pkg.latestVersion}</span>
+              ) : (
+                <span className="text-sm">v{pkg.version ?? 'N/A'}</span>
+              )}
             </ItemActions>
           </Item>
         ))}

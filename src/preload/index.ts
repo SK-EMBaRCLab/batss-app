@@ -23,6 +23,10 @@ const runtime = {
     return ipcRenderer.invoke('runtime:check')
   },
 
+  update: (packageNames: string[]): Promise<RuntimeResult> => {
+    return ipcRenderer.invoke('runtime:update', packageNames)
+  },
+
   onUpdate: (callback: (update: RuntimeUpdate) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, update: RuntimeUpdate): void => {
       callback(update)

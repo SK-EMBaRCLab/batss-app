@@ -133,6 +133,12 @@ export class RManager {
     return stdout.trim()
   }
 
+  async rVersion(): Promise<string> {
+    return this.evaluate<string>(`
+      paste(R.version$major, R.version$minor, sep = ".")
+    `)
+  }
+
   async isInstalled(): Promise<boolean> {
     try {
       await this.version()

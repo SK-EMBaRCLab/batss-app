@@ -20,6 +20,7 @@ type RuntimeState = {
 
   initialize: () => Promise<void>
   checkRuntime: () => Promise<void>
+  updatePackages: () => Promise<void>
   clearLogs: () => void
 }
 
@@ -87,6 +88,64 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
         status: 'error',
         message: error instanceof Error ? error.message : 'Runtime failed',
         error: error instanceof Error ? error.message : 'Runtime failed'
+      })
+    } finally {
+      unsubscribeUpdate()
+      unsubscribeLog()
+    }
+  },
+
+  updatePackages: async () => {
+    const packagesToUpdate = get().packages.filter((pkg) => pkg.updateAvailable)
+
+    if (packagesToUpdate.length === 0) {
+      return
+    }
+
+    set({
+      status: 'installing',
+      message: `Updating ${packagesToUpdate.length} package(s)`,
+      progress: 0,
+      logs: []
+    })
+
+    const unsubscribeUpdate = window.runtime.onUpdate((update: RuntimeUpdate) => {
+      set({
+        status: update.status,
+        message: update.message,
+        progress: update.progress
+      })
+    })
+
+    const unsubscribeLog = window.runtime.onLog((line: string) => {
+      set((state) => ({
+        logs:
+          state.logs.length >= MAX_LOG_LINES
+            ? [...state.logs.slice(state.logs.length - MAX_LOG_LINES + 1), line]
+            : [...state.logs, line]
+      }))
+    })
+
+    try {
+      const result = await window.runtime.update(packagesToUpdate.map((pkg) => pkg.name))
+
+      set({
+        status: result.ready ? 'ready' : 'error',
+        message: result.ready ? 'Packages updated' : 'One or more packages failed to update',
+        progress: 100,
+        packages: result.packages,
+        error: result.ready
+          ? undefined
+          : `Failed to update: ${result.packages
+              .filter((p) => p.updateAvailable)
+              .map((p) => p.name)
+              .join(', ')}`
+      })
+    } catch (error) {
+      set({
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Package update failed',
+        error: error instanceof Error ? error.message : 'Package update failed'
       })
     } finally {
       unsubscribeUpdate()
