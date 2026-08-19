@@ -1,13 +1,13 @@
-import { type ReactElement } from 'react'
 import { Field as FormischField } from '@formisch/react'
+import { type ReactElement } from 'react'
 
+import type { SimulationFormStore } from '@/components/types'
 import {
   Field as ShadcnField,
-  FieldLabel,
+  FieldDescription,
   FieldError,
-  FieldDescription
+  FieldLabel
 } from '@/components/ui/field'
-
 import {
   Select,
   SelectContent,
@@ -15,8 +15,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-
-import type { SimulationFormStore } from '@/components/types'
 
 const outcomeTypes = ['binary', 'continuous', 'ordinal'] as const
 

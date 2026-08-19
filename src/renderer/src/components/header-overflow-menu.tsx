@@ -1,6 +1,7 @@
+import { FilePlus2, FolderOpen, MoreHorizontal, Save, Settings } from 'lucide-react'
 import type { ReactElement } from 'react'
-import { MoreHorizontal, FilePlus2, FolderOpen, Save, Settings } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-
-import { Button } from '@/components/ui/button'
 
 export function HeaderOverflowMenu({
   onNew,

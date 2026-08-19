@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react'
-import { Field as ShadcnField, FieldError, FieldLabel } from './ui/field'
-import { Input } from './ui/input'
+
+import { Field as ShadcnField, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 export function NumberInputField({
   id,

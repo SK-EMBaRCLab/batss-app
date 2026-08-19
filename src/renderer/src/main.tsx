@@ -3,8 +3,10 @@ import './assets/globals.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
+
+import { AppError } from '@/components/app-error'
+
 import App from './App'
-import { AppError } from './components/app-error'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

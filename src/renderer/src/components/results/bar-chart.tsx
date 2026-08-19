@@ -1,5 +1,5 @@
+import { SimulationChartRow } from '@shared/simulation-types'
 import { type ReactElement } from 'react'
-
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
 import {
@@ -10,7 +10,6 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart'
-import { SimulationChartRow } from '@shared/simulation-types'
 
 const chartConfig = {
   superior: {

@@ -1,5 +1,6 @@
-import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
+
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
 import type {
   SimulationRunInput,

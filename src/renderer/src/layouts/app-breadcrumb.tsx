@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react'
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
-
 import { navigationItems } from '@/config/navigation'
 import { useNavigation } from '@/stores/navigation'
 

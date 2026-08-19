@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { RuntimeStatus, RuntimeUpdate, RuntimePackage } from '../../../shared/runtime-types'
+
+import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
 
 // Keep only the most recent N log lines in memory. A full source build
 // (fmesher, sf, etc.) can produce thousands of compiler lines; nothing

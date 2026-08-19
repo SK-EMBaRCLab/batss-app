@@ -1,13 +1,13 @@
-import { type ReactElement, useState } from 'react'
 import { FilePlus2, FolderOpen } from 'lucide-react'
+import { type ReactElement, useState } from 'react'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { initialDesignInput } from '@/lib/schema'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
-import { initialDesignInput } from '@/lib/schema'
-import { Field, FieldContent, FieldError, FieldLabel } from './ui/field'
-import { Input } from './ui/input'
 
 export function WelcomeScreen(): ReactElement {
   const newDesign = useDesign((s) => s.newDesign)

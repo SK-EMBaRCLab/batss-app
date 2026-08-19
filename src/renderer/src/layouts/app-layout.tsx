@@ -1,9 +1,9 @@
 import { type ReactElement } from 'react'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
-import { AppSidebar } from '@/layouts/app-sidebar'
-import { AppHeader } from '@/layouts/app-header'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppBanner } from '@/layouts/app-banner'
+import { AppHeader } from '@/layouts/app-header'
+import { AppSidebar } from '@/layouts/app-sidebar'
 
 export function AppLayout({ children }: { children: React.ReactNode }): ReactElement {
   return (

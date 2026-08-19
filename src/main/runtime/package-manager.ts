@@ -1,8 +1,8 @@
 // src/main/runtime/package-manager.ts
 
 import { RManager } from './r-manager'
+import { PACKAGE_REPOS, REQUIRED_R_PACKAGES } from './r-packages'
 import { RuntimeReporter } from './reporter'
-import { REQUIRED_R_PACKAGES, PACKAGE_REPOS } from './r-packages'
 import type { RuntimePackage } from './types'
 
 const PACKAGES_ENV = 'ALBATROSS_R_PACKAGES'

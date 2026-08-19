@@ -1,4 +1,3 @@
-import { type ReactElement, useMemo } from 'react'
 import {
   BarChart3,
   CheckCircle2,
@@ -9,7 +8,9 @@ import {
   Save,
   SquareStack
 } from 'lucide-react'
+import { type ReactElement, useMemo } from 'react'
 
+import { DesignParams } from '@/components/design-parameters'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,15 +30,14 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
-
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
-import { decisionRuleFormula } from '@/lib/utils'
 
 export default function Dashboard(): ReactElement {
   const design = useDesign((s) => s.design)
   const saveDesign = useDesign((s) => s.saveDesign)
   const selectResult = useDesign((s) => s.selectResult)
+  const selectResults = useDesign((s) => s.selectResults)
   const navigate = useNavigation((s) => s.navigate)
   const isDirty = useDesign((state) => state.isDirty)
 
@@ -56,14 +56,14 @@ export default function Dashboard(): ReactElement {
 
   const openResult = (id: string): void => {
     selectResult(id)
+    selectResults([id])
     navigate('results')
   }
 
-  const rule = design.input?.decisionRules[0]
-  const formula = decisionRuleFormula({
-    ...rule,
-    treatmentEffectType: design.input?.treatmentEffectType
-  })
+  function viewAllResults(): void {
+    selectResults([])
+    navigate('results')
+  }
 
   return (
     <div className="h-full overflow-y-auto p-6">
@@ -169,19 +169,7 @@ export default function Dashboard(): ReactElement {
                   <CardDescription>Current configuration for this study design.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Parameter label="Outcome Type" value={design.input.outcomeType} />
-                    <Parameter
-                      label="Probability of outcome in control arm"
-                      value={design.input.probability}
-                    />
-                    <Parameter label="Odds Ratio" value={design.input.treatmentEffect} />
-                    <Parameter label="Burn-in (m0)" value={design.input.m0} />
-                    <Parameter label="Patients between interims" value={design.input.m} />
-                    <Parameter label="Maximum sample size" value={design.input.N} />
-                    <Parameter label="Decision Rule" value={formula} />
-                    <Parameter label="Number of simulations" value={design.input.R} />
-                  </div>
+                  <DesignParams input={design.input} />
                 </CardContent>
               </Card>
 
@@ -192,7 +180,7 @@ export default function Dashboard(): ReactElement {
                     <CardTitle>Recent Runs</CardTitle>
                     <CardDescription>Latest results for this design.</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => navigate('results')}>
+                  <Button variant="ghost" size="sm" onClick={() => viewAllResults()}>
                     View all
                   </Button>
                 </CardHeader>
@@ -239,7 +227,7 @@ export default function Dashboard(): ReactElement {
                 <Play className="mr-2 h-4 w-4" />
                 Run Another Simulation
               </Button>
-              <Button variant="outline" onClick={() => navigate('results')}>
+              <Button variant="outline" onClick={() => viewAllResults()}>
                 <BarChart3 className="mr-2 h-4 w-4" />
                 View All Results
               </Button>
@@ -247,21 +235,6 @@ export default function Dashboard(): ReactElement {
           </>
         )}
       </div>
-    </div>
-  )
-}
-
-function Parameter({
-  label,
-  value
-}: {
-  label: string
-  value: string | number | undefined
-}): ReactElement {
-  return (
-    <div>
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="font-medium">{value}</p>
     </div>
   )
 }

@@ -1,23 +1,24 @@
-import { useState, type ReactElement } from 'react'
-import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
 import type { SubmitHandler } from '@formisch/react'
+import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
+import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
+import { Play } from 'lucide-react'
+import { type ReactElement, useState } from 'react'
 import * as v from 'valibot'
 
-import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
+import { Stepper } from '@/components/stepper'
+import { Button } from '@/components/ui/button'
 import { designSchema, initialDesignInput } from '@/lib/schema'
-import { OutcomeTypeSection } from './outcome-type-section'
-import { OutcomeParametersSection } from './outcome-parameters-section'
-import { Stepper } from '../stepper'
-import { Button } from '../ui/button'
-import { SampleSizeSection } from './sample-size-section'
-import { ReviewSection } from './review-section'
 import { toSimulationInput } from '@/lib/simulation-mapper'
 import { useDesign } from '@/stores/design'
-import { Play } from 'lucide-react'
+
+import { OutcomeParametersSection } from './outcome-parameters-section'
+import { OutcomeTypeSection } from './outcome-type-section'
+import { ReviewSection } from './review-section'
+import { SampleSizeSection } from './sample-size-section'
 
 type SimulationFormProps = {
-  onRun: (input: SimulationRunInput) => Promise<void>
+  onRun: (input: SimulationRunInput, output) => Promise<void>
   initialInput?: DesignInput
 }
 
@@ -133,7 +134,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
     try {
       const input = toSimulationInput(output)
 
-      await onRun(input)
+      await onRun(input, output)
     } catch (error) {
       if (v.isValiError(error)) {
         console.error('Invalid simulation input:', error.issues)

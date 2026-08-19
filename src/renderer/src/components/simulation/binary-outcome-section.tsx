@@ -1,8 +1,8 @@
-import { type ReactElement } from 'react'
 import { Field as FormischField } from '@formisch/react'
+import { type ReactElement } from 'react'
 
-import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
-
+import type { SimulationFormStore } from '@/components/types'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -12,7 +12,6 @@ import {
   SelectValue
 } from '@/components/ui/select'
 
-import type { SimulationFormStore } from '@/components/types'
 import { treatmentEffects } from './utils'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {

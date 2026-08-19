@@ -1,8 +1,9 @@
-import { type ReactElement } from 'react'
 import { useField } from '@formisch/react'
+import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/components/types'
 import { Button } from '@/components/ui/button'
+
 import { DecisionRuleCard } from './decision-rule-card'
 
 export function DecisionRuleSection({ form }: { form: SimulationFormStore }): ReactElement {

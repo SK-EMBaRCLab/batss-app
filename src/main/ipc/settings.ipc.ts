@@ -1,7 +1,7 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 
-import { settingsService } from '../services/settings.service'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
+import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
 
 export function registerSettingsIPC(): void {

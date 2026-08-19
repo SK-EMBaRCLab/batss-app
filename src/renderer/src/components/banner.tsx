@@ -1,7 +1,8 @@
+import { AlertTriangle, CheckCircle2, Info, Loader2, Siren, X } from 'lucide-react'
 import { type ReactElement } from 'react'
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, CheckCircle2, Info, Loader2, Siren, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type BannerVariant = 'info' | 'success' | 'warning' | 'error' | 'loading'

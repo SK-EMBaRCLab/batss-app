@@ -1,18 +1,16 @@
-import { type ReactElement } from 'react'
 import { FilePlus2, FolderOpen, Moon, Save, SearchIcon, Settings, Sun } from 'lucide-react'
+import { type ReactElement } from 'react'
 
-import { SidebarTrigger } from '@/components/ui/sidebar'
-
+import { EditableDesignName } from '@/components/editable-design-name'
+import { HeaderOverflowMenu } from '@/components/header-overflow-menu'
 import { Button } from '@/components/ui/button'
-// import { AppBreadcrumb } from './app-breadcrumb'
-import { useTheme } from '@/stores/theme'
+import { Separator } from '@/components/ui/separator'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { initialDesignInput } from '@/lib/schema'
+import { useCommandPalette } from '@/stores/command-palette'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
-import { initialDesignInput } from '@/lib/schema'
-import { Separator } from '@/components/ui/separator'
-import { EditableDesignName } from '@/components/editable-design-name'
-import { useCommandPalette } from '@/stores/command-palette'
-import { HeaderOverflowMenu } from '@/components/header-overflow-menu'
+import { useTheme } from '@/stores/theme'
 
 export function AppHeader(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)

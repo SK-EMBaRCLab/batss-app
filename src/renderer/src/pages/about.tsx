@@ -1,4 +1,7 @@
+import { PackageCheck, PackageX } from 'lucide-react'
 import { type ReactElement } from 'react'
+import { useEffect } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Item,
@@ -11,8 +14,6 @@ import {
 } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntime } from '@/stores/runtime'
-import { PackageCheck, PackageX } from 'lucide-react'
-import { useEffect } from 'react'
 
 export default function About(): ReactElement {
   const status = useRuntime((state) => state.status)

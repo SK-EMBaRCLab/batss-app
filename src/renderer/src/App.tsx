@@ -1,28 +1,23 @@
+import { AnimatePresence, motion } from 'motion/react'
 import { type ReactElement, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
 
-import { AppLayout } from '@/layouts/app-layout'
+import { CommandPalette } from '@/components/command-palette'
+import { RuntimeScreen } from '@/components/runtime-screen'
+import { ViewErrorBoundary } from '@/components/view-error-boundary'
+import { WelcomeScreen } from '@/components/welcome-screen'
 import { views } from '@/config/views'
+import { useCommandShortcuts } from '@/hooks/use-command-shortcuts'
+import { AppLayout } from '@/layouts/app-layout'
+import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 import { useRuntime } from '@/stores/runtime'
-
-import { RuntimeScreen } from '@/components/runtime-screen'
-import { WelcomeScreen } from '@/components/welcome-screen'
 import { useTheme } from '@/stores/theme'
-import { useDesign } from './stores/design'
-import { ViewErrorBoundary } from './components/view-error-boundary'
-import { CommandPalette } from './components/command-palette'
-import { useCommandShortcuts } from './hooks/use-command-shortcuts'
 
 export default function App(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
-
   const status = useRuntime((state) => state.status)
-
   const design = useDesign((state) => state.design)
-
   const initialize = useRuntime((state) => state.initialize)
-
   const initializeTheme = useTheme((state) => state.initialize)
 
   useCommandShortcuts()

@@ -1,20 +1,14 @@
-import { type ReactElement, useMemo, useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle
-} from '@/components/ui/empty'
-
-import { useDesign } from '@/stores/design'
-import { Button } from '@/components/ui/button'
-import { ResultsBarChart } from '@/components/results/bar-chart'
-import { SummaryTable } from '@/components/results/summary-table'
 import { ImageDown, Minus, MoreHorizontal, Play } from 'lucide-react'
+import { type ReactElement, useMemo, useRef, useState } from 'react'
+
+import { DesignParams } from '@/components/design-parameters'
+import { ResultsBarChart } from '@/components/results/bar-chart'
+import { SampleSizeTable } from '@/components/results/sample-size-table'
+import { SummaryTable } from '@/components/results/summary-table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,57 +19,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { useNavigation } from '@/stores/navigation'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn, decisionRuleFormula } from '@/lib/utils'
-import { SampleSizeTable } from '@/components/results/sample-size-table'
-import { SimulationRunInput } from '@shared/simulation-types'
-
-function getDesignParams(input: SimulationRunInput): ReactElement | null {
-  const rule = input?.decisionRules[0]
-  let formula = ''
-  if (input?.outcomeType === 'binary') {
-    formula = decisionRuleFormula({
-      ...rule,
-      treatmentEffectType: input?.treatmentEffectType
-    })
-  } else if (input?.outcomeType === 'continuous') {
-    formula = decisionRuleFormula({
-      ...rule,
-      treatmentEffectType: 'meanDifference'
-    })
-  }
-  if (input?.outcomeType === 'binary') {
-    return (
-      <>
-        <Parameter label="Outcome Type" value={input.outcomeType} />
-        <Parameter label="Probability of outcome in control arm" value={input.probability} />
-        <Parameter label="Odds Ratio" value={input.treatmentEffect} />
-        <Parameter label="Burn-in (m0)" value={input.m0} />
-        <Parameter label="Patients between interims" value={input.m} />
-        <Parameter label="Maximum sample size" value={input.N} />
-        <Parameter label="Decision Rule" value={formula} />
-        <Parameter label="Number of simulations" value={input.R} />
-      </>
-    )
-  } else if (input?.outcomeType === 'continuous') {
-    return (
-      <>
-        <Parameter label="Outcome Type" value={input.outcomeType} />
-        <Parameter label="Mean outcome in control arm" value={input.meanOutcome} />
-        <Parameter label="Standard Deviation" value={input.sd} />
-        <Parameter label="Mean Difference for the treatment effect" value={input.meanDiff} />
-        <Parameter label="Burn-in (m0)" value={input.m0} />
-        <Parameter label="Patients between interims" value={input.m} />
-        <Parameter label="Maximum sample size" value={input.N} />
-        <Parameter label="Decision Rule" value={formula} />
-        <Parameter label="Number of simulations" value={input.R} />
-      </>
-    )
-  }
-
-  return null
-}
+import { cn } from '@/lib/utils'
+import { useDesign } from '@/stores/design'
+import { useNavigation } from '@/stores/navigation'
 
 export default function Results(): ReactElement {
   const [options, setOptions] = useState({
@@ -83,6 +37,7 @@ export default function Results(): ReactElement {
   })
   const design = useDesign((state) => state.design)
   const selectedResultId = useDesign((state) => state.selectedResultId)
+  const selectedResults = useDesign((state) => state.selectedResults)
   const selectResult = useDesign((state) => state.selectResult)
   const loadDesign = useDesign((state) => state.loadDesign)
   const navigate = useNavigation((state) => state.navigate)
@@ -135,18 +90,24 @@ export default function Results(): ReactElement {
   const result = selectedEntry?.result
   const input = selectedEntry?.input
 
+  let list = design.results
+
+  if (selectedResults && selectedResults.length > 0) {
+    list = design.results.filter((entry) => selectedResults.includes(entry.id))
+  }
+
   return (
     <div className="flex h-full min-h-0 min-w-0 overflow-hidden p-6">
       {/* Run history for this design */}
       <div className="flex h-full w-64 shrink-0 flex-col border-r border-border p-4">
         <h2 className="mb-1 truncate text-sm font-semibold">{design.name}</h2>
         <p className="mb-4 text-xs text-muted-foreground">
-          {design.results.length} run{design.results.length === 1 ? '' : 's'}
+          {list.length} run{list.length === 1 ? '' : 's'}
         </p>
 
         <ScrollArea className="min-h-0 flex-1">
           <div className="flex flex-col gap-2 pr-2">
-            {[...design.results].reverse().map((entry) => (
+            {[...list].reverse().map((entry) => (
               <button
                 key={entry.id}
                 onClick={() => selectResult(entry.id)}
@@ -188,9 +149,7 @@ export default function Results(): ReactElement {
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-3">
-                  {getDesignParams(input)}
-                </div>
+                <DesignParams input={input} />
               </CardContent>
             </Card>
           )}
@@ -275,15 +234,6 @@ export default function Results(): ReactElement {
           )}
         </div>
       </div>
-    </div>
-  )
-}
-
-function Parameter({ label, value }: { label: string; value: string | number }): ReactElement {
-  return (
-    <div>
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="font-semibold">{value}</p>
     </div>
   )
 }

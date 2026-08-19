@@ -5,8 +5,8 @@
 // types actually live in src/shared. Do not redeclare these shapes here.
 
 export type {
-  RuntimeStatus,
-  RuntimeUpdate,
   RuntimePackage,
-  RuntimeResult
+  RuntimeResult,
+  RuntimeStatus,
+  RuntimeUpdate
 } from '../../shared/runtime-types'

@@ -1,6 +1,7 @@
+import { Home } from 'lucide-react'
+
 import { useNavigation } from '@/stores/navigation'
 import type { AppCommand } from '@/types/command'
-import { Home } from 'lucide-react'
 
 export const navigationCommands: AppCommand[] = [
   {

@@ -1,4 +1,6 @@
 import { type ReactElement } from 'react'
+
+import { commands } from '@/commands'
 import {
   Command,
   CommandDialog,
@@ -9,7 +11,6 @@ import {
   CommandList,
   CommandShortcut
 } from '@/components/ui/command'
-import { commands } from '@/commands'
 import { formatShortcut } from '@/lib/utils'
 import { useCommandPalette } from '@/stores/command-palette'
 

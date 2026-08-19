@@ -1,6 +1,6 @@
+import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { type ReactElement } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

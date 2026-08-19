@@ -1,7 +1,8 @@
 import { type ReactElement } from 'react'
+import { useState } from 'react'
+
 import { Banner } from '@/components/banner'
 import { useRuntime } from '@/stores/runtime'
-import { useState } from 'react'
 
 export function AppBanner(): ReactElement | null {
   const [visible, setVisible] = useState(true)

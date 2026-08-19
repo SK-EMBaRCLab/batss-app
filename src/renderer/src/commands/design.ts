@@ -1,7 +1,8 @@
+import { FilePlus2, FolderOpen, Save } from 'lucide-react'
+
 import { initialDesignInput } from '@/lib/schema'
 import { useDesign } from '@/stores/design'
 import type { AppCommand } from '@/types/command'
-import { FilePlus2, FolderOpen, Save } from 'lucide-react'
 
 export const designCommands: AppCommand[] = [
   {

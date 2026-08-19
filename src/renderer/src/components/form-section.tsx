@@ -1,7 +1,8 @@
-import { type ReactElement } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDown } from 'lucide-react'
+import { type ReactElement } from 'react'
 import { useState } from 'react'
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 export function FormSection({
   title,

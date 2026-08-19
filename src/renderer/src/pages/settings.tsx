@@ -1,10 +1,10 @@
-import { type ReactElement, useEffect, useState } from 'react'
 import { FolderOpen } from 'lucide-react'
+import { type ReactElement, useEffect, useState } from 'react'
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Field, FieldLabel, FieldDescription, FieldContent } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 export default function Settings(): ReactElement {
   const [outputPath, setOutputPath] = useState('')

@@ -1,8 +1,8 @@
 // src/main/runtime/bootstrap.ts
 
 import { PackageManager } from './package-manager'
-import { RuntimeReporter } from './reporter'
 import { RManager } from './r-manager'
+import { RuntimeReporter } from './reporter'
 import type { RuntimeResult } from './types'
 
 export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<RuntimeResult> {

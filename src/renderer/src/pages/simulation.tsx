@@ -1,17 +1,17 @@
+import { SimulationRunInput } from '@shared/simulation-types'
+import { ChevronDown } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 import * as v from 'valibot'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatDuration } from '@/lib/utils'
 import { SimulationForm } from '@/components/simulation/form'
 import { LogPanel } from '@/components/simulation/log-panel'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { runnableDesignSchema } from '@/lib/schema'
+import { formatDuration } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
-import { Button } from '@/components/ui/button'
-import { CollapsibleContent, Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown } from 'lucide-react'
-import { SimulationRunInput } from '@shared/simulation-types'
-import { runnableDesignSchema } from '@/lib/schema'
 
 export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
@@ -31,7 +31,7 @@ export default function Simulation(): ReactElement {
     return unsubscribe
   }, [])
 
-  const handleRun = async (input: SimulationRunInput): Promise<void> => {
+  const handleRun = async (input: SimulationRunInput, formInput): Promise<void> => {
     setLogsOpen(true)
     setLogs([])
     setElapsedSeconds(0)
@@ -61,7 +61,7 @@ export default function Simulation(): ReactElement {
     }, 100)
 
     try {
-      const response = await runSimulation(runnableInput)
+      const response = await runSimulation(runnableInput, formInput)
 
       if (response.status === 'success') {
         navigate('results')

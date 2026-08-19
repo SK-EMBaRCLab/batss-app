@@ -1,13 +1,9 @@
+import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
 import { type ReactElement, useEffect, useRef } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-
 import { Progress } from '@/components/ui/progress'
-
 import { ScrollArea } from '@/components/ui/scroll-area'
-
-import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
-
 import { useRuntime } from '@/stores/runtime'
 
 export function RuntimeScreen(): ReactElement {

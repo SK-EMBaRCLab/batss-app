@@ -1,8 +1,9 @@
-import { ipcMain, dialog } from 'electron'
+import { dialog, ipcMain } from 'electron'
 import fs from 'fs/promises'
-import { settingsService } from '../services/settings.service'
 import path from 'path'
+
 import { getWorkspacePath } from '../services/filesystem/app-paths'
+import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
 
 const DESIGN_FILE_EXTENSION = 'design'

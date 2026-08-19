@@ -1,3 +1,9 @@
+import { SampleSizeData, SampleSizeScenario } from '@shared/simulation-types'
+import { type ReactElement, useMemo, useState } from 'react'
+
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
 import {
   Table,
   TableBody,
@@ -6,11 +12,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { SampleSizeData, SampleSizeScenario } from '@shared/simulation-types'
-import { useMemo, useState, type ReactElement } from 'react'
-import { Slider } from '../ui/slider'
-import { Label } from '../ui/label'
-import { Separator } from '../ui/separator'
 
 type SampleSizeStats = {
   mean: number

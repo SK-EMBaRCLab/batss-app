@@ -1,4 +1,6 @@
+import { GalleryVerticalEnd } from 'lucide-react'
 import { type ReactElement } from 'react'
+
 import {
   Sidebar,
   SidebarContent,
@@ -11,12 +13,10 @@ import {
   SidebarMenuItem,
   SidebarRail
 } from '@/components/ui/sidebar'
-
-import { useNavigation } from '@/stores/navigation'
-import { navigationItems } from '@/config/navigation'
-import { GalleryVerticalEnd } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { navigationItems } from '@/config/navigation'
 import { useDesign } from '@/stores/design'
+import { useNavigation } from '@/stores/navigation'
 
 export function AppSidebar(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)

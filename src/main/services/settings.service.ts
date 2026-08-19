@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
+
 import { getSettingsPath } from './filesystem/app-paths'
 
 class SettingsService {

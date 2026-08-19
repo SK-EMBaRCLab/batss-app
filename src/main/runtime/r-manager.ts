@@ -1,9 +1,9 @@
 // src/main/runtime/r-manager.ts
 
-import { spawn, execFile } from 'child_process'
-import { promisify } from 'util'
+import { execFile, spawn } from 'child_process'
 import fs from 'fs/promises'
 import path from 'path'
+import { promisify } from 'util'
 
 import { getRLibraryPath } from '../services/filesystem/app-paths'
 import { REQUIRED_R_VERSION } from './r-config'

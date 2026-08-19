@@ -1,5 +1,3 @@
-import { create } from 'zustand'
-
 import type {
   DesignInput,
   SimulationResultEntry,
@@ -7,6 +5,7 @@ import type {
   SimulationRunResult,
   StudyDesign
 } from '@shared/simulation-types'
+import { create } from 'zustand'
 
 function makeId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -17,14 +16,16 @@ function makeId(): string {
 interface DesignState {
   design: StudyDesign | null
   selectedResultId: string | null
+  selectedResults: string[] | null
   isRunning: boolean
   isDirty: boolean
 
   newDesign: (input: DesignInput, name?: string) => Promise<void>
   startNewDesign: (input: DesignInput, name?: string) => void
   renameDesign: (name: string) => void
-  runSimulation: (input: SimulationRunInput) => Promise<SimulationRunResult>
+  runSimulation: (input: SimulationRunInput, formInput) => Promise<SimulationRunResult>
   selectResult: (id: string) => void
+  selectResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
   loadDesign: () => Promise<boolean>
   closeDesign: () => void
@@ -39,6 +40,7 @@ export const useDesign = create<DesignState>((set, get) => {
   return {
     design: null,
     selectedResultId: null,
+    selectedResults: null,
     isRunning: false,
     isDirty: false,
 
@@ -72,7 +74,8 @@ export const useDesign = create<DesignState>((set, get) => {
 
       set({
         design,
-        selectedResultId: null
+        selectedResultId: null,
+        selectedResults: null
       })
 
       setDirty(true)
@@ -87,7 +90,7 @@ export const useDesign = create<DesignState>((set, get) => {
       setDirty(true)
     },
 
-    runSimulation: async (input) => {
+    runSimulation: async (input, formInput) => {
       set({ isRunning: true })
 
       try {
@@ -106,9 +109,11 @@ export const useDesign = create<DesignState>((set, get) => {
           return {
             design: {
               ...state.design,
+              input: formInput ?? state.design.input,
               results: [...state.design.results, entry]
             },
-            selectedResultId: entry.id
+            selectedResultId: entry.id,
+            selectedResults: null
           }
         })
 
@@ -121,6 +126,7 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     selectResult: (id) => set({ selectedResultId: id }),
+    selectResults: (ids) => set({ selectedResults: ids }),
 
     saveDesign: async () => {
       const { design } = get()
@@ -159,7 +165,8 @@ export const useDesign = create<DesignState>((set, get) => {
     closeDesign: () => {
       set({
         design: null,
-        selectedResultId: null
+        selectedResultId: null,
+        selectedResults: null
       })
 
       setDirty(false)

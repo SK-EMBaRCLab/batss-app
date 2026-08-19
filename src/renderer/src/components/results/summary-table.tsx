@@ -1,3 +1,6 @@
+import { SimulationSummaryRow } from '@shared/simulation-types'
+import type { ReactElement } from 'react'
+
 import {
   Table,
   TableBody,
@@ -6,8 +9,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { SimulationSummaryRow } from '@shared/simulation-types'
-import type { ReactElement } from 'react'
 
 export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactElement {
   return (

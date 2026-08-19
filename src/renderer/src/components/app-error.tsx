@@ -1,9 +1,9 @@
+import { AlertTriangle, Copy, RefreshCw } from 'lucide-react'
 import { type ReactElement } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
-import { AlertTriangle, Copy, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
 import { toError } from '@/lib/utils'

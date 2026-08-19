@@ -1,9 +1,10 @@
-import { type ReactElement } from 'react'
-import { cn } from '@/lib/utils'
-import { Button } from './ui/button'
 import { Check } from 'lucide-react'
-import { Separator } from './ui/separator'
-import { Progress } from './ui/progress'
+import { type ReactElement } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 type Step = {
   id: string

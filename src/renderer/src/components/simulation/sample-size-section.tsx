@@ -1,11 +1,9 @@
-import { type ReactElement } from 'react'
 import { Field as FormischField } from '@formisch/react'
-
-import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
-
-import { Input } from '@/components/ui/input'
+import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/components/types'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 export function SampleSizeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (

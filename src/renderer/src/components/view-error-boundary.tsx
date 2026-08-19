@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { ViewError } from './view-error'
+
+import { ViewError } from '@/components/view-error'
 
 type Props = {
   children: React.ReactNode

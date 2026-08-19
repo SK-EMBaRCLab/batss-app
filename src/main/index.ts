@@ -1,14 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain, screen, nativeTheme, dialog } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import icon from '../../resources/icon.png?asset'
-
-import { registerRuntimeIPC } from './ipc/runtime.ipc'
-import { registerSettingsIPC } from './ipc/settings.ipc'
-import { SimulationService } from './services/simulation.service'
-import { settingsService } from './services/settings.service'
 import { SimulationRunInput } from '../shared/simulation-types'
 import {
   clearUnsavedDesignChanges,
@@ -16,6 +11,10 @@ import {
   registerAlbatrossFilesIPC
 } from './ipc/albatross-files.ipc'
 import { registerAppIPC } from './ipc/app.ipc'
+import { registerRuntimeIPC } from './ipc/runtime.ipc'
+import { registerSettingsIPC } from './ipc/settings.ipc'
+import { settingsService } from './services/settings.service'
+import { SimulationService } from './services/simulation.service'
 
 let mainWindow: BrowserWindow | null = null
 let forceClose = false

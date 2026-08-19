@@ -1,10 +1,12 @@
-import { type ReactElement } from 'react'
 import { useField } from '@formisch/react'
+import { Trash2 } from 'lucide-react'
+import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/components/types'
-
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -12,11 +14,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '../ui/button'
-import { Trash2 } from 'lucide-react'
-import { Input } from '../ui/input'
 import { decisionRuleFormula } from '@/lib/utils'
 
 type DecisionRuleCardProps = {
