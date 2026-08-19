@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.1.0...v3.2.0) (2026-08-19)
+
+
+### Features
+
+* **runtime:** Add ability to check for R package versions and update to latest ([dd63884](https://github.com/SK-EMBaRCLab/batss-app/commit/dd638844e0e239cdfe053797144a7ebd75421bf3)), closes [#26](https://github.com/SK-EMBaRCLab/batss-app/issues/26)
+
 ## [3.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.0.2...v3.1.0) (2026-08-19)
 
 
