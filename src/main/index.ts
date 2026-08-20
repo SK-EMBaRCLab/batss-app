@@ -23,17 +23,25 @@ if (process.platform === 'linux') {
   app.commandLine.appendSwitch('ozone-platform', 'x11')
 }
 
-app.disableHardwareAcceleration()
+// These software-rendering switches exist for the headless Docker dev
+// environment (see docker-compose.yml: DISPLAY/ELECTRON_DISABLE_GPU/
+// LIBGL_ALWAYS_SOFTWARE), where no real GPU is available. They should
+// NOT be applied on native installs — forcing swiftshader there just
+// disables hardware acceleration for no reason.
+const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1'
 
-app.commandLine.appendSwitch('disable-gpu')
-app.commandLine.appendSwitch('disable-gpu-compositing')
-app.commandLine.appendSwitch('disable-gpu-rasterization')
-app.commandLine.appendSwitch('disable-zero-copy')
-app.commandLine.appendSwitch('disable-software-rasterizer', 'false')
+if (isHeadlessContainer) {
+  app.disableHardwareAcceleration()
 
-app.commandLine.appendSwitch('use-gl', 'swiftshader')
-app.commandLine.appendSwitch('use-angle', 'swiftshader')
-app.commandLine.appendSwitch('enable-unsafe-swiftshader')
+  app.commandLine.appendSwitch('disable-gpu')
+  app.commandLine.appendSwitch('disable-gpu-compositing')
+  app.commandLine.appendSwitch('disable-gpu-rasterization')
+  app.commandLine.appendSwitch('disable-zero-copy')
+
+  app.commandLine.appendSwitch('use-gl', 'swiftshader')
+  app.commandLine.appendSwitch('use-angle', 'swiftshader')
+  app.commandLine.appendSwitch('enable-unsafe-swiftshader')
+}
 
 const simulationService = new SimulationService()
 
