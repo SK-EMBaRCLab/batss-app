@@ -1,14 +1,12 @@
 import { SimulationRunInput } from '@shared/simulation-types'
 import { ChevronDown } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
-import * as v from 'valibot'
 
 import { SimulationForm } from '@/components/simulation/form'
 import { LogPanel } from '@/components/simulation/log-panel'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { runnableDesignSchema } from '@/lib/schema'
 import { formatDuration } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
@@ -31,19 +29,10 @@ export default function Simulation(): ReactElement {
     return unsubscribe
   }, [])
 
-  const handleRun = async (input: SimulationRunInput, formInput): Promise<void> => {
+  const handleRun = async (runnableInput: SimulationRunInput, formInput): Promise<void> => {
     setLogsOpen(true)
     setLogs([])
     setElapsedSeconds(0)
-
-    const parsed = v.safeParse(runnableDesignSchema, input)
-    if (!parsed.success) {
-      // Handle validation errors here
-      setLogs(['> Cannot run simulation', '> Please complete all required fields.'])
-      return
-    }
-
-    const runnableInput: SimulationRunInput = parsed.output
 
     setLogs([
       '> Starting BATSS simulation',
