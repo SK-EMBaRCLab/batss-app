@@ -315,3 +315,13 @@ export class RManager {
     return new Error('R execution failed')
   }
 }
+
+// Shared singleton. RManager caches the resolved Rscript executable on
+// the instance (see getRExecutable), so constructing a fresh instance
+// per call — as bootstrap.ts and simulation.service.ts previously did —
+// meant that cache never survived past a single operation. Every
+// runtime check, package install, and simulation run re-walked the
+// full candidate list, including Windows registry queries. Importing
+// this singleton instead lets the resolved path persist for the life
+// of the app.
+export const rManager = new RManager()

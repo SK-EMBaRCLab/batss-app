@@ -1,12 +1,12 @@
 // src/main/runtime/bootstrap.ts
 
 import { PackageManager } from './package-manager'
-import { RManager } from './r-manager'
+import { rManager } from './r-manager'
 import { RuntimeReporter } from './reporter'
 import type { RuntimeResult } from './types'
 
 export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<RuntimeResult> {
-  const r = new RManager()
+  const r = rManager
 
   try {
     reporter.checking('Checking R installation', 10)
@@ -51,7 +51,7 @@ export async function updateRuntime(
   packageNames: string[],
   reporter: RuntimeReporter
 ): Promise<RuntimeResult> {
-  const r = new RManager()
+  const r = rManager
 
   try {
     reporter.checking('Checking R installation', 10)

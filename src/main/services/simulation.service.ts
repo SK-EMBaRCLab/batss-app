@@ -1,10 +1,10 @@
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
-import { OutputListener, RManager } from '../runtime/r-manager'
+import { OutputListener, rManager } from '../runtime/r-manager'
 
 const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
 
 export class SimulationService {
-  private readonly r = new RManager()
+  private readonly r = rManager
 
   /**
    * Runs the 2-arm binomial BATSS design (batss.glm with rbinom /
