@@ -2,10 +2,9 @@
 
 ## [3.2.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.0...v3.2.1) (2026-08-20)
 
-
 ### Bug Fixes
 
-* improve theme colors and contrast and overall style ([a33bf74](https://github.com/SK-EMBaRCLab/batss-app/commit/a33bf7418850c79b2e3602f7ffb0d44314b38c6a))
+- improve theme colors and contrast and overall style ([a33bf74](https://github.com/SK-EMBaRCLab/batss-app/commit/a33bf7418850c79b2e3602f7ffb0d44314b38c6a))
 
 ## [3.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.1.0...v3.2.0) (2026-08-19)
 
