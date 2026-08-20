@@ -24,6 +24,62 @@ type RuntimeState = {
   clearLogs: () => void
 }
 
+// Runs a tracked runtime operation (initial check or package update):
+// subscribes to the live update/log channels, runs `operation`, maps
+// the resulting RuntimeResult into store state, and always cleans up
+// the subscriptions - regardless of success, R-level failure, or a
+// rejected IPC call. checkRuntime and updatePackages previously
+// duplicated this wiring; both now just describe what makes them
+// different (the operation itself and the ready/failure messages).
+async function runTrackedOperation(
+  set: (partial: Partial<RuntimeState> | ((state: RuntimeState) => Partial<RuntimeState>)) => void,
+  operation: () => Promise<{ ready: boolean; packages: RuntimePackage[] }>,
+  messages: { ready: string; failed: string }
+): Promise<void> {
+  const unsubscribeUpdate = window.runtime.onUpdate((update: RuntimeUpdate) => {
+    set({
+      status: update.status,
+      message: update.message,
+      progress: update.progress
+    })
+  })
+
+  const unsubscribeLog = window.runtime.onLog((line: string) => {
+    set((state) => ({
+      logs:
+        state.logs.length >= MAX_LOG_LINES
+          ? [...state.logs.slice(state.logs.length - MAX_LOG_LINES + 1), line]
+          : [...state.logs, line]
+    }))
+  })
+
+  try {
+    const result = await operation()
+
+    set({
+      status: result.ready ? 'ready' : 'error',
+      message: result.ready ? messages.ready : messages.failed,
+      progress: 100,
+      packages: result.packages,
+      error: result.ready
+        ? undefined
+        : `${messages.failed}: ${result.packages
+            .filter((p) => !p.installed)
+            .map((p) => p.name)
+            .join(', ')}`
+    })
+  } catch (error) {
+    set({
+      status: 'error',
+      message: error instanceof Error ? error.message : messages.failed,
+      error: error instanceof Error ? error.message : messages.failed
+    })
+  } finally {
+    unsubscribeUpdate()
+    unsubscribeLog()
+  }
+}
+
 export const useRuntime = create<RuntimeState>((set, get) => ({
   status: 'idle',
   message: '',
@@ -48,51 +104,10 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
       logs: []
     })
 
-    // Subscribe before invoking check() so no events can be missed in
-    // the (unlikely but possible) window between the invoke call being
-    // sent and the listeners being attached.
-    const unsubscribeUpdate = window.runtime.onUpdate((update: RuntimeUpdate) => {
-      set({
-        status: update.status,
-        message: update.message,
-        progress: update.progress
-      })
+    await runTrackedOperation(set, () => window.runtime.check(), {
+      ready: 'Runtime ready',
+      failed: 'One or more packages failed to install'
     })
-
-    const unsubscribeLog = window.runtime.onLog((line: string) => {
-      set((state) => ({
-        logs:
-          state.logs.length >= MAX_LOG_LINES
-            ? [...state.logs.slice(state.logs.length - MAX_LOG_LINES + 1), line]
-            : [...state.logs, line]
-      }))
-    })
-
-    try {
-      const result = await window.runtime.check()
-
-      set({
-        status: result.ready ? 'ready' : 'error',
-        message: result.ready ? 'Runtime ready' : 'One or more packages failed to install',
-        progress: 100,
-        packages: result.packages,
-        error: result.ready
-          ? undefined
-          : `Failed to install: ${result.packages
-              .filter((p) => !p.installed)
-              .map((p) => p.name)
-              .join(', ')}`
-      })
-    } catch (error) {
-      set({
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Runtime failed',
-        error: error instanceof Error ? error.message : 'Runtime failed'
-      })
-    } finally {
-      unsubscribeUpdate()
-      unsubscribeLog()
-    }
   },
 
   updatePackages: async () => {
@@ -109,48 +124,14 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
       logs: []
     })
 
-    const unsubscribeUpdate = window.runtime.onUpdate((update: RuntimeUpdate) => {
-      set({
-        status: update.status,
-        message: update.message,
-        progress: update.progress
-      })
-    })
-
-    const unsubscribeLog = window.runtime.onLog((line: string) => {
-      set((state) => ({
-        logs:
-          state.logs.length >= MAX_LOG_LINES
-            ? [...state.logs.slice(state.logs.length - MAX_LOG_LINES + 1), line]
-            : [...state.logs, line]
-      }))
-    })
-
-    try {
-      const result = await window.runtime.update(packagesToUpdate.map((pkg) => pkg.name))
-
-      set({
-        status: result.ready ? 'ready' : 'error',
-        message: result.ready ? 'Packages updated' : 'One or more packages failed to update',
-        progress: 100,
-        packages: result.packages,
-        error: result.ready
-          ? undefined
-          : `Failed to update: ${result.packages
-              .filter((p) => p.updateAvailable)
-              .map((p) => p.name)
-              .join(', ')}`
-      })
-    } catch (error) {
-      set({
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Package update failed',
-        error: error instanceof Error ? error.message : 'Package update failed'
-      })
-    } finally {
-      unsubscribeUpdate()
-      unsubscribeLog()
-    }
+    await runTrackedOperation(
+      set,
+      () => window.runtime.update(packagesToUpdate.map((pkg) => pkg.name)),
+      {
+        ready: 'Packages updated',
+        failed: 'One or more packages failed to update'
+      }
+    )
   },
 
   clearLogs: () => set({ logs: [] }),
