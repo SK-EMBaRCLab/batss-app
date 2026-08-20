@@ -56,6 +56,16 @@ export class PackageManager {
         lib.loc = install_lib
       )
 
+      unique_repos <- unique(unlist(package_repos))
+
+      available_by_repo <- list()
+
+      for (repo in unique_repos) {
+        available_by_repo[[repo]] <- available.packages(
+          repos = repo
+        )
+      }
+
       for (pkg in packages) {
         is_installed <- pkg %in% rownames(installed)
 
@@ -71,10 +81,7 @@ export class PackageManager {
         }
 
         repo <- package_repos[[pkg]]
-
-        available <- available.packages(
-          repos = repo
-        )
+        available <- available_by_repo[[repo]]
 
         latest_version <- if (pkg %in% rownames(available)) {
           as.character(
