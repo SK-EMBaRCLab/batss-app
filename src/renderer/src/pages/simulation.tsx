@@ -65,6 +65,8 @@ export default function Simulation(): ReactElement {
 
       if (response.status === 'success') {
         navigate('results')
+      } else {
+        setLogs((prev) => [...prev, '', `> Error: ${response.message}`])
       }
     } finally {
       const elapsed = (performance.now() - start) / 1000

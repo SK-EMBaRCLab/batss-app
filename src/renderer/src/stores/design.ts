@@ -1,3 +1,4 @@
+import { toError } from '@/lib/utils'
 import type {
   DesignInput,
   SimulationResultEntry,
@@ -94,7 +95,12 @@ export const useDesign = create<DesignState>((set, get) => {
       set({ isRunning: true })
 
       try {
-        const response = await window.simulation.runSimulation(input)
+        const response = await window.simulation
+          .runSimulation(input)
+          .catch((error): SimulationRunResult => ({
+            status: 'error',
+            message: toError(error).message
+          }))
 
         set((state) => {
           if (!state.design) return state
