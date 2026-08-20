@@ -67,7 +67,39 @@ function createWindow(): void {
     mainWindow?.show()
   })
 
+  let saveBoundsTimer: NodeJS.Timeout | null = null
+
+  const saveBounds = (): void => {
+    if (saveBoundsTimer) {
+      clearTimeout(saveBoundsTimer)
+    }
+
+    saveBoundsTimer = setTimeout(() => {
+      if (!mainWindow?.isMinimized()) {
+        settingsService.set('windowState', {
+          bounds: mainWindow?.getBounds(),
+          isMaximized: mainWindow?.isMaximized()
+        })
+      }
+      saveBoundsTimer = null
+    }, 300)
+  }
+
+  mainWindow.on('resize', saveBounds)
+  mainWindow.on('move', saveBounds)
+
   mainWindow.on('close', async (event) => {
+    if (saveBoundsTimer) {
+      clearTimeout(saveBoundsTimer)
+      saveBoundsTimer = null
+      if (!mainWindow?.isMinimized()) {
+        settingsService.set('windowState', {
+          bounds: mainWindow?.getBounds(),
+          isMaximized: mainWindow?.isMaximized()
+        })
+      }
+    }
+
     if (forceClose) {
       return
     }
@@ -117,22 +149,10 @@ function createWindow(): void {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-
-  const saveBounds = (): void => {
-    if (!mainWindow?.isMinimized()) {
-      settingsService.set('windowState', {
-        bounds: mainWindow?.getBounds(),
-        isMaximized: mainWindow?.isMaximized()
-      })
-    }
-  }
-
-  mainWindow.on('resize', saveBounds)
-  mainWindow.on('move', saveBounds)
 }
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.albatross')
+  electronApp.setAppUserModelId('com.albatross.app')
 
   autoUpdater.on('checking-for-update', () => {
     console.log('Checking for updates...')

@@ -4,7 +4,7 @@
 
 :root {
   --background: oklch(0.9816 0.0055 211.0391);
-  --foreground: oklch(0.2204 0.0300 218.3459);
+  --foreground: oklch(0.2204 0.03 218.3459);
 
   --card: oklch(0.9977 0.0032 197.1059);
   --card-foreground: oklch(0.1499 0.0196 221.4949);
@@ -12,14 +12,14 @@
   --popover: oklch(0.9977 0.0032 197.1059);
   --popover-foreground: oklch(0.1499 0.0196 221.4949);
 
-  --primary: oklch(0.4761 0.0870 221.3232);
+  --primary: oklch(0.4761 0.087 221.3232);
   --primary-foreground: oklch(1 0 0);
 
   --secondary: oklch(0.8216 0.1707 78.9825);
   --secondary-foreground: oklch(0.2506 0.0502 64.9833);
 
-  --muted: oklch(0.9422 0.0110 211.0375);
-  --muted-foreground: oklch(0.4987 0.0150 221.6120);
+  --muted: oklch(0.9422 0.011 211.0375);
+  --muted-foreground: oklch(0.4987 0.015 221.612);
 
   --accent: oklch(0.6554 0.1151 214.5277);
   --accent-foreground: oklch(1 0 0);
@@ -33,7 +33,7 @@
 
   --chart-1: oklch(0.55 0.12 220); /* blue */
   --chart-2: oklch(0.78 0.16 80); /* yellow */
-  --chart-3: oklch(0.60 0.14 145); /* green */
+  --chart-3: oklch(0.6 0.14 145); /* green */
   --chart-4: oklch(0.62 0.14 300); /* purple */
   --chart-5: oklch(0.59 0.17 30); /* red */
 
@@ -51,8 +51,7 @@
 
   --font-sans: 'Google Sans Flex', ui-sans-serif, system-ui, sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
-  --font-mono:
-    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --radius: 0.625rem;
 
@@ -65,23 +64,12 @@
 
   --shadow-2xs: 0 1px 8px 0px hsl(0 0% 0% / 0.07);
   --shadow-xs: 0 1px 8px 0px hsl(0 0% 0% / 0.07);
-  --shadow-sm:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 1px 2px -1px hsl(0 0% 0% / 0.13);
-  --shadow:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 1px 2px -1px hsl(0 0% 0% / 0.13);
-  --shadow-md:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 2px 4px -1px hsl(0 0% 0% / 0.13);
-  --shadow-lg:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 4px 6px -1px hsl(0 0% 0% / 0.13);
-  --shadow-xl:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 8px 10px -1px hsl(0 0% 0% / 0.13);
-  --shadow-2xl:
-    0 1px 8px 0px hsl(0 0% 0% / 0.33);
+  --shadow-sm: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 1px 2px -1px hsl(0 0% 0% / 0.13);
+  --shadow: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 1px 2px -1px hsl(0 0% 0% / 0.13);
+  --shadow-md: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 2px 4px -1px hsl(0 0% 0% / 0.13);
+  --shadow-lg: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 4px 6px -1px hsl(0 0% 0% / 0.13);
+  --shadow-xl: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 8px 10px -1px hsl(0 0% 0% / 0.13);
+  --shadow-2xl: 0 1px 8px 0px hsl(0 0% 0% / 0.33);
 
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -116,13 +104,13 @@
   --input: oklch(0.3193 0.0195 223.3506);
   --ring: oklch(0.5518 0.0972 214.4813);
 
-  --chart-1: oklch(0.6001 0.1000 215); /* blue */
+  --chart-1: oklch(0.6001 0.1 215); /* blue */
   --chart-2: oklch(0.7791 0.1499 79); /* yellow */
   --chart-3: oklch(0.5591 0.1394 146); /* green */
-  --chart-4: oklch(0.7200 0.0852 300); /* purple */
+  --chart-4: oklch(0.72 0.0852 300); /* purple */
   --chart-5: oklch(0.5998 0.1592 35); /* red */
 
-  --sidebar: oklch(0.1003 0.0120 213.9613);
+  --sidebar: oklch(0.1003 0.012 213.9613);
   --sidebar-foreground: oklch(0.8802 0.0077 207.1375);
 
   --sidebar-primary: var(--primary);
@@ -134,9 +122,11 @@
   --sidebar-border: oklch(0.2794 0.0199 223.5646);
   --sidebar-ring: oklch(0.5518 0.0972 214.4813);
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
 
   --radius: 0.625rem;
 
@@ -149,23 +139,12 @@
 
   --shadow-2xs: 0 1px 8px 0px hsl(0 0% 0% / 0.07);
   --shadow-xs: 0 1px 8px 0px hsl(0 0% 0% / 0.07);
-  --shadow-sm:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 1px 2px -1px hsl(0 0% 0% / 0.13);
-  --shadow:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 1px 2px -1px hsl(0 0% 0% / 0.13);
-  --shadow-md:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 2px 4px -1px hsl(0 0% 0% / 0.13);
-  --shadow-lg:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 4px 6px -1px hsl(0 0% 0% / 0.13);
-  --shadow-xl:
-    0 1px 8px 0px hsl(0 0% 0% / 0.13),
-    0 8px 10px -1px hsl(0 0% 0% / 0.13);
-  --shadow-2xl:
-    0 1px 8px 0px hsl(0 0% 0% / 0.33);
+  --shadow-sm: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 1px 2px -1px hsl(0 0% 0% / 0.13);
+  --shadow: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 1px 2px -1px hsl(0 0% 0% / 0.13);
+  --shadow-md: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 2px 4px -1px hsl(0 0% 0% / 0.13);
+  --shadow-lg: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 4px 6px -1px hsl(0 0% 0% / 0.13);
+  --shadow-xl: 0 1px 8px 0px hsl(0 0% 0% / 0.13), 0 8px 10px -1px hsl(0 0% 0% / 0.13);
+  --shadow-2xl: 0 1px 8px 0px hsl(0 0% 0% / 0.33);
 }
 
 @theme inline {
