@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.2.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.1...v3.2.2) (2026-08-20)
+
+
+### Bug Fixes
+
+* **main:** only force software rendering in headless Docker dev env ([f647fcb](https://github.com/SK-EMBaRCLab/batss-app/commit/f647fcb5795ac891e1b09e640a79a1c92060a94a))
+* **simulation:** don't crash the view when the IPC run call rejects ([1255624](https://github.com/SK-EMBaRCLab/batss-app/commit/1255624c26a02189acac7d1d405b68c6bd8c9940))
+
+
+### Performance Improvements
+
+* **runtime:** batch available.packages() calls by unique repo ([eb2a82f](https://github.com/SK-EMBaRCLab/batss-app/commit/eb2a82f0a91ca5875d03a086276e84da759a4e07))
+* **runtime:** share a single RManager instance across the app ([3679de0](https://github.com/SK-EMBaRCLab/batss-app/commit/3679de0a839f53948d10acf9c32f3ce1ae8ad11f))
+* **settings:** cache settings in memory and debounce window bounds saves ([b1f895f](https://github.com/SK-EMBaRCLab/batss-app/commit/b1f895f41842afbc61bc441c96cfb4d2af8eda5f))
+
 ## [3.2.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.0...v3.2.1) (2026-08-20)
 
 ### Bug Fixes
