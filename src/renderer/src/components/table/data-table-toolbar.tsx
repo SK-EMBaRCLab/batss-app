@@ -1,7 +1,7 @@
-import { type ReactTable } from '@tanstack/react-table'
 import { useDebouncedCallback } from '@tanstack/react-pacer/debouncer'
+import { type ReactTable } from '@tanstack/react-table'
 import { FileChartColumn, Search, X } from 'lucide-react'
-import { Dispatch, SetStateAction, useEffect, useState, type ReactElement } from 'react'
+import { Dispatch, type ReactElement, SetStateAction, useEffect, useState } from 'react'
 
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Button } from '@/components/ui/button'
@@ -10,9 +10,9 @@ import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 import { DataTableRow } from '@/types/data-table-types'
 
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
 
 interface DataTableToolbarProps<TData extends DataTableRow> {
   table: ReactTable<DataTableFeatures, TData>
@@ -96,7 +96,7 @@ function DebouncedInput({
   value: string | number
   onChange: (value: string | number) => void
   debounce?: number
-} & Omit<React.ComponentProps<typeof Input>, 'onChange'>) {
+} & Omit<React.ComponentProps<typeof Input>, 'onChange'>): ReactElement {
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {

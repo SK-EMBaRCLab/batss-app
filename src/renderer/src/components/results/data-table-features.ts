@@ -1,5 +1,5 @@
-import { rankItem } from '@tanstack/match-sorter-utils'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import type { FilterFn, RowData, TableFeatures } from '@tanstack/react-table'
 import {
   columnFacetingFeature,
@@ -11,14 +11,14 @@ import {
   createPaginatedRowModel,
   createSortedRowModel,
   globalFilteringFeature,
+  metaHelper,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
-  sortFn_datetime,
   sortFn_alphanumeric,
+  sortFn_datetime,
   sortFn_text,
-  tableFeatures,
-  metaHelper
+  tableFeatures
 } from '@tanstack/react-table'
 
 interface FuzzyFilterMeta {
@@ -35,7 +35,7 @@ const fuzzyFilter: FilterFn<FuzzyFeatures, RowData> = (
   addMeta?: (meta: object) => void
 ) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value)
+  const itemRank = rankItem(row.getValue(columnId), value as string)
 
   // Store the itemRank info
   addMeta?.({ itemRank })

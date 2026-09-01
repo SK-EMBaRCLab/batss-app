@@ -1,4 +1,3 @@
-import { toError } from '@/lib/utils'
 import type {
   DesignInput,
   SimulationResultEntry,
@@ -7,6 +6,8 @@ import type {
   StudyDesign
 } from '@shared/simulation-types'
 import { create } from 'zustand'
+
+import { toError } from '@/lib/utils'
 
 function makeId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
