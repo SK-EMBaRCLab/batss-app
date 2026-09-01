@@ -33,10 +33,6 @@ export const columns = columnHelper.columns([
     enableSorting: false,
     enableHiding: false
   }),
-  columnHelper.accessor('id', {
-    id: 'ID',
-    header: 'ID'
-  }),
   columnHelper.accessor('createdAt', {
     id: 'createdAt',
     meta: {
@@ -64,6 +60,27 @@ export const columns = columnHelper.columns([
     filterFn: (row, columnId, filterValue: string[]) => {
       return filterValue.includes(row.getValue(columnId))
     }
+  }),
+  columnHelper.accessor('input.meanOutcome', {
+    id: 'meanOutcome',
+    meta: {
+      label: 'Mean Outcome'
+    },
+    header: 'Mean Outcome in control arm'
+  }),
+  columnHelper.accessor('input.meanDiff', {
+    id: 'meanDiff',
+    meta: {
+      label: 'Mean Difference'
+    },
+    header: 'Mean Difference in treatment effect'
+  }),
+  columnHelper.accessor('input.sd', {
+    id: 'sd',
+    meta: {
+      label: 'Standard Deviation'
+    },
+    header: 'Standard Deviation'
   }),
   columnHelper.accessor('input.N', {
     id: 'maxSampleSize',

@@ -200,8 +200,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.on('ping', () => console.log('pong'))
-
   // App IPC
   registerAppIPC()
 

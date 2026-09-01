@@ -38,20 +38,24 @@ export function DataTable<TData extends DataTableRow>({
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({})
 
   const table = useTable({
     features,
     data,
     columns,
+    globalFilterFn: 'fuzzy',
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      globalFilter,
       rowSelection,
       columnVisibility
     }
@@ -65,7 +69,11 @@ export function DataTable<TData extends DataTableRow>({
 
   return (
     <div className="flex flex-col gap-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar
+        table={table}
+        globalFilter={globalFilter}
+        setGlobalFilter={setGlobalFilter}
+      />
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
