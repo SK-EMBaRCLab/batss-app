@@ -53,12 +53,6 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
               <CollapsibleContent>
                 <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
                   <div className="space-y-5">
-                    <p className="leading-relaxed">
-                      Decision rules are predefined conditions that determine whether the trial
-                      adapts. When a rule is met, a pre-specified action takes place, such as
-                      stopping or modifying the trial.
-                    </p>
-
                     <div className="space-y-2">
                       <h4 className="font-medium text-primary">Binary</h4>
 
