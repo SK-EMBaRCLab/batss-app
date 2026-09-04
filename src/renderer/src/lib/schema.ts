@@ -71,7 +71,10 @@ const binaryDesignSchema = v.object({
     v.maxValue(1, 'Probability must be at most 1.')
   ),
 
-  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+  treatmentEffectType: v.picklist(
+    ['oddsRatio', 'riskDifference', 'riskRatio'],
+    'Please select a treatment effect.'
+  ),
 
   treatmentEffect: requiredNumber('Treatment effect'),
 
@@ -98,7 +101,10 @@ const ordinalDesignSchema = v.object({
 
   probability: requiredNumber('Control arm probability'),
 
-  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
+  treatmentEffectType: v.picklist(
+    ['oddsRatio', 'riskDifference', 'riskRatio'],
+    'Please select a treatment effect.'
+  ),
 
   treatmentEffect: requiredNumber('Treatment effect'),
 

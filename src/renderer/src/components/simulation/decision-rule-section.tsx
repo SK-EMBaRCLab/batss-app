@@ -32,7 +32,7 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
       <div className="flex shrink-0 items-center justify-between">
         <h3 className="font-semibold">Decision Rules</h3>
 
-        <Button type="button" onClick={addRule} disabled>
+        <Button type="button" onClick={addRule} disabled={rules.input.length > 0}>
           Add decision rule
         </Button>
       </div>
