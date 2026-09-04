@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.0.0...v4.0.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* better error message for empty outcome type ([153ad98](https://github.com/SK-EMBaRCLab/batss-app/commit/153ad98bf40889e8ccc5af1c64c273526be70f71))
+* but with button disabled when there are no decision rules not allowing you to add one ([2a61e99](https://github.com/SK-EMBaRCLab/batss-app/commit/2a61e9938e1c3f058b72508146e1eb6c5813fce6))
+* copy paste error text in wrong place ([ba7b0af](https://github.com/SK-EMBaRCLab/batss-app/commit/ba7b0af8b76a123b42a96195f1cc44ff0f1b902f))
+
 ## [4.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.2...v4.0.0) (2026-09-04)
 
 
