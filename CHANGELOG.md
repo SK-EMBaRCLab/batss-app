@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.2...v4.0.0) (2026-09-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* add the decision rule graph and update the text across the application. Also update some of the packages
+
+### Features
+
+* add global filtering to table and new columns for continous outcome type ([e1ef20d](https://github.com/SK-EMBaRCLab/batss-app/commit/e1ef20ddec52c97b29087b17a8e3bab47b2ddfb5))
+* add the decision rule graph and update the text across the application. Also update some of the packages ([a535117](https://github.com/SK-EMBaRCLab/batss-app/commit/a53511749ad04ef453a1f15b2f40ff8757a5544b))
+
 ## [3.2.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v3.2.1...v3.2.2) (2026-08-20)
 
 ### Bug Fixes
