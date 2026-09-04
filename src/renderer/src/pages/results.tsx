@@ -9,7 +9,7 @@ import { SampleSizeTable } from '@/components/results/sample-size-table'
 import { SummaryTable } from '@/components/results/summary-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -180,6 +180,11 @@ export default function Results(): ReactElement {
               <Card>
                 <CardHeader>
                   <CardTitle>Simulated Trial Outcome Probability Summary by Scenario</CardTitle>
+                  <CardDescription>
+                    The following table summarizes that probabilities of each trial outcome across
+                    the simulated scenarios. Each column represents a scenario and the probabilities
+                    of each trial outcome
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent>
@@ -188,42 +193,49 @@ export default function Results(): ReactElement {
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>
-                    Graphical Summary of Simulated Trial Outcome Probabilities by Scenario
-                  </CardTitle>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal />
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent>
-                      <DropdownMenuGroup>
-                        <DropdownMenuLabel>Chart</DropdownMenuLabel>
+                <CardHeader className="gap-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle>
+                      Graphical Summary of Simulated Trial Outcome Probabilities by Scenario
+                    </CardTitle>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal />
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent>
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>Chart</DropdownMenuLabel>
 
-                        <DropdownMenuItem onClick={download}>
-                          <ImageDown className="h-4 w-4" />
-                          Export Chart
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
-                        <DropdownMenuCheckboxItem
-                          checked={options.reference}
-                          onCheckedChange={(checked) =>
-                            setOptions({ ...options, reference: checked === true })
-                          }
-                        >
-                          <Minus />
-                          Reference Line
-                        </DropdownMenuCheckboxItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                          <DropdownMenuItem onClick={download}>
+                            <ImageDown className="h-4 w-4" />
+                            Export Chart
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
+                          <DropdownMenuCheckboxItem
+                            checked={options.reference}
+                            onCheckedChange={(checked) =>
+                              setOptions({ ...options, reference: checked === true })
+                            }
+                          >
+                            <Minus />
+                            Reference Line
+                          </DropdownMenuCheckboxItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <CardDescription>
+                    The following graph summarizes that probabilities of each trial outcome across
+                    the simulated scenarios. Each bar represents a scenario and the probabilities of
+                    each trial outcome
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent>
@@ -236,6 +248,17 @@ export default function Results(): ReactElement {
               <Card>
                 <CardHeader>
                   <CardTitle>Simulated Sample Size Summary by Scenario</CardTitle>
+                  <CardDescription>
+                    The following tables summarize the simulated sample size distributions under
+                    both the null effect and target treatment effect scenarios. For each scenario,
+                    the tables present the mean, minimum, maximum, and a user-selected quantile of
+                    the sample size distribution. Sample sizes are reported for the total study
+                    population as well as separately for the control and experimental treatment
+                    arms. The quantile slider determines the percentile displayed in the quantile
+                    column. For example, setting the slider to 0.80 displays the 80th percentile
+                    sample size, meaning that 80% of simulated trials reached a conclusion before or
+                    at the reported sample size
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent>

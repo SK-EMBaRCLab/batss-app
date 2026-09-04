@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react'
 
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppBanner } from '@/layouts/app-banner'
 import { AppHeader } from '@/layouts/app-header'
 import { AppSidebar } from '@/layouts/app-sidebar'
@@ -15,7 +16,9 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
 
         <AppBanner />
 
-        <main className="min-h-0 min-w-0 flex-1 overflow-hidden">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-hidden">
+          <TooltipProvider>{children}</TooltipProvider>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )

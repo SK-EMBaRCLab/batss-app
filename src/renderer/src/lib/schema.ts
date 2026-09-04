@@ -19,7 +19,8 @@ export const requiredNumber = (label: string) =>
 
       return Number(trimmed)
     }),
-    v.number(`${label} must be a number.`)
+    v.number(`${label} must be a number.`),
+    v.finite(`${label} must be a finite number.`)
   )
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

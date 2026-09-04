@@ -14,7 +14,9 @@ export function ContinuousOutcomeSection({ form }: { form: SimulationFormStore }
         {(field) => (
           <Field data-invalid={field.errors !== null}>
             <FieldLabel>Mean Outcome in Control arm</FieldLabel>
-            <FieldDescription>TODO</FieldDescription>
+            <FieldDescription>
+              The average outcome for participants receiving the control intervention
+            </FieldDescription>
             <Input
               {...field.props}
               type="number"
@@ -37,7 +39,9 @@ export function ContinuousOutcomeSection({ form }: { form: SimulationFormStore }
         {(field) => (
           <Field data-invalid={field.errors !== null}>
             <FieldLabel>Standard Deviation of Outcome</FieldLabel>
-            <FieldDescription>TODO</FieldDescription>
+            <FieldDescription>
+              A measure of individual variation around the mean outcome
+            </FieldDescription>
             <Input
               {...field.props}
               type="number"
@@ -59,7 +63,9 @@ export function ContinuousOutcomeSection({ form }: { form: SimulationFormStore }
         {(field) => (
           <Field data-invalid={field.errors !== null}>
             <FieldLabel>Mean Difference for the treatment effect</FieldLabel>
-            <FieldDescription>Describe this</FieldDescription>
+            <FieldDescription>
+              The difference in the average outcome between treatment and control arms
+            </FieldDescription>
             <Input
               {...field.props}
               type="number"

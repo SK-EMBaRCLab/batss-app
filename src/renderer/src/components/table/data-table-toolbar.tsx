@@ -88,7 +88,7 @@ export function DataTableToolbar<TData extends DataTableRow>({
 }
 
 function DebouncedInput({
-  value: initialValue,
+  value: externalValue,
   onChange,
   debounce = 300,
   ...props
@@ -97,11 +97,12 @@ function DebouncedInput({
   onChange: (value: string | number) => void
   debounce?: number
 } & Omit<React.ComponentProps<typeof Input>, 'onChange'>): ReactElement {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState(externalValue)
 
   useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setValue(externalValue)
+  }, [externalValue])
 
   const debouncedOnChange = useDebouncedCallback(onChange, { wait: debounce })
 

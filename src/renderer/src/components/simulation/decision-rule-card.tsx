@@ -1,25 +1,52 @@
 import { useField } from '@formisch/react'
+import type { DecisionRule } from '@shared/simulation-types'
 import { Trash2 } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/components/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { decisionRuleFormula } from '@/lib/utils'
+
+import { DecisionRuleFields } from './decision-rule-fields'
+import { DecisionRulePreview } from './decision-rule-preview'
 
 type DecisionRuleCardProps = {
   form: SimulationFormStore
   index: number
   onRemove: () => void
+}
+
+function getDecisionRule(
+  type: string | undefined,
+  direction: string | undefined,
+  margin: string | number | undefined,
+  threshold: string | number | undefined
+): DecisionRule | null {
+  if (type !== 'superiority' && type !== 'futility') {
+    return null
+  }
+
+  if (direction !== 'greater' && direction !== 'less') {
+    return null
+  }
+
+  if (margin === '' || threshold === '') {
+    return null
+  }
+
+  const parsedMargin = Number(margin)
+  const parsedThreshold = Number(threshold)
+
+  if (!Number.isFinite(parsedMargin) || !Number.isFinite(parsedThreshold)) {
+    return null
+  }
+
+  return {
+    type,
+    direction,
+    margin: parsedMargin,
+    threshold: parsedThreshold
+  }
 }
 
 export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProps): ReactElement {
@@ -47,147 +74,90 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     path: ['outcomeType']
   })
 
-  let formula = ''
+  const treatmentEffect = useField(form, {
+    path: ['treatmentEffect']
+  })
 
-  if (outcomeType.input === 'binary') {
-    formula = decisionRuleFormula({
-      type: typeField.input,
-      direction: directionField.input,
-      margin: marginField.input,
-      threshold: thresholdField.input,
-      treatmentEffectType: treatmentEffectType.input
-    })
-  } else if (outcomeType.input === 'continuous') {
-    formula = decisionRuleFormula({
-      type: typeField.input,
-      direction: directionField.input,
-      margin: marginField.input,
-      threshold: thresholdField.input,
-      treatmentEffectType: 'meanDifference'
-    })
+  const rule = getDecisionRule(
+    typeField.input,
+    directionField.input,
+    marginField.input,
+    thresholdField.input
+  )
+
+  const oddsRatio = Number(treatmentEffect.input)
+
+  const formula = rule
+    ? decisionRuleFormula({
+        ...rule,
+        treatmentEffectType:
+          outcomeType.input === 'continuous' ? 'meanDifference' : treatmentEffectType.input
+      })
+    : ''
+
+  const handleTypeChange = (type: 'superiority' | 'futility'): void => {
+    typeField.onChange(type)
+
+    if (type === 'superiority') {
+      directionField.onChange('greater')
+      marginField.onChange(1)
+      thresholdField.onChange(0.95)
+    }
+
+    if (type === 'futility') {
+      directionField.onChange('less')
+      marginField.onChange(1)
+      thresholdField.onChange(0.05)
+    }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Decision Rule {index + 1}</CardTitle>
-        <CardAction>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onRemove}
-            aria-label={`Remove decision rule ${index + 1}`}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </CardAction>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        <div className="rounded-md bg-muted p-3 text-sm">
-          <div className="capitalize">
-            Treatment will stop for {typeField.input ?? 'decision'} if:
-          </div>
-
-          <div className="mt-2 font-mono font-semibold">{formula}</div>
+    <div className="rounded-lg border bg-background">
+      <div className="flex items-center justify-between border-b px-6 py-4">
+        <div>
+          <h2 className="text-base font-semibold">Decision Rule {index + 1}</h2>
+          <p className="text-sm text-muted-foreground">
+            Define when the treatment is considered superior or futile.
+          </p>
         </div>
-        <Field>
-          <FieldLabel>Decision rule type</FieldLabel>
-          <FieldDescription>Is treatment superior to control</FieldDescription>
-          <Select
-            value={typeField.input ?? ''}
-            onValueChange={(value) => {
-              if (value !== 'superiority' && value !== 'futility') {
-                return
-              }
 
-              typeField.onChange(value)
-
-              if (value === 'superiority') {
-                directionField.onChange('greater')
-                marginField.onChange(1)
-                thresholdField.onChange(0.95)
-              }
-
-              if (value === 'futility') {
-                directionField.onChange('less')
-                marginField.onChange(1)
-                thresholdField.onChange(0.05)
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select rule type" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="superiority">Superiority</SelectItem>
-
-              <SelectItem value="futility">Futility</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field>
-          <FieldLabel>Direction</FieldLabel>
-
-          <Select
-            value={directionField.input ?? ''}
-            onValueChange={(value) => {
-              if (value === 'greater' || value === 'less') {
-                directionField.onChange(value)
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select direction" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="greater">Greater than</SelectItem>
-
-              <SelectItem value="less">Less than</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field>
-          <FieldLabel>Superiority margin (SM)</FieldLabel>
-          <FieldDescription>Denotes what meets a clinicly meaningful margin </FieldDescription>
-
-          <Input
-            type="number"
-            step="0.01"
-            value={marginField.input ?? ''}
-            onChange={(e) => marginField.onChange(e.target.value)}
-          />
-
-          {marginField.errors && (
-            <FieldError
-              errors={marginField.errors.map((message) => ({
-                message
-              }))}
-            />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          aria-label={`Remove decision rule ${index + 1}`}
+          disabled={index === 0}
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
+      <div className="p-6">
+        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+          {outcomeType.input === 'binary' && rule && (
+            <DecisionRulePreview rule={rule} oddsRatio={oddsRatio} formula={formula} />
           )}
-        </Field>
-        <Field>
-          <FieldLabel>Decision threshold (DT)</FieldLabel>
 
-          <Input
-            type="number"
-            step="0.01"
-            value={thresholdField.input ?? ''}
-            onChange={(e) => thresholdField.onChange(e.target.value)}
+          <DecisionRuleFields
+            type={typeField.input}
+            direction={directionField.input}
+            margin={marginField.input}
+            threshold={thresholdField.input}
+            onTypeChange={handleTypeChange}
+            onDirectionChange={(direction) => {
+              directionField.onChange(direction)
+            }}
+            onMarginChange={(margin) => {
+              marginField.onChange(margin)
+            }}
+            onThresholdChange={(threshold) => {
+              thresholdField.onChange(threshold)
+            }}
+            marginErrors={marginField.errors ?? undefined}
+            thresholdErrors={thresholdField.errors ?? undefined}
           />
-
-          {thresholdField.errors && (
-            <FieldError
-              errors={thresholdField.errors.map((message) => ({
-                message
-              }))}
-            />
-          )}
-        </Field>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   )
 }

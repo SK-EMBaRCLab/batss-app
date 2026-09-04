@@ -1,10 +1,11 @@
 import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
-import { type ReactElement, useEffect, useRef } from 'react'
+import { type ReactElement } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntime } from '@/stores/runtime'
+
+import { LogViewer } from './log-viewer'
 
 export function RuntimeScreen(): ReactElement {
   const status = useRuntime((state) => state.status)
@@ -15,8 +16,6 @@ export function RuntimeScreen(): ReactElement {
 
   const logs = useRuntime((state) => state.logs)
 
-  const scrollRootRef = useRef<HTMLDivElement>(null)
-
   const isChecking = status === 'checking'
 
   const isInstalling = status === 'installing'
@@ -24,17 +23,6 @@ export function RuntimeScreen(): ReactElement {
   const isReady = status === 'ready'
 
   const isError = status === 'error'
-
-  // Auto-scroll to the newest log line as output streams in.
-  useEffect(() => {
-    const viewport = scrollRootRef.current?.querySelector<HTMLDivElement>(
-      '[data-slot="scroll-area-viewport"]'
-    )
-
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight
-    }
-  }, [logs])
 
   return (
     <div
@@ -124,19 +112,7 @@ export function RuntimeScreen(): ReactElement {
           )}
 
           {logs.length > 0 && (isChecking || isInstalling || isError) && (
-            <div ref={scrollRootRef}>
-              <ScrollArea className="h-48 rounded-md border border-border bg-black p-3">
-                <div className="font-mono text-xs text-green-400">
-                  {logs.map((line, i) => (
-                    // Index is stable here since lines only ever get
-                    // appended/trimmed from the front, never reordered.
-                    <div key={i} className="whitespace-pre-wrap break-all">
-                      {line}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
+            <LogViewer logs={logs} className="h-48" />
           )}
         </CardContent>
       </Card>

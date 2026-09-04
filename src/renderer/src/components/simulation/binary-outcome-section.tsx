@@ -1,4 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
+import { CircleQuestionMark } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/components/types'
@@ -12,6 +13,8 @@ import {
   SelectValue
 } from '@/components/ui/select'
 
+import { Button } from '../ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { treatmentEffects } from './utils'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
@@ -22,8 +25,30 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
       <FormischField of={form} path={['probability']}>
         {(field) => (
           <Field data-invalid={field.errors !== null}>
-            <FieldLabel>Control arm probability</FieldLabel>
-            <FieldDescription>Probability of response</FieldDescription>
+            <FieldLabel>
+              Control arm event probability
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button variant="ghost" size="icon-sm">
+                      <CircleQuestionMark />
+                    </Button>
+                  }
+                />
+                <TooltipContent side="right">
+                  <p>
+                    The probability that patient in the control group experiences the outcome of
+                    interest. If the control arm event probabilty is 0.4, then about 40% of patients
+                    in the control group experiences the event of interest
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </FieldLabel>
+            <FieldDescription>
+              The probability that patient in the control group experiences the outcome of interest.
+              If the control arm event probabilty is 0.4, then about 40% of patients in the control
+              group experiences the event of interest
+            </FieldDescription>
             <Input
               {...field.props}
               type="number"
@@ -50,6 +75,10 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
           <Field>
             <FieldLabel>Treatment effect</FieldLabel>
             <FieldDescription>Difference betweeen treatment arm and control arm</FieldDescription>
+            <small>
+              {treatmentEffects.find((effect) => effect.value === field.input)?.description}
+            </small>
+
             <Select
               value={field.input ?? ''}
               onValueChange={(value) => {
@@ -85,7 +114,11 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
         {(field) => (
           <Field>
             <FieldLabel>Treatment effect value</FieldLabel>
-            <FieldDescription>Describe this</FieldDescription>
+            <FieldDescription>
+              The assumed size of the treatment effect used in the simulation. This value is often
+              based on previous research, clinical expertise, or the minimum improvement that would
+              justify adopting the treatment in practice
+            </FieldDescription>
             <Input
               {...field.props}
               type="number"
