@@ -106,7 +106,11 @@ const ordinalDesignSchema = v.object({
 })
 
 export const designSchema = v.pipe(
-  v.variant('outcomeType', [binaryDesignSchema, continuousDesignSchema, ordinalDesignSchema]),
+  v.variant(
+    'outcomeType',
+    [binaryDesignSchema, continuousDesignSchema, ordinalDesignSchema],
+    'Please select an outcome type.'
+  ),
   /**
    * Cross-field validation
    */

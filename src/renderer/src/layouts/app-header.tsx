@@ -26,7 +26,7 @@ export function AppHeader(): ReactElement {
 
   const handleNew = async (): Promise<void> => {
     await newDesign(initialDesignInput)
-    navigate('simulation')
+    navigate('dashboard')
   }
 
   const handleLoad = async (): Promise<void> => {
