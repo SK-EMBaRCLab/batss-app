@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.0.1...v4.1.0) (2026-09-09)
+
+
+### Features
+
+* add decision rule graph for continuous family ([f29269d](https://github.com/SK-EMBaRCLab/batss-app/commit/f29269d656613da0d8db2a6fc4f1c09f620ed397))
+
+
+### Bug Fixes
+
+* clean up text for simulation page and place info in collapsible panels ([f29269d](https://github.com/SK-EMBaRCLab/batss-app/commit/f29269d656613da0d8db2a6fc4f1c09f620ed397))
+* the simulation service R code for continuous family ([f29269d](https://github.com/SK-EMBaRCLab/batss-app/commit/f29269d656613da0d8db2a6fc4f1c09f620ed397))
+
 ## [4.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.0.0...v4.0.1) (2026-09-04)
 
 ### Bug Fixes
