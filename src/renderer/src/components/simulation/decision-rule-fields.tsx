@@ -1,6 +1,5 @@
 import type { DecisionRule } from '@shared/simulation-types'
-import { CircleQuestionMark } from 'lucide-react'
-import { ReactElement } from 'react'
+import { type ReactElement } from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -11,9 +10,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-
-import { Button } from '../ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
 type DecisionRuleFieldsProps = {
   type: DecisionRule['type'] | undefined
@@ -28,56 +24,6 @@ type DecisionRuleFieldsProps = {
 
   marginErrors?: string[]
   thresholdErrors?: string[]
-}
-
-type FieldLabelWithTooltipProps = {
-  children: React.ReactNode
-  tooltip: React.ReactNode
-}
-
-function FieldLabelWithTooltip({ children, tooltip }: FieldLabelWithTooltipProps): ReactElement {
-  return (
-    <FieldLabel className="flex min-h-8 items-center">
-      {children}
-
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <Button type="button" variant="ghost" size="icon-sm" className="ml-1">
-              <CircleQuestionMark />
-            </Button>
-          }
-        />
-        <TooltipContent side="top" className="max-w-sm text-left">
-          {tooltip}
-        </TooltipContent>
-      </Tooltip>
-    </FieldLabel>
-  )
-}
-
-const tooltips = {
-  direction: (
-    <>
-      Indicates whether a larger or smaller treatment effect is considered beneficial. Use{' '}
-      <strong>Greater than (&gt;)</strong> when higher values are better and{' '}
-      <strong>Less than (&lt;)</strong> when lower values are better.
-    </>
-  ),
-
-  margin: (
-    <>
-      The minimum treatment difference that is clinically meaningful (i.e., 0 or the minimal
-      clinically important difference).
-    </>
-  ),
-
-  threshold: (
-    <>
-      The probability required for a rule to be triggered. Common values include 0.90, 0.95, 0.975,
-      and 0.99.
-    </>
-  )
 }
 
 export function DecisionRuleFields({
@@ -95,7 +41,7 @@ export function DecisionRuleFields({
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <Field>
-        <FieldLabel className="min-h-8 flex items-center">Decision rule type</FieldLabel>
+        <FieldLabel className="">Decision rule type</FieldLabel>
 
         <Select
           value={type ?? ''}
@@ -111,13 +57,15 @@ export function DecisionRuleFields({
 
           <SelectContent>
             <SelectItem value="superiority">Superiority</SelectItem>
-            <SelectItem value="futility">Futility</SelectItem>
+            <SelectItem value="futility" disabled>
+              Futility
+            </SelectItem>
           </SelectContent>
         </Select>
       </Field>
 
       <Field>
-        <FieldLabelWithTooltip tooltip={tooltips.direction}>Direction</FieldLabelWithTooltip>
+        <FieldLabel className="">Direction</FieldLabel>
 
         <Select
           value={direction ?? ''}
@@ -139,9 +87,7 @@ export function DecisionRuleFields({
       </Field>
 
       <Field>
-        <FieldLabelWithTooltip tooltip={tooltips.margin}>
-          Superiority margin (SM)
-        </FieldLabelWithTooltip>
+        <FieldLabel className="">Superiority margin (SM)</FieldLabel>
 
         <Input
           type="number"
@@ -154,9 +100,7 @@ export function DecisionRuleFields({
       </Field>
 
       <Field>
-        <FieldLabelWithTooltip tooltip={tooltips.threshold}>
-          Decision threshold (DT)
-        </FieldLabelWithTooltip>
+        <FieldLabel className="">Decision threshold (DT)</FieldLabel>
 
         <Input
           type="number"

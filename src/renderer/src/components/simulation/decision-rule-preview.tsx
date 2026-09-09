@@ -1,18 +1,20 @@
 import type { DecisionRule } from '@shared/simulation-types'
 import { type ReactElement } from 'react'
 
-import { OddsRatioDecisionChart } from './decision-rule-chart'
+import { DecisionChart } from './decision-rule-chart'
 
 type DecisionRulePreviewProps = {
   rule: DecisionRule
-  oddsRatio: number
+  value: number
   formula: string
+  type: 'binary' | 'continuous' | 'ordinal' | undefined
 }
 
 export function DecisionRulePreview({
   rule,
-  oddsRatio,
-  formula
+  value,
+  formula,
+  type
 }: DecisionRulePreviewProps): ReactElement {
   return (
     <div className="space-y-3">
@@ -22,7 +24,7 @@ export function DecisionRulePreview({
       </div>
 
       <div className="h-40 rounded-lg border bg-muted/20 p-2">
-        <OddsRatioDecisionChart rule={rule} oddsRatio={oddsRatio} />
+        <DecisionChart rule={rule} value={value} type={type} />
       </div>
 
       <div className="rounded-lg border bg-muted/50 px-3 py-2">

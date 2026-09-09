@@ -21,3 +21,9 @@ export const treatmentEffects = [
       'Compares the probability of experiencing the event between treatment and control groups. An risk ratio of 1 indicates no effect of treatment on the event probability; values above 1 increase event probability, and values below 1 decrease them'
   }
 ] as const
+
+export function getTreatmentEffectLabel(
+  value: (typeof treatmentEffects)[number]['value'] | undefined
+): string {
+  return treatmentEffects.find((effect) => effect.value === value)?.label ?? '-'
+}

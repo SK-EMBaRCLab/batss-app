@@ -1,11 +1,10 @@
 import { useField } from '@formisch/react'
-import { ChevronDown, Info } from 'lucide-react'
 import { type ReactElement } from 'react'
 
+import { CollapsibleInfoPanel } from '@/components/collapsible-info-panel'
 import type { SimulationFormStore } from '@/components/types'
 import { Button } from '@/components/ui/button'
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 import { DecisionRuleCard } from './decision-rule-card'
 
 export function DecisionRuleSection({ form }: { form: SimulationFormStore }): ReactElement {
@@ -36,23 +35,11 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
           Add decision rule
         </Button>
       </div>
-      <Collapsible className="shrink-0 rounded-lg border border-primary/20 bg-primary/5 dark:border-primary/30 dark:bg-primary/10">
-        <CollapsibleTrigger
-          render={
-            <Button
-              variant="ghost"
-              className="group w-full justify-start px-4 py-3 hover:bg-primary/5"
-            >
-              <Info className="h-4 w-4 text-primary" />
 
-              <span className="font-medium text-primary">About decision rules</span>
+      {rules.errors?.[0] && <p className="text-sm text-destructive">{rules.errors[0]}</p>}
 
-              <ChevronDown className="ml-auto text-muted-foreground group-data-panel-open/button:rotate-180" />
-            </Button>
-          }
-        ></CollapsibleTrigger>
-
-        <CollapsibleContent>
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
+        <CollapsibleInfoPanel title="About Decision Rules">
           <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
             <div className="space-y-5">
               <p className="leading-relaxed">
@@ -92,14 +79,37 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
                   </li>
                 </ul>
               </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-primary">Direction</h4>
+
+                <p className="list-disc space-y-2 pl-5 leading-relaxed">
+                  Indicates whether a larger or smaller treatment effect is considered beneficial.
+                  Use <strong>Greater than (&gt;)</strong> when higher values are better and{' '}
+                  <strong>Less than (&lt;)</strong> when lower values are better.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-primary">Superiority Margin</h4>
+
+                <p className="list-disc space-y-2 pl-5 leading-relaxed">
+                  The minimum treatment difference that is clinically meaningful (i.e., 0 or the
+                  minimal clinically important difference).
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-primary">Decision Threshold</h4>
+
+                <p className="list-disc space-y-2 pl-5 leading-relaxed">
+                  The probability required for a rule to be triggered. Common values include 0.90,
+                  0.95, 0.975, and 0.99.
+                </p>
+              </div>
             </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {rules.errors?.[0] && <p className="text-sm text-destructive">{rules.errors[0]}</p>}
-
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
+        </CollapsibleInfoPanel>
         {(rules.input ?? []).map((_, index) => (
           <DecisionRuleCard
             key={index}

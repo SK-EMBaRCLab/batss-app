@@ -4,6 +4,8 @@ import { type ReactElement, type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { decisionRuleFormula } from '@/lib/utils'
 
+import { getTreatmentEffectLabel } from './simulation/utils'
+
 export function DesignParams({
   input
 }: {
@@ -27,13 +29,17 @@ export function DesignParams({
       <div className="space-y-6">
         <ParameterSection title="Outcome & Treatment Effect">
           <Parameter label="Outcome Type" value={input.outcomeType} />
-          <Parameter label="Probability of outcome in control arm" value={input.probability} />
-          <Parameter label="Odds Ratio" value={input.treatmentEffect} />
+          <Parameter label="Control arm event probability" value={input.probability} />
+          <Parameter
+            label="Treatment Effect"
+            value={getTreatmentEffectLabel(input.treatmentEffectType)}
+          />
+          <Parameter label="Treatment Effect value" value={input.treatmentEffect} />
         </ParameterSection>
         <Separator className="h-px" />
 
         <ParameterSection title="Simulation Design">
-          <Parameter label="Burn-in (m0)" value={input.m0} />
+          <Parameter label="Burn-in" value={input.m0} />
           <Parameter label="Patients between interims" value={input.m} />
           <Parameter label="Maximum sample size" value={input.N} />
         </ParameterSection>
@@ -57,7 +63,7 @@ export function DesignParams({
         </ParameterSection>
         <Separator className="h-px" />
         <ParameterSection title="Simulation Design">
-          <Parameter label="Burn-in (m0)" value={input.m0} />
+          <Parameter label="Burn-in" value={input.m0} />
           <Parameter label="Patients between interims" value={input.m} />
           <Parameter label="Maximum sample size" value={input.N} />
         </ParameterSection>

@@ -12,9 +12,10 @@ import {
 
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart'
 
-type OddsRatioDecisionChartProps = {
+type DecisionChartProps = {
   rule: DecisionRule
-  oddsRatio: number
+  value: number
+  type: 'binary' | 'continuous' | 'ordinal' | undefined
 }
 
 const chartConfig = {
@@ -36,30 +37,56 @@ function normalDensity(x: number, mean: number, standardDeviation: number): numb
   return coefficient * Math.exp(exponent)
 }
 
-export function OddsRatioDecisionChart({
-  rule,
-  oddsRatio
-}: OddsRatioDecisionChartProps): ReactElement {
+function getChartType(type: 'binary' | 'continuous' | 'ordinal' | undefined): {
+  key: string
+  label: string
+  x: number
+} {
+  switch (type) {
+    case 'binary':
+      return { key: 'oddsRatio', label: 'Odds Ratio', x: 1 }
+
+    case 'continuous':
+      return { key: 'meanDiff', label: 'Mean Difference', x: 0 }
+
+    default:
+      return { key: 'oddsRatio', label: 'Odds Ratio', x: 1 }
+  }
+}
+
+export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactElement {
   const data = useMemo(() => {
     // This is only visual spread.
     // It is NOT the statistical SE.
     const spread = 0.25
 
-    const min = Math.max(0.01, oddsRatio - 4 * spread)
+    const min = Math.max(0.01, value - 4 * spread)
 
-    const max = oddsRatio + 4 * spread
+    const max = value + 4 * spread
 
     const points = 200
 
     return Array.from({ length: points + 1 }, (_, index) => {
       const x = min + ((max - min) * index) / points
 
-      const distribution = normalDensity(x, oddsRatio, spread)
+      const distribution = normalDensity(x, value, spread)
 
       const isDecisionRegion = rule.direction === 'greater' ? x >= rule.margin : x <= rule.margin
 
+      if (type === 'binary') {
+        return {
+          oddsRatio: x,
+          distribution,
+
+          // IMPORTANT:
+          // null means Recharts doesn't draw
+          // the decision area on this side.
+          decisionRegion: isDecisionRegion ? distribution : null
+        }
+      }
+
       return {
-        oddsRatio: x,
+        meanDiff: x,
         distribution,
 
         // IMPORTANT:
@@ -68,7 +95,9 @@ export function OddsRatioDecisionChart({
         decisionRegion: isDecisionRegion ? distribution : null
       }
     })
-  }, [oddsRatio, rule.margin, rule.direction])
+  }, [value, rule.margin, rule.direction, type])
+
+  const chartType = getChartType(type)
 
   return (
     <ChartContainer config={chartConfig} className="h-40 w-full">
@@ -85,7 +114,7 @@ export function OddsRatioDecisionChart({
           <CartesianGrid vertical={false} className="stroke-muted" />
 
           <XAxis
-            dataKey="oddsRatio"
+            dataKey={chartType.key}
             type="number"
             domain={['dataMin', 'dataMax']}
             tickLine={false}
@@ -101,17 +130,17 @@ export function OddsRatioDecisionChart({
                 return null
               }
 
-              const oddsRatio = Number(payload[0]?.payload?.oddsRatio)
+              const value = Number(payload[0]?.payload?.value)
 
-              if (!Number.isFinite(oddsRatio)) {
+              if (!Number.isFinite(value)) {
                 return null
               }
 
               return (
                 <div className="rounded-lg border bg-background px-3 py-2 text-sm shadow-sm">
-                  <div className="font-medium">Odds Ratio</div>
+                  <div className="font-medium">{chartType.label}</div>
 
-                  <div className="text-muted-foreground">{oddsRatio.toFixed(2)}</div>
+                  <div className="text-muted-foreground">{value.toFixed(2)}</div>
                 </div>
               )
             }}
@@ -137,7 +166,7 @@ export function OddsRatioDecisionChart({
           />
 
           {/* Null odds ratio */}
-          <ReferenceLine x={1} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
+          <ReferenceLine x={chartType.x} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
 
           {/* Superiority margin */}
           <ReferenceLine

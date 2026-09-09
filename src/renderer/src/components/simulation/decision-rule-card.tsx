@@ -78,6 +78,10 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     path: ['treatmentEffect']
   })
 
+  const meanDiffInput = useField(form, {
+    path: ['meanDiff']
+  })
+
   const rule = getDecisionRule(
     typeField.input,
     directionField.input,
@@ -85,7 +89,8 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     thresholdField.input
   )
 
-  const oddsRatio = Number(treatmentEffect.input)
+  const value =
+    outcomeType.input === 'binary' ? Number(treatmentEffect.input) : Number(meanDiffInput.input)
 
   const formula = rule
     ? decisionRuleFormula({
@@ -134,8 +139,13 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
       </div>
       <div className="p-6">
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-          {outcomeType.input === 'binary' && rule && (
-            <DecisionRulePreview rule={rule} oddsRatio={oddsRatio} formula={formula} />
+          {rule && (
+            <DecisionRulePreview
+              rule={rule}
+              value={value}
+              formula={formula}
+              type={outcomeType.input}
+            />
           )}
 
           <DecisionRuleFields

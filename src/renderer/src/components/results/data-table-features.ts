@@ -21,7 +21,7 @@ import {
   tableFeatures
 } from '@tanstack/react-table'
 
-interface FuzzyFilterMeta {
+export interface FuzzyFilterMeta {
   itemRank?: RankingInfo
 }
 

@@ -54,7 +54,7 @@ const commonDesignFields = {
 
   m: positiveInteger('Patients between interim analyses'),
 
-  R: positiveInteger('Number of simulations'),
+  R: positiveInteger('Number of simulated trials'),
 
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
@@ -66,7 +66,7 @@ const binaryDesignSchema = v.object({
   outcomeType: v.literal('binary'),
 
   probability: v.pipe(
-    requiredNumber('Control arm probability'),
+    requiredNumber('Control arm event probability'),
     v.minValue(0, 'Probability must be at least 0.'),
     v.maxValue(1, 'Probability must be at most 1.')
   ),
@@ -84,9 +84,9 @@ const binaryDesignSchema = v.object({
 const continuousDesignSchema = v.object({
   outcomeType: v.literal('continuous'),
 
-  meanOutcome: requiredNumber('Mean outcome'),
+  meanOutcome: requiredNumber('Mean outcome in control arm'),
 
-  meanDiff: requiredNumber('Mean difference'),
+  meanDiff: requiredNumber('Mean difference for the treatment effect'),
 
   sd: v.pipe(
     requiredNumber('Standard deviation'),

@@ -85,7 +85,7 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.N', {
     id: 'maxSampleSize',
     meta: {
-      label: 'Max Sample Size (N)'
+      label: 'Max Sample Size'
     },
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Maximum Sample Size" />
@@ -94,28 +94,28 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.m0', {
     id: 'burnIn',
     meta: {
-      label: 'Burn-in (m0)'
+      label: 'Burn-in'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Burn-in (m0)" />
+      return <DataTableColumnHeader column={column} title="Burn-in" />
     }
   }),
   columnHelper.accessor('input.m', {
     id: 'm',
     meta: {
-      label: 'Patients Between (m)'
+      label: 'Patients Between'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Patients Between (m)" />
+      return <DataTableColumnHeader column={column} title="Patients Between" />
     }
   }),
   columnHelper.accessor('input.R', {
     id: 'numOfSimulatedTrials',
     meta: {
-      label: 'Number of simulated Trials (R)'
+      label: 'Number of simulated Trials'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Number of simulated Trials (R)" />
+      return <DataTableColumnHeader column={column} title="Number of simulated Trials" />
     }
   })
 ])

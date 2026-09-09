@@ -93,7 +93,7 @@ export class SimulationService {
       } else if(input$outcomeType == 'continuous') {
         varControl <- list(y = list(sd = input$sd))
         beta <- c(input$meanOutcome, input$meanDiff)
-        delta.eff <- 0
+        delta.eff <- rule$margin
       }
 
       trials <- batss.glm(
