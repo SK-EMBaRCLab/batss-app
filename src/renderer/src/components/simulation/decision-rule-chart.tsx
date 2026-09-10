@@ -60,7 +60,7 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
     // It is NOT the statistical SE.
     const spread = 0.25
 
-    const min = Math.max(0.01, value - 4 * spread)
+    const min = Math.max(0, value - 4 * spread)
 
     const max = value + 4 * spread
 
@@ -99,6 +99,8 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
   const chartType = getChartType(type)
 
+  console.log({ chartType })
+
   return (
     <ChartContainer config={chartConfig} className="h-40 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -126,11 +128,17 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
           <ChartTooltip
             content={({ active, payload }) => {
+              console.log({ payload })
               if (!active || !payload?.length) {
                 return null
               }
 
-              const value = Number(payload[0]?.payload?.value)
+              let value = Number.POSITIVE_INFINITY
+              if (type === 'binary') {
+                value = Number(payload[0]?.payload?.oddsRatio)
+              } else if (type === 'continuous') {
+                value = Number(payload[0]?.payload?.meanDiff)
+              }
 
               if (!Number.isFinite(value)) {
                 return null
