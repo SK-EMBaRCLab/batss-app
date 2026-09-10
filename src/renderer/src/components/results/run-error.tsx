@@ -1,15 +1,10 @@
-import { type ReactElement, useMemo } from 'react'
+import { type ReactElement } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useDesign } from '@/stores/design'
+import { useSelectedEntry } from '@/stores/design'
 
 export function RunError(): ReactElement | null {
-  const design = useDesign((state) => state.design)
-  const selectedResultId = useDesign((state) => state.selectedResultId)
-  const selectedEntry = useMemo(
-    () => design?.results.find((entry) => entry.id === selectedResultId) ?? design?.results.at(-1),
-    [design, selectedResultId]
-  )
+  const selectedEntry = useSelectedEntry()
 
   const result = selectedEntry?.result
 

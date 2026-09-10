@@ -1,22 +1,18 @@
-import { type ReactElement, useMemo } from 'react'
+import { type ReactElement } from 'react'
 
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { useDesign } from '@/stores/design'
+import { useDesign, useSelectedEntry } from '@/stores/design'
 
 import { outcomeTypes } from './columns'
 
 export function RunsHistory(): ReactElement | null {
   const design = useDesign((state) => state.design)
-  const selectedResultId = useDesign((state) => state.selectedResultId)
   const selectedResults = useDesign((state) => state.selectedResults)
   const selectResult = useDesign((state) => state.selectResult)
 
-  const selectedEntry = useMemo(
-    () => design?.results.find((entry) => entry.id === selectedResultId) ?? design?.results.at(-1),
-    [design, selectedResultId]
-  )
+  const selectedEntry = useSelectedEntry()
 
   if (!design || design.results.length === 0) {
     return null

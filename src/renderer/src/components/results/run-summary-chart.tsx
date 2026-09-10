@@ -1,6 +1,6 @@
 import { toPng } from 'html-to-image'
 import { ImageDown, Minus, MoreHorizontal } from 'lucide-react'
-import { type ReactElement, useMemo, useRef, useState } from 'react'
+import { type ReactElement, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { useDesign } from '@/stores/design'
+import { useSelectedEntry } from '@/stores/design'
 
 import { ResultsBarChart } from './bar-chart'
 
@@ -22,14 +22,9 @@ export function RunSummaryChart(): ReactElement | null {
   const [options, setOptions] = useState({
     reference: true
   })
-  const design = useDesign((state) => state.design)
-  const selectedResultId = useDesign((state) => state.selectedResultId)
   const chartRef = useRef<HTMLDivElement>(null)
 
-  const selectedEntry = useMemo(
-    () => design?.results.find((entry) => entry.id === selectedResultId) ?? design?.results.at(-1),
-    [design, selectedResultId]
-  )
+  const selectedEntry = useSelectedEntry()
 
   const download = async (): Promise<void> => {
     if (!chartRef.current) return

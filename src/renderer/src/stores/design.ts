@@ -5,6 +5,7 @@ import type {
   SimulationRunResult,
   StudyDesign
 } from '@shared/simulation-types'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 
 import { toError } from '@/lib/utils'
@@ -180,3 +181,16 @@ export const useDesign = create<DesignState>((set, get) => {
     }
   }
 })
+
+export function useSelectedEntry(): SimulationResultEntry | null {
+  const design = useDesign((state) => state.design)
+  const selectedResultId = useDesign((state) => state.selectedResultId)
+
+  return useMemo(
+    () =>
+      design?.results.find((entry) => entry.id === selectedResultId) ??
+      design?.results.at(-1) ??
+      null,
+    [design, selectedResultId]
+  )
+}
