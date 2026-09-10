@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.1...v4.1.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* minor bug with decision rule graph not showing 0 on x axis ([bc75939](https://github.com/SK-EMBaRCLab/batss-app/commit/bc75939118b5d882d46614f0fe297df665c8ee89))
+
 ## [4.1.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.0...v4.1.1) (2026-09-10)
 
 
