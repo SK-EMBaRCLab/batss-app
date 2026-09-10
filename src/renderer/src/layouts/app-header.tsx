@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, Save, SearchIcon, Settings } from 'lucide-react'
+import { FilePlus2, FolderOpen, Save, SearchIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { EditableDesignName } from '@/components/editable-design-name'
@@ -76,20 +76,11 @@ export function AppHeader(): ReactElement {
           <kbd className="hidden xl:inline pointer-events-none font-mono text-xs">⌘K</kbd>
         </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hidden lg:flex"
-          onClick={() => navigate('settings')}
-        >
-          <Settings />
-        </Button>
         <div className="lg:hidden">
           <HeaderOverflowMenu
             onNew={handleNew}
             onLoad={handleLoad}
             onSave={saveDesign}
-            onSettings={() => navigate('settings')}
             canSave={!!design && isDirty}
           />
         </div>

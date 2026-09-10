@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, MoreHorizontal, Save, Settings } from 'lucide-react'
+import { FilePlus2, FolderOpen, MoreHorizontal, Save } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
@@ -14,13 +13,11 @@ export function HeaderOverflowMenu({
   onNew,
   onLoad,
   onSave,
-  onSettings,
   canSave
 }: {
   onNew: () => void
   onLoad: () => void
   onSave: () => void
-  onSettings: () => void
   canSave: boolean
 }): ReactElement {
   return (
@@ -47,13 +44,6 @@ export function HeaderOverflowMenu({
         <DropdownMenuItem disabled={!canSave} onClick={onSave}>
           <Save />
           Save
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem onClick={onSettings}>
-          <Settings />
-          Settings
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
