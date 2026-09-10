@@ -99,8 +99,6 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
   const chartType = getChartType(type)
 
-  console.log({ chartType })
-
   return (
     <ChartContainer config={chartConfig} className="h-40 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -128,7 +126,6 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
           <ChartTooltip
             content={({ active, payload }) => {
-              console.log({ payload })
               if (!active || !payload?.length) {
                 return null
               }

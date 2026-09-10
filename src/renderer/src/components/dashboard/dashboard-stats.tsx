@@ -13,11 +13,12 @@ import { useDesign } from '@/stores/design'
 
 export function DashboardStats(): ReactElement | null {
   const design = useDesign((s) => s.design)
-  const latestRun = design?.results.at(-1)
 
   if (!design) {
     return null
   }
+
+  const latestRun = design.results.at(-1)
 
   return (
     <ItemGroup className="grid grid-cols-2 gap-3 md:grid-cols-4">
