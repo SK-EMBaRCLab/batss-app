@@ -2,26 +2,23 @@
 
 ## [4.1.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.2...v4.1.3) (2026-09-10)
 
-
 ### Bug Fixes
 
-* remove debug console log statements ([0f5307d](https://github.com/SK-EMBaRCLab/batss-app/commit/0f5307d9c02f4755f1ead4cda9b30963f2be2bff))
-* sandbox to true for prodution and false only in docker ([074cdf1](https://github.com/SK-EMBaRCLab/batss-app/commit/074cdf159da60923b17e0bbbe5f1df177c422ecf))
+- remove debug console log statements ([0f5307d](https://github.com/SK-EMBaRCLab/batss-app/commit/0f5307d9c02f4755f1ead4cda9b30963f2be2bff))
+- sandbox to true for prodution and false only in docker ([074cdf1](https://github.com/SK-EMBaRCLab/batss-app/commit/074cdf159da60923b17e0bbbe5f1df177c422ecf))
 
 ## [4.1.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.1...v4.1.2) (2026-09-10)
 
-
 ### Bug Fixes
 
-* minor bug with decision rule graph not showing 0 on x axis ([bc75939](https://github.com/SK-EMBaRCLab/batss-app/commit/bc75939118b5d882d46614f0fe297df665c8ee89))
+- minor bug with decision rule graph not showing 0 on x axis ([bc75939](https://github.com/SK-EMBaRCLab/batss-app/commit/bc75939118b5d882d46614f0fe297df665c8ee89))
 
 ## [4.1.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.0...v4.1.1) (2026-09-10)
 
-
 ### Bug Fixes
 
-* move theme toggle to settings ([7a4c408](https://github.com/SK-EMBaRCLab/batss-app/commit/7a4c40875199174ef825936f22e3c560faf9842f))
-* remove settings from header ([4de6e79](https://github.com/SK-EMBaRCLab/batss-app/commit/4de6e794dbad71605e47e2e5d98152018af7ceab))
+- move theme toggle to settings ([7a4c408](https://github.com/SK-EMBaRCLab/batss-app/commit/7a4c40875199174ef825936f22e3c560faf9842f))
+- remove settings from header ([4de6e79](https://github.com/SK-EMBaRCLab/batss-app/commit/4de6e794dbad71605e47e2e5d98152018af7ceab))
 
 ## [4.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.0.1...v4.1.0) (2026-09-09)
 
