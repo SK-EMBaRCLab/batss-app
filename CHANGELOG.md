@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.3...v4.1.4) (2026-09-10)
+
+
+### Bug Fixes
+
+* bug related to electron preload and sandbox true causing error for build ([55c9dcb](https://github.com/SK-EMBaRCLab/batss-app/commit/55c9dcbc5753dcbbbbc701440e0966efb4535e07))
+
 ## [4.1.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.2...v4.1.3) (2026-09-10)
 
 ### Bug Fixes
