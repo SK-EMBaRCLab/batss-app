@@ -1,4 +1,3 @@
-import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
@@ -141,8 +140,6 @@ const settings = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('app', app)
-
-    contextBridge.exposeInMainWorld('electron', electronAPI)
 
     contextBridge.exposeInMainWorld('api', api)
 

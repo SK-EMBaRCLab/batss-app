@@ -1,5 +1,3 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
-
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
 import type {
   SimulationRunInput,
@@ -9,7 +7,6 @@ import type {
 
 declare global {
   interface Window {
-    electron: ElectronAPI
     api: unknown
     app: {
       version: () => string
