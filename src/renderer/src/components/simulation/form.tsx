@@ -16,6 +16,7 @@ import { OutcomeParametersSection } from './outcome-parameters-section'
 import { OutcomeTypeSection } from './outcome-type-section'
 import { ReviewSection } from './review-section'
 import { SampleSizeSection } from './sample-size-section'
+import { hasAnyFieldError } from './utils'
 
 type SimulationFormProps = {
   onRun: (input: SimulationRunInput, output) => Promise<void>
@@ -45,6 +46,15 @@ const steps = [
   }
 ]
 
+// in SimulationForm, module scope
+const stepFields: Record<number, string[]> = {
+  0: ['outcomeType'],
+  1: ['probability', 'treatmentEffectType', 'treatmentEffect', 'meanOutcome', 'sd', 'meanDiff'],
+  2: ['N', 'm0', 'm', 'R'],
+  3: ['decisionRules'],
+  4: []
+}
+
 export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
   const isRunning = useDesign((s) => s.isRunning)
   const [step, setStep] = useState(0)
@@ -60,74 +70,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
 
     const errors = getDeepErrorEntries(form)
 
-    const hasOutcomeTypeError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'outcomeType'
-    )
-
-    const hasProbabilityError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'probability'
-    )
-
-    const hasTreatmentEffectTypeError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'treatmentEffectType'
-    )
-
-    const hasTreatmentEffectError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'treatmentEffect'
-    )
-
-    const hasMaxSampleSizeError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'N'
-    )
-    const hasBurnInError = errors.some((error) => error.path.length === 1 && error.path[0] === 'm0')
-    const hasInterimSampleError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'm'
-    )
-
-    const hasNumOfSimulationsError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'R'
-    )
-
-    const hasDecisionRulesError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'decisionRules'
-    )
-
-    const hasMeanOutcomeError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'meanOutcome'
-    )
-
-    const hasStandardDeviationError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'sd'
-    )
-
-    const hasMeanDifferenceError = errors.some(
-      (error) => error.path.length === 1 && error.path[0] === 'meanDiff'
-    )
-
-    const hasBinaryOutcomeParamsErrors =
-      hasProbabilityError || hasTreatmentEffectTypeError || hasTreatmentEffectError
-    const hasContinuousOutcomeParamsErrors =
-      hasMeanOutcomeError || hasStandardDeviationError || hasMeanDifferenceError
-
-    switch (step) {
-      case 0:
-        return !hasOutcomeTypeError
-      case 1:
-        return !hasBinaryOutcomeParamsErrors && !hasContinuousOutcomeParamsErrors
-      case 2:
-        return (
-          !hasMaxSampleSizeError &&
-          !hasBurnInError &&
-          !hasInterimSampleError &&
-          !hasNumOfSimulationsError
-        )
-      case 3:
-        return !hasDecisionRulesError
-      case 4:
-        return true
-      default:
-        return false
-    }
+    return !hasAnyFieldError(errors, stepFields[step] ?? [])
   }
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {

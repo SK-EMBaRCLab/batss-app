@@ -1,3 +1,9 @@
+import { getDeepErrorEntries } from '@formisch/react'
+
+import { designSchema } from '@/lib/schema'
+
+type ErrorEntry = ReturnType<typeof getDeepErrorEntries<typeof designSchema>>[number]
+
 export const treatmentEffects = [
   {
     value: 'oddsRatio',
@@ -26,4 +32,12 @@ export function getTreatmentEffectLabel(
   value: (typeof treatmentEffects)[number]['value'] | undefined
 ): string {
   return treatmentEffects.find((effect) => effect.value === value)?.label ?? '-'
+}
+
+export function hasFieldError(errors: ErrorEntry[], path: string): boolean {
+  return errors.some((error) => error.path.length === 1 && error.path[0] === path)
+}
+
+export function hasAnyFieldError(errors: ErrorEntry[], paths: string[]): boolean {
+  return paths.some((path) => hasFieldError(errors, path))
 }
