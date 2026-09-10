@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.1.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.0...v4.1.1) (2026-09-10)
+
+
+### Bug Fixes
+
+* move theme toggle to settings ([7a4c408](https://github.com/SK-EMBaRCLab/batss-app/commit/7a4c40875199174ef825936f22e3c560faf9842f))
+* remove settings from header ([4de6e79](https://github.com/SK-EMBaRCLab/batss-app/commit/4de6e794dbad71605e47e2e5d98152018af7ceab))
+
 ## [4.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.0.1...v4.1.0) (2026-09-09)
 
 ### Features
