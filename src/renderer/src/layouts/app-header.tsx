@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, Moon, Save, SearchIcon, Settings, Sun } from 'lucide-react'
+import { FilePlus2, FolderOpen, Save, SearchIcon, Settings } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { EditableDesignName } from '@/components/editable-design-name'
@@ -10,12 +10,9 @@ import { initialDesignInput } from '@/lib/schema'
 import { useCommandPalette } from '@/stores/command-palette'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
-import { useTheme } from '@/stores/theme'
 
 export function AppHeader(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
-  const isDark = useTheme((state) => state.isDark)
-  const setTheme = useTheme((state) => state.setTheme)
   const design = useDesign((s) => s.design)
   const renameDesign = useDesign((s) => s.renameDesign)
   const newDesign = useDesign((s) => s.newDesign)
@@ -79,9 +76,6 @@ export function AppHeader(): ReactElement {
           <kbd className="hidden xl:inline pointer-events-none font-mono text-xs">⌘K</kbd>
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
-          {isDark ? <Sun /> : <Moon />}
-        </Button>
         <Button
           variant="ghost"
           size="icon"

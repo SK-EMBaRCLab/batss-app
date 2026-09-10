@@ -1,16 +1,21 @@
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, Moon, Sun } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
+import { useTheme } from '@/stores/theme'
 
 export default function Settings(): ReactElement {
   const [outputPath, setOutputPath] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
+
+  const isDark = useTheme((state) => state.isDark)
+  const setTheme = useTheme((state) => state.setTheme)
 
   useEffect(() => {
     let cancelled = false
@@ -53,50 +58,69 @@ export default function Settings(): ReactElement {
 
       <p className="text-muted-foreground mt-2">Application settings.</p>
 
-      <Card className="mt-6 max-w-2xl">
-        <CardHeader>
-          <CardTitle>Output Location</CardTitle>
+      <div className="flex flex-col gap-4 mt-4 max-w-2xl">
+        <Item variant="muted">
+          <ItemContent>
+            <ItemTitle>Theme</ItemTitle>
+            <ItemDescription>Toggle between light and dark color scheme.</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
+              {isDark ? <Sun /> : <Moon />}
+            </Button>
+          </ItemActions>
+        </Item>
 
-          <CardDescription>
-            Choose the folder where simulation results and exported files are saved.
-          </CardDescription>
-        </CardHeader>
+        <Card className="mt-6 ">
+          <CardHeader>
+            <CardTitle>Output Location</CardTitle>
 
-        <CardContent className="space-y-4">
-          <Field orientation="responsive">
-            <FieldContent>
-              <FieldLabel htmlFor="output-path">Output folder</FieldLabel>
+            <CardDescription>
+              Choose the folder where simulation results and exported files are saved.
+            </CardDescription>
+          </CardHeader>
 
-              <div className="flex gap-2">
-                <Input
-                  id="output-path"
-                  value={outputPath}
-                  onChange={(event) => {
-                    setOutputPath(event.target.value)
-                    setIsDirty(true)
-                  }}
-                  disabled={isLoading}
-                  placeholder="Select a folder"
-                  autoComplete="off"
-                />
+          <CardContent className="space-y-4">
+            <Field orientation="responsive">
+              <FieldContent>
+                <FieldLabel htmlFor="output-path">Output folder</FieldLabel>
 
-                <Button type="button" variant="outline" onClick={handleBrowse} disabled={isLoading}>
-                  <FolderOpen />
-                  Browse
-                </Button>
-              </div>
+                <div className="flex gap-2">
+                  <Input
+                    id="output-path"
+                    value={outputPath}
+                    onChange={(event) => {
+                      setOutputPath(event.target.value)
+                      setIsDirty(true)
+                    }}
+                    disabled={isLoading}
+                    placeholder="Select a folder"
+                    autoComplete="off"
+                  />
 
-              <FieldDescription>
-                {isDirty ? 'Unsaved changes.' : 'Files created by Albatross are written here.'}
-              </FieldDescription>
-            </FieldContent>
-          </Field>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBrowse}
+                    disabled={isLoading}
+                  >
+                    <FolderOpen />
+                    Browse
+                  </Button>
+                </div>
 
-          <Button onClick={handleSave} disabled={isLoading || isSaving || !isDirty}>
-            {isSaving ? 'Saving…' : 'Save'}
-          </Button>
-        </CardContent>
-      </Card>
+                <FieldDescription>
+                  {isDirty ? 'Unsaved changes.' : 'Files created by Albatross are written here.'}
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+
+            <Button onClick={handleSave} disabled={isLoading || isSaving || !isDirty}>
+              {isSaving ? 'Saving…' : 'Save'}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

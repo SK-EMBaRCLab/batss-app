@@ -4,6 +4,7 @@ import { ChartSpline, CircleDot, ListOrdered } from 'lucide-react'
 
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 
+import { getTreatmentEffectLabel } from '../simulation/utils'
 import { Checkbox } from '../ui/checkbox'
 import { type DataTableFeatures } from './data-table-features'
 
@@ -61,26 +62,52 @@ export const columns = columnHelper.columns([
       return filterValue.includes(row.getValue(columnId))
     }
   }),
+  columnHelper.accessor('input.treatmentEffectType', {
+    id: 'treatmentEffectType',
+    meta: {
+      label: 'Treatment Effect'
+    },
+    header: 'Treatment Effect',
+    cell: ({ getValue }) => {
+      const value = getValue()
+      return getTreatmentEffectLabel(value)
+    }
+  }),
+  columnHelper.accessor('input.treatmentEffect', {
+    id: 'treatmentEffect',
+    meta: {
+      label: 'Treatment Effect Value'
+    },
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Treatment Effect Value" />
+    }
+  }),
   columnHelper.accessor('input.meanOutcome', {
     id: 'meanOutcome',
     meta: {
       label: 'Mean Outcome'
     },
-    header: 'Mean Outcome in control arm'
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Mean Outcome in control arm" />
+    }
   }),
   columnHelper.accessor('input.meanDiff', {
     id: 'meanDiff',
     meta: {
       label: 'Mean Difference'
     },
-    header: 'Mean Difference in treatment effect'
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Mean Difference in treatment effect" />
+    }
   }),
   columnHelper.accessor('input.sd', {
     id: 'sd',
     meta: {
       label: 'Standard Deviation'
     },
-    header: 'Standard Deviation'
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Standard Deviation" />
+    }
   }),
   columnHelper.accessor('input.N', {
     id: 'maxSampleSize',
