@@ -83,29 +83,57 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
               <div className="space-y-2">
                 <h4 className="font-medium text-primary">Direction</h4>
 
-                <p className="list-disc space-y-2 pl-5 leading-relaxed">
-                  Indicates whether a larger or smaller treatment effect is considered beneficial.
-                  Use <strong>Greater than (&gt;)</strong> when higher values are better and{' '}
-                  <strong>Less than (&lt;)</strong> when lower values are better.
-                </p>
+                <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+                  <li>
+                    Indicates whether a larger or smaller treatment effect is considered beneficial.
+                    Use <strong>Greater than (&gt;)</strong> when higher values are better and{' '}
+                    <strong>Less than (&lt;)</strong> when lower values are better.
+                  </li>
+                </ul>
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-medium text-primary">Superiority Margin</h4>
+                <h4 className="font-medium text-primary">Superiority margin</h4>
 
-                <p className="list-disc space-y-2 pl-5 leading-relaxed">
-                  The minimum treatment difference that is clinically meaningful (i.e., 0 or the
-                  minimal clinically important difference).
-                </p>
+                <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+                  <li>
+                    The minimum treatment difference that is clinically meaningful (i.e., 0 or the
+                    minimal clinically important difference).
+                  </li>
+                </ul>
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-medium text-primary">Decision Threshold</h4>
+                <h4 className="font-medium text-primary">Decision threshold</h4>
 
-                <p className="list-disc space-y-2 pl-5 leading-relaxed">
-                  The probability required for a rule to be triggered. Common values include 0.90,
-                  0.95, 0.975, and 0.99.
-                </p>
+                <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+                  <li>
+                    The probability required for a rule to be triggered. Common values include 0.90,
+                    0.95, 0.975, and 0.99.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-primary">MD</h4>
+
+                <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+                  <li>
+                    Mean difference, referring to the difference between the treatment and control
+                    group for a continuous outcome.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-primary">OR</h4>
+
+                <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+                  <li>
+                    Odds ratio, referring to the difference between the treatment and control group
+                    for a binary outcome.
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
