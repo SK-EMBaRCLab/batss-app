@@ -47,7 +47,14 @@ export function WelcomeScreen(): ReactElement {
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Albatross</CardTitle>
-          <CardDescription>Start a new study design or load one you saved earlier</CardDescription>
+          <CardDescription>
+            Welcome to the Bayesian Adaptive Trials Simulator Software Application (BATSS App)! This
+            app will allow you to create Bayesian adaptive trial designs without the need for
+            coding.
+          </CardDescription>
+          <CardDescription className="mt-1 font-medium text-foreground">
+            Start a new study design or load one you saved earlier.
+          </CardDescription>
         </CardHeader>
 
         <CardContent className="flex flex-col gap-6">
