@@ -32,7 +32,7 @@ export default function Dashboard(): ReactElement {
 
   function viewAllResults(): void {
     selectResults([])
-    navigate('results')
+    navigate('table')
   }
 
   return (

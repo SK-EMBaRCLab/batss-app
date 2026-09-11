@@ -7,12 +7,12 @@ export const navigationItems = [
     view: 'dashboard'
   },
   {
-    title: 'Simulation',
+    title: 'Run Simulation',
     icon: Play,
     view: 'simulation'
   },
   {
-    title: 'Results Table',
+    title: 'Simulations Table',
     icon: Table,
     view: 'table'
   },

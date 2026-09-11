@@ -15,7 +15,14 @@ export default function Table(): ReactElement {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <DataTable
+        title="Simulation Runs"
+        description="The following table allows you to view all of the simulations you have performed
+        for your trial to date. The filtering tools will enable you to find specific simulations of interest.
+        You can select any number of simulations and click View Results to narrow to a smaller list of simulations."
+        columns={columns}
+        data={data}
+      />
     </div>
   )
 }

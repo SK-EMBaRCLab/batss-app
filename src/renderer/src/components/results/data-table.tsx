@@ -24,11 +24,15 @@ import { DataTableRow } from '@/types/data-table-types'
 import { type DataTableFeatures, features } from './data-table-features'
 
 interface DataTableProps<TData extends DataTableRow> {
+  title?: string
+  description?: string
   columns: ColumnDef<DataTableFeatures, TData>[]
   data: TData[]
 }
 
 export function DataTable<TData extends DataTableRow>({
+  title,
+  description,
   columns,
   data
 }: DataTableProps<TData>): ReactElement {
@@ -69,6 +73,12 @@ export function DataTable<TData extends DataTableRow>({
 
   return (
     <div className="flex flex-col gap-4">
+      {(title || description) && (
+        <div className="flex flex-col gap-1">
+          {title && <h3 className="text-lg font-semibold">{title}</h3>}
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+      )}
       <DataTableToolbar
         table={table}
         globalFilter={globalFilter}
