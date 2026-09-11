@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.5...v4.2.0) (2026-09-11)
+
+
+### Features
+
+* add info text to table page and update link and navigation text ([1d11ac5](https://github.com/SK-EMBaRCLab/batss-app/commit/1d11ac56b95bfe4ff61b3b15de84380f484d9b72))
+* add welcome text to welcome screen on application load ([b49339b](https://github.com/SK-EMBaRCLab/batss-app/commit/b49339b2e296727c0c82b9be499d0fa18978a14d))
+
+
+### Bug Fixes
+
+* add continuous outcome parameters info panel ([b2a5a45](https://github.com/SK-EMBaRCLab/batss-app/commit/b2a5a45707979473017255c65c9e77cec393df39))
+* clean up and update text for decision rule info panel ([31eaf75](https://github.com/SK-EMBaRCLab/batss-app/commit/31eaf75cd64a75df5ed60b20c7ca3aaecf285905))
+
 ## [4.1.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.4...v4.1.5) (2026-09-11)
 
 ### Bug Fixes
