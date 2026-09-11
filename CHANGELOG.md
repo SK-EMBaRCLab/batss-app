@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.4...v4.1.5) (2026-09-11)
+
+
+### Bug Fixes
+
+* bug with closeconfirmed when user clicks save and then cancels on os file picker the app closes anyway ([3218fd8](https://github.com/SK-EMBaRCLab/batss-app/commit/3218fd842b31723686bda3984034db07672b7252))
+
 ## [4.1.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.3...v4.1.4) (2026-09-10)
 
 ### Bug Fixes
