@@ -2,6 +2,7 @@ import { type Column, type RowData } from '@tanstack/react-table'
 import { Check, PlusCircle } from 'lucide-react'
 import * as React from 'react'
 
+import { outcomeTypes } from '@/components/results/columns'
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,8 +18,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-
-import { outcomeTypes } from '../results/columns'
 
 interface DataTableFacetedFilterProps<TData extends RowData, TValue> {
   column?: Column<DataTableFeatures, TData, TValue>

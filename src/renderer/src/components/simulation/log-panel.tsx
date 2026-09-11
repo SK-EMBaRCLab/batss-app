@@ -1,8 +1,7 @@
 import { type ReactElement } from 'react'
 
+import { LogViewer } from '@/components/log-viewer'
 import { formatDuration } from '@/lib/utils'
-
-import { LogViewer } from '../log-viewer'
 
 type LogPanelProps = {
   logs: string[]

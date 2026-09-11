@@ -6,11 +6,11 @@ import { Dispatch, type ReactElement, SetStateAction, useEffect, useState } from
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 import { DataTableRow } from '@/types/data-table-types'
 
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
 

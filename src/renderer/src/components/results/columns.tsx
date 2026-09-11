@@ -2,10 +2,10 @@ import { SimulationResultEntry } from '@shared/simulation-types'
 import { createColumnHelper } from '@tanstack/react-table'
 import { ChartSpline, CircleDot, ListOrdered } from 'lucide-react'
 
+import { getTreatmentEffectLabel } from '@/components/simulation/utils'
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
+import { Checkbox } from '@/components/ui/checkbox'
 
-import { getTreatmentEffectLabel } from '../simulation/utils'
-import { Checkbox } from '../ui/checkbox'
 import { type DataTableFeatures } from './data-table-features'
 
 // Use `accessor` for data columns and `display` for columns without one.

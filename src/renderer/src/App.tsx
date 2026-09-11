@@ -32,9 +32,11 @@ export default function App(): ReactElement {
 
   useEffect(() => {
     const cleanup = window.design.onSaveRequested(async () => {
-      await useDesign.getState().saveDesign()
+      const saved = await useDesign.getState().saveDesign()
 
-      window.design.closeConfirmed()
+      if (saved) {
+        window.design.closeConfirmed()
+      }
     })
 
     return cleanup
