@@ -31,7 +31,7 @@ export const treatmentEffects = [
 export function getTreatmentEffectLabel(
   value: (typeof treatmentEffects)[number]['value'] | undefined
 ): string {
-  return treatmentEffects.find((effect) => effect.value === value)?.label ?? '-'
+  return treatmentEffects.find((effect) => effect.value === value)?.label ?? '—'
 }
 
 export function hasFieldError(errors: ErrorEntry[], path: string): boolean {

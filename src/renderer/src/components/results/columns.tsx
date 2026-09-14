@@ -6,6 +6,8 @@ import { getTreatmentEffectLabel } from '@/components/simulation/utils'
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 import { Checkbox } from '@/components/ui/checkbox'
 
+import { EmptyCell } from '../table/empty-cell'
+import { renderCellValue } from '../table/render-cell-value'
 import { type DataTableFeatures } from './data-table-features'
 
 // Use `accessor` for data columns and `display` for columns without one.
@@ -68,8 +70,15 @@ export const columns = columnHelper.columns([
       label: 'Treatment Effect'
     },
     header: 'Treatment Effect',
-    cell: ({ getValue }) => {
+    cell: ({ row, getValue }) => {
       const value = getValue()
+      const outcomeType = row.original.input.outcomeType
+      if (outcomeType !== 'binary') {
+        return <EmptyCell state="not-applicable" />
+      }
+      if (value == null) {
+        return <EmptyCell />
+      }
       return getTreatmentEffectLabel(value)
     }
   }),
@@ -80,6 +89,15 @@ export const columns = columnHelper.columns([
     },
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Treatment Effect Value" />
+    },
+    cell: ({ row, getValue }) => {
+      const outcomeType = row.original.input.outcomeType
+
+      if (outcomeType !== 'binary') {
+        return <EmptyCell state="not-applicable" />
+      }
+
+      return renderCellValue(getValue())
     }
   }),
   columnHelper.accessor('input.meanOutcome', {
@@ -89,6 +107,15 @@ export const columns = columnHelper.columns([
     },
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Mean Outcome in control arm" />
+    },
+    cell: ({ row, getValue }) => {
+      const outcomeType = row.original.input.outcomeType
+
+      if (outcomeType !== 'continuous') {
+        return <EmptyCell state="not-applicable" />
+      }
+
+      return renderCellValue(getValue())
     }
   }),
   columnHelper.accessor('input.meanDiff', {
@@ -98,6 +125,15 @@ export const columns = columnHelper.columns([
     },
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Mean Difference in treatment effect" />
+    },
+    cell: ({ row, getValue }) => {
+      const outcomeType = row.original.input.outcomeType
+
+      if (outcomeType !== 'continuous') {
+        return <EmptyCell state="not-applicable" />
+      }
+
+      return renderCellValue(getValue())
     }
   }),
   columnHelper.accessor('input.sd', {
@@ -107,6 +143,15 @@ export const columns = columnHelper.columns([
     },
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Standard Deviation" />
+    },
+    cell: ({ row, getValue }) => {
+      const outcomeType = row.original.input.outcomeType
+
+      if (outcomeType !== 'continuous') {
+        return <EmptyCell state="not-applicable" />
+      }
+
+      return renderCellValue(getValue())
     }
   }),
   columnHelper.accessor('input.N', {
