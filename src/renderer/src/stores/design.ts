@@ -27,6 +27,7 @@ interface DesignState {
   startNewDesign: (input: DesignInput, name?: string) => void
   renameDesign: (name: string) => void
   runSimulation: (input: SimulationRunInput, formInput) => Promise<SimulationRunResult>
+  cancelSimulation: () => Promise<void>
   selectResult: (id: string) => void
   selectResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
@@ -131,6 +132,15 @@ export const useDesign = create<DesignState>((set, get) => {
       } finally {
         set({ isRunning: false })
       }
+    },
+
+    // Fire-and-forget: cancelling doesn't resolve anything itself — it
+    // just asks the main process to abort the in-flight Rscript
+    // process. The pending runSimulation() call above settles on its
+    // own (with a "Simulation cancelled" error result) once that
+    // happens, and its `finally` clears isRunning as usual.
+    cancelSimulation: async () => {
+      await window.simulation.cancelSimulation()
     },
 
     selectResult: (id) => set({ selectedResultId: id }),

@@ -221,11 +221,16 @@ app.whenReady().then(() => {
   })
 
   ipcMain.removeHandler('simulation:run')
+  ipcMain.removeHandler('simulation:cancel')
 
   ipcMain.handle('simulation:run', async (event, input: SimulationRunInput) => {
     return await simulationService.runExample(input, (line) => {
       event.sender.send('simulation:log', line)
     })
+  })
+
+  ipcMain.handle('simulation:cancel', () => {
+    return simulationService.cancel()
   })
 
   app.setName('albatross')

@@ -29,6 +29,7 @@ declare global {
     }
     simulation: {
       runSimulation: (input: SimulationRunInput) => Promise<SimulationRunResult>
+      cancelSimulation: () => Promise<boolean>
       onLog: (callback: (line: string) => void) => () => void
     }
     theme: {

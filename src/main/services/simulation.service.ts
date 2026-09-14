@@ -3,8 +3,38 @@ import { OutputListener, rManager } from '../runtime/r-manager'
 
 const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
 
+// BATSS/INLA runs are usually seconds to a few minutes, but a
+// pathological set of inputs (huge N/R, a model that fails to
+// converge, etc.) can hang indefinitely. Without a ceiling, a hung run
+// leaves the UI stuck in "Running" forever with no way out but
+// restarting the app.
+const SIMULATION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
+
 export class SimulationService {
   private readonly r = rManager
+
+  // Tracks the currently in-flight run, if any. Doubles as both the
+  // cancellation handle for cancel() and a lock: runExample() refuses
+  // to start a second run while this is set, so two overlapping
+  // simulation:run IPC calls can't spawn concurrent Rscript processes
+  // and compete for the machine's resources.
+  private activeRun: { controller: AbortController } | null = null
+
+  isRunning(): boolean {
+    return this.activeRun !== null
+  }
+
+  // Aborts the in-flight run, if any. Returns false if nothing was
+  // running so the IPC handler can tell "cancelled" apart from
+  // "nothing to cancel".
+  cancel(): boolean {
+    if (!this.activeRun) {
+      return false
+    }
+
+    this.activeRun.controller.abort(new Error('Simulation cancelled by user'))
+    return true
+  }
 
   /**
    * Runs the 2-arm binomial BATSS design (batss.glm with rbinom /
@@ -26,6 +56,16 @@ export class SimulationService {
     input: SimulationRunInput,
     onOutput?: OutputListener
   ): Promise<SimulationRunResult> {
+    if (this.activeRun) {
+      return {
+        status: 'error',
+        message: 'A simulation is already running. Wait for it to finish or cancel it first.'
+      }
+    }
+
+    const controller = new AbortController()
+    this.activeRun = { controller }
+
     const alternative = input.decisionRules[0]?.direction ?? 'greater'
 
     let family = ''
@@ -180,7 +220,8 @@ export class SimulationService {
       const output = await this.r.execute(
         script,
         { [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }) },
-        onOutput
+        onOutput,
+        { signal: controller.signal, timeoutMs: SIMULATION_TIMEOUT_MS }
       )
 
       return JSON.parse(output) as SimulationRunResult
@@ -189,6 +230,8 @@ export class SimulationService {
         status: 'error',
         message: error instanceof Error ? error.message : 'Simulation run failed'
       }
+    } finally {
+      this.activeRun = null
     }
   }
 }

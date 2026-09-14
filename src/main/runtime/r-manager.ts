@@ -20,6 +20,19 @@ type ExecuteResult = { stdout: string; stderr: string }
  * time instead of only after the whole R process exits. */
 export type OutputListener = (line: string, stream: 'stdout' | 'stderr') => void
 
+/**
+ * Options for cancelling or bounding a long-running R process.
+ *  - `signal`    lets a caller (e.g. a "Cancel" button) abort an
+ *    in-flight run on demand.
+ *  - `timeoutMs` aborts the run automatically if it hasn't finished in
+ *    time, so a hung INLA/BATSS call can't leave the app stuck forever
+ *    in a "Running" state with no recovery short of a restart.
+ */
+export type ExecuteOptions = {
+  signal?: AbortSignal
+  timeoutMs?: number
+}
+
 export class RManager {
   private resolvedExecutable?: string
 
@@ -162,7 +175,8 @@ export class RManager {
   async execute(
     script: string,
     env: NodeJS.ProcessEnv = {},
-    onOutput?: OutputListener
+    onOutput?: OutputListener,
+    options: ExecuteOptions = {}
   ): Promise<string> {
     const wrappedScript = this.wrapScript(script)
     const libraryPath = getRLibraryPath()
@@ -174,7 +188,8 @@ export class RManager {
         [R_LIBRARY_PATH_ENV]: libraryPath,
         ...env
       },
-      onOutput
+      onOutput,
+      options
     ).catch((error) => {
       throw this.toExecutionError(error)
     })
@@ -234,18 +249,58 @@ export class RManager {
   private async runProcess(
     args: string[],
     env: NodeJS.ProcessEnv,
-    onOutput?: OutputListener
+    onOutput?: OutputListener,
+    options: ExecuteOptions = {}
   ): Promise<ExecuteResult> {
     const executable = await this.getRExecutable()
+    const { signal: externalSignal, timeoutMs } = options
+
     return new Promise((resolve, reject) => {
+      // Own AbortController so spawn() only has to know about one
+      // signal, regardless of whether the abort came from the caller
+      // (Cancel button) or from timeoutMs elapsing.
+      const controller = new AbortController()
+
+      const onExternalAbort = (): void => controller.abort(externalSignal?.reason)
+      externalSignal?.addEventListener('abort', onExternalAbort)
+
+      const timeoutHandle = timeoutMs
+        ? setTimeout(() => {
+            controller.abort(
+              new Error(`R process timed out after ${Math.round(timeoutMs / 1000)}s`)
+            )
+          }, timeoutMs)
+        : undefined
+
       const childEnv: NodeJS.ProcessEnv = { ...env }
 
       const child = spawn(executable, args, {
-        env: childEnv
+        env: childEnv,
+        signal: controller.signal
       })
 
       let stdoutBuffer = ''
       let stderrBuffer = ''
+      let settled = false
+
+      const cleanup = (): void => {
+        if (timeoutHandle) clearTimeout(timeoutHandle)
+        externalSignal?.removeEventListener('abort', onExternalAbort)
+      }
+
+      const settleResolve = (result: ExecuteResult): void => {
+        if (settled) return
+        settled = true
+        cleanup()
+        resolve(result)
+      }
+
+      const settleReject = (error: unknown): void => {
+        if (settled) return
+        settled = true
+        cleanup()
+        reject(error)
+      }
 
       const consume = (
         chunk: Buffer,
@@ -277,7 +332,7 @@ export class RManager {
       })
 
       child.on('error', (error) => {
-        reject(error)
+        settleReject(controller.signal.aborted ? this.toAbortError(controller.signal) : error)
       })
 
       child.on('close', (code) => {
@@ -285,10 +340,15 @@ export class RManager {
         if (stdoutTailRef.value) onOutput?.(stdoutTailRef.value, 'stdout')
         if (stderrTailRef.value) onOutput?.(stderrTailRef.value, 'stderr')
 
+        if (controller.signal.aborted) {
+          settleReject(this.toAbortError(controller.signal))
+          return
+        }
+
         if (code === 0) {
-          resolve({ stdout: stdoutBuffer, stderr: stderrBuffer })
+          settleResolve({ stdout: stdoutBuffer, stderr: stderrBuffer })
         } else {
-          reject({
+          settleReject({
             message: `Rscript exited with code ${code}`,
             stdout: stdoutBuffer,
             stderr: stderrBuffer
@@ -298,7 +358,25 @@ export class RManager {
     })
   }
 
+  // Produces a consistent, user-facing message whether the process was
+  // cancelled on purpose or hit timeoutMs. Tagging `name = 'AbortError'`
+  // lets toExecutionError() pass the message through unwrapped instead
+  // of prefixing it with "R execution failed:".
+  private toAbortError(signal: AbortSignal): Error {
+    const reason = signal.reason
+    const error =
+      reason instanceof Error ? new Error(reason.message) : new Error('Simulation cancelled')
+    error.name = 'AbortError'
+    return error
+  }
+
   private toExecutionError(error: unknown): Error {
+    // Cancellations/timeouts already carry a clear, user-facing message
+    // (see toAbortError) — pass them through as-is instead of wrapping.
+    if (error instanceof Error && error.name === 'AbortError') {
+      return error
+    }
+
     if (error && typeof error === 'object') {
       const err = error as { message?: string; stderr?: string; stdout?: string }
       const detail = (err.stderr || err.stdout || '').trim()

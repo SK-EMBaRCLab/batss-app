@@ -1,5 +1,5 @@
 import { SimulationRunInput } from '@shared/simulation-types'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Square } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { SimulationForm } from '@/components/simulation/form'
@@ -16,6 +16,7 @@ export default function Simulation(): ReactElement {
   const design = useDesign((s) => s.design)
   const isRunning = useDesign((s) => s.isRunning)
   const runSimulation = useDesign((s) => s.runSimulation)
+  const cancelSimulation = useDesign((s) => s.cancelSimulation)
   const [logs, setLogs] = useState<string[]>([])
   const [logsOpen, setLogsOpen] = useState(false)
 
@@ -71,14 +72,22 @@ export default function Simulation(): ReactElement {
     <div className="flex h-full min-h-0 flex-col gap-4 p-6">
       <Card className="flex min-h-0 flex-1 flex-col">
         <CardHeader className="shrink-0">
-          <CardTitle>
-            {design?.name ?? 'BATSS Simulation Design'}
-            {design && design.results.length > 0 && (
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
-              </span>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              {design?.name ?? 'BATSS Simulation Design'}
+              {design && design.results.length > 0 && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
+                </span>
+              )}
+            </CardTitle>
+            {isRunning && (
+              <Button variant="destructive" size="sm" onClick={() => cancelSimulation()}>
+                <Square className="mr-1.5 h-3.5 w-3.5" />
+                Cancel
+              </Button>
             )}
-          </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="min-h-0 flex-1 overflow-hidden">
           <SimulationForm onRun={handleRun} initialInput={design?.input} />

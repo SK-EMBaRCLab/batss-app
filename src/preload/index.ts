@@ -91,6 +91,10 @@ const simulation = {
     return ipcRenderer.invoke('simulation:run', input)
   },
 
+  cancelSimulation: (): Promise<boolean> => {
+    return ipcRenderer.invoke('simulation:cancel')
+  },
+
   // Streamed raw R/INLA output from a batss.glm() run, as it happens.
   onLog: (callback: (line: string) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, line: string): void => {
