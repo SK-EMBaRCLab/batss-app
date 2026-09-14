@@ -2,6 +2,7 @@ import { dialog, ipcMain } from 'electron'
 import fs from 'fs/promises'
 import path from 'path'
 
+import { parseStudyDesignFile } from '../../shared/design-file-schema'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
@@ -110,6 +111,34 @@ export function registerAlbatrossFilesIPC(): void {
 
     const text = await fs.readFile(filePaths[0], 'utf8')
 
-    return JSON.parse(text)
+    let parsed: unknown
+
+    try {
+      parsed = JSON.parse(text)
+    } catch {
+      await dialog.showMessageBox({
+        type: 'error',
+        title: 'Invalid Design File',
+        message: 'This file could not be opened.',
+        detail: 'The file is not valid JSON.'
+      })
+
+      return null
+    }
+
+    const validation = parseStudyDesignFile(parsed)
+
+    if (!validation.success) {
+      await dialog.showMessageBox({
+        type: 'error',
+        title: 'Invalid Design File',
+        message: "This file doesn't match the expected Albatross design format.",
+        detail: validation.issues.slice(0, 5).join('\n')
+      })
+
+      return null
+    }
+
+    return validation.data
   })
 }
