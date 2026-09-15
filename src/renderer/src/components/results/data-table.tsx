@@ -40,7 +40,12 @@ export function DataTable<TData extends DataTableRow>({
   const selectResult = useDesign((state) => state.selectResult)
   const selectResults = useDesign((state) => state.selectResults)
   const [rowSelection, setRowSelection] = useState({})
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'createdAt',
+      desc: true
+    }
+  ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({})
