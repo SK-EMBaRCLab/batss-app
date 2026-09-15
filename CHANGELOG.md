@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.2.0...v4.3.0) (2026-09-15)
+
+
+### Features
+
+* add ability to cancel simulation run as well as self-termination for hung process ([3e9f942](https://github.com/SK-EMBaRCLab/batss-app/commit/3e9f94255b0c3e76b13d9cecdcf9c2fbcba9f6e2))
+* add schema validation for loading .design files ([d6fff02](https://github.com/SK-EMBaRCLab/batss-app/commit/d6fff0217c82a8caabf5f7d89acecac86cf1e326))
+
+
+### Bug Fixes
+
+* add default sorting by created at date for table ([38a1b6d](https://github.com/SK-EMBaRCLab/batss-app/commit/38a1b6d16c4c74c1c009ebc8ea41bef18c1a0b0d))
+* add N/A for empty cells in table ([dcc77a2](https://github.com/SK-EMBaRCLab/batss-app/commit/dcc77a2822482eb63aea78405f197921d67085e8))
+
 ## [4.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.5...v4.2.0) (2026-09-11)
 
 ### Features
