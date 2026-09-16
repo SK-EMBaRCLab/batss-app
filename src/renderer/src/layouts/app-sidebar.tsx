@@ -1,6 +1,6 @@
-import { GalleryVerticalEnd } from 'lucide-react'
 import { type ReactElement } from 'react'
 
+import electronLogo from '@/assets/electron.svg'
 import {
   Sidebar,
   SidebarContent,
@@ -29,9 +29,11 @@ export function AppSidebar(): ReactElement {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Albatross">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <GalleryVerticalEnd className="size-4" />
-              </div>
+              <img
+                src={electronLogo}
+                alt="Albatross"
+                className="size-12 rounded-lg object-contain"
+              />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-extrabold font-mono uppercase">Albatross</span>

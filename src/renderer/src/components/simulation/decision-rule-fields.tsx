@@ -86,7 +86,7 @@ export function DecisionRuleFields({
         </Select>
       </Field>
 
-      <Field>
+      <Field data-invalid={marginErrors !== undefined}>
         <FieldLabel className="">Superiority margin (SM)</FieldLabel>
 
         <Input
@@ -99,7 +99,7 @@ export function DecisionRuleFields({
         {marginErrors && <FieldError errors={marginErrors.map((message) => ({ message }))} />}
       </Field>
 
-      <Field>
+      <Field data-invalid={thresholdErrors !== undefined}>
         <FieldLabel className="">Decision threshold (DT)</FieldLabel>
 
         <Input

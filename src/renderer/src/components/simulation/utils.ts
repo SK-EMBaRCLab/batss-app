@@ -35,7 +35,7 @@ export function getTreatmentEffectLabel(
 }
 
 export function hasFieldError(errors: ErrorEntry[], path: string): boolean {
-  return errors.some((error) => error.path.length === 1 && error.path[0] === path)
+  return errors.some((error) => error.path.length > 0 && error.path[0] === path)
 }
 
 export function hasAnyFieldError(errors: ErrorEntry[], paths: string[]): boolean {
