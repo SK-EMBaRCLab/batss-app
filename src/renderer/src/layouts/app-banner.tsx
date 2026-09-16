@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react'
 import { useState } from 'react'
 
-import { Banner } from '@/components/banner'
+import { Banner } from '@/components/common/banner'
 import { Button } from '@/components/ui/button'
 import { useRuntime } from '@/stores/runtime'
 

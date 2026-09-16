@@ -1,5 +1,3 @@
-// src/main/runtime/package-manager.ts
-
 import { RManager } from './r-manager'
 import { PACKAGE_REPOS, REQUIRED_R_PACKAGES } from './r-packages'
 import { RuntimeReporter } from './reporter'

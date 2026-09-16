@@ -1,8 +1,8 @@
 import { FilePlus2, FolderOpen, Save, SearchIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import { EditableDesignName } from '@/components/editable-design-name'
-import { HeaderOverflowMenu } from '@/components/header-overflow-menu'
+import { EditableInPlaceInput } from '@/components/common/editable-inplace-input'
+import { HeaderOverflowMenu } from '@/components/common/header-overflow-menu'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -42,7 +42,11 @@ export function AppHeader(): ReactElement {
         {design && (
           <>
             <Separator orientation="vertical" className="h-5" />
-            <EditableDesignName name={design.name} onRename={renameDesign} />
+            <EditableInPlaceInput
+              name={design.name}
+              onRename={renameDesign}
+              title="Rename study design"
+            />
             {isDirty && <span className="size-2 rounded-full bg-primary" title="Unsaved changes" />}
           </>
         )}

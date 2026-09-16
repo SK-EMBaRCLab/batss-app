@@ -1,9 +1,9 @@
 import { useField } from '@formisch/react'
 import { type ReactElement } from 'react'
 
-import { CollapsibleInfoPanel } from '@/components/collapsible-info-panel'
-import type { SimulationFormStore } from '@/components/types'
+import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
 import { Button } from '@/components/ui/button'
+import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleCard } from './decision-rule-card'
 

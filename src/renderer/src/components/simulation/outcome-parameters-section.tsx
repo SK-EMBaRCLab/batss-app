@@ -1,7 +1,7 @@
 import { useField } from '@formisch/react'
 import { type ReactElement } from 'react'
 
-import type { SimulationFormStore } from '@/components/types'
+import type { SimulationFormStore } from '@/types/form-types'
 
 import { BinaryOutcomeSection } from './binary-outcome-section'
 import { ContinuousOutcomeSection } from './continuous-outcome-section'

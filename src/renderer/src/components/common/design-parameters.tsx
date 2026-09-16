@@ -4,7 +4,7 @@ import { type ReactElement, type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { decisionRuleFormula } from '@/lib/utils'
 
-import { getTreatmentEffectLabel } from './simulation/utils'
+import { getTreatmentEffectLabel } from '../simulation/utils'
 
 export function DesignParams({
   input

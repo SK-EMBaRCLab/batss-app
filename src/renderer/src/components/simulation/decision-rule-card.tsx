@@ -3,9 +3,9 @@ import type { DecisionRule } from '@shared/simulation-types'
 import { Trash2 } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import type { SimulationFormStore } from '@/components/types'
 import { Button } from '@/components/ui/button'
 import { decisionRuleFormula } from '@/lib/utils'
+import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleFields } from './decision-rule-fields'
 import { DecisionRulePreview } from './decision-rule-preview'

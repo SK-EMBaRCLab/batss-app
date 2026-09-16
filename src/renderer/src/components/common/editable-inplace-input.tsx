@@ -4,12 +4,14 @@ import { type ReactElement, useCallback, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-export function EditableDesignName({
+export function EditableInPlaceInput({
   name,
+  title,
   onRename,
   className
 }: {
   name: string
+  title: string
   onRename: (name: string) => void
   className?: string
 }): ReactElement {
@@ -62,7 +64,7 @@ export function EditableDesignName({
         'group/rename flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
         className
       )}
-      title="Rename study design"
+      title={title}
     >
       <span className="max-w-56 truncate">{name}</span>
       <Pencil className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/rename:opacity-100" />

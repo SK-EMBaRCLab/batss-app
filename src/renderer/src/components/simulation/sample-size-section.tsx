@@ -1,10 +1,10 @@
 import { Field as FormischField } from '@formisch/react'
 import { type ReactElement } from 'react'
 
-import { CollapsibleInfoPanel } from '@/components/collapsible-info-panel'
-import type { SimulationFormStore } from '@/components/types'
+import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import type { SimulationFormStore } from '@/types/form-types'
 
 export function SampleSizeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (

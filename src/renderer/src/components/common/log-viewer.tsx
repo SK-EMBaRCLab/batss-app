@@ -2,7 +2,7 @@ import { type ReactElement, useEffect, useRef } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { ScrollArea } from './ui/scroll-area'
+import { ScrollArea } from '../ui/scroll-area'
 
 type LogViewerProps = {
   logs: string[]

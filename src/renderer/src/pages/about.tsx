@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 import { AboutHeader } from '@/components/about/about-header'
 import { AboutPackages } from '@/components/about/about-packages'
-import { LogViewer } from '@/components/log-viewer'
+import { LogViewer } from '@/components/common/log-viewer'
 import { useRuntime } from '@/stores/runtime'
 
 export default function About(): ReactElement {

@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
 
-import { LogViewer } from '@/components/log-viewer'
+import { LogViewer } from '@/components/common/log-viewer'
 import { formatDuration } from '@/lib/utils'
 
 type LogPanelProps = {

@@ -1,9 +1,9 @@
 import { useField } from '@formisch/react'
 import { Fragment, type ReactElement } from 'react'
 
-import type { SimulationFormStore } from '@/components/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { decisionRuleFormula } from '@/lib/utils'
+import type { SimulationFormStore } from '@/types/form-types'
 
 import { getTreatmentEffectLabel } from './utils'
 

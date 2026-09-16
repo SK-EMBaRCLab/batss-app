@@ -4,7 +4,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { AppError } from '@/components/app-error'
+import { AppError } from '@/components/common/app-error'
 
 import App from './App'
 

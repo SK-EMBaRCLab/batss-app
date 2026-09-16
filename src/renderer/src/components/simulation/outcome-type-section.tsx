@@ -1,8 +1,7 @@
 import { Field as FormischField } from '@formisch/react'
 import { type ReactElement } from 'react'
 
-import { CollapsibleInfoPanel } from '@/components/collapsible-info-panel'
-import type { SimulationFormStore } from '@/components/types'
+import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
 import {
   Field as ShadcnField,
   FieldDescription,
@@ -16,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import type { SimulationFormStore } from '@/types/form-types'
 
 const outcomeTypes = ['binary', 'continuous', 'ordinal'] as const
 

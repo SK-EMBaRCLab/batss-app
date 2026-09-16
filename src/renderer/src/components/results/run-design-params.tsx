@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
 
-import { DesignParams } from '@/components/design-parameters'
+import { DesignParams } from '@/components/common/design-parameters'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSelectedEntry } from '@/stores/design'
 

@@ -1,8 +1,7 @@
 import { Field as FormischField } from '@formisch/react'
 import { Fragment, type ReactElement } from 'react'
 
-import { CollapsibleInfoPanel } from '@/components/collapsible-info-panel'
-import type { SimulationFormStore } from '@/components/types'
+import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import type { SimulationFormStore } from '@/types/form-types'
 
 import { treatmentEffects } from './utils'
 
