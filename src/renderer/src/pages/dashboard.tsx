@@ -1,4 +1,4 @@
-import { BarChart3, Play } from 'lucide-react'
+import { Play, TableIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
@@ -69,7 +69,7 @@ export default function Dashboard(): ReactElement {
                 Run Another Simulation
               </Button>
               <Button variant="outline" onClick={() => viewAllResults()}>
-                <BarChart3 className="mr-2 h-4 w-4" />
+                <TableIcon className="mr-2 h-4 w-4" />
                 View All Results
               </Button>
             </div>

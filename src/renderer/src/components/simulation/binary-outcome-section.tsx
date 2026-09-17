@@ -3,7 +3,6 @@ import { Fragment, type ReactElement } from 'react'
 
 import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/select'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { NumericField } from './numeric-field'
 import { treatmentEffects } from './utils'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
@@ -21,30 +21,15 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <FormischField of={form} path={['probability']}>
-            {(field) => (
-              <Field data-invalid={field.errors !== null}>
-                <FieldLabel>Control arm event probability</FieldLabel>
-                <Input
-                  {...field.props}
-                  type="number"
-                  min={0}
-                  max={1}
-                  step="0.01"
-                  value={field.input ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-
-                {field.errors && (
-                  <FieldError
-                    errors={field.errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )}
-          </FormischField>
+          <NumericField
+            form={form}
+            path={['probability']}
+            label="Control arm event probability"
+            min={0}
+            max={1}
+            step="0.01"
+            className="max-w-lg"
+          />
 
           <FormischField of={form} path={['treatmentEffectType']}>
             {(field) => {
@@ -53,7 +38,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
               )
 
               return (
-                <Field data-invalid={field.errors !== null}>
+                <Field data-invalid={field.errors !== null} className="max-w-lg">
                   <FieldLabel>Treatment effect</FieldLabel>
                   <FieldDescription>
                     Difference betweeen treatment arm and control arm
@@ -100,27 +85,12 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
               )
             }}
           </FormischField>
-
-          <FormischField of={form} path={['treatmentEffect']}>
-            {(field) => (
-              <Field data-invalid={field.errors !== null}>
-                <FieldLabel>Treatment effect value</FieldLabel>
-                <Input
-                  {...field.props}
-                  type="number"
-                  value={field.input ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-                {field.errors && (
-                  <FieldError
-                    errors={field.errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )}
-          </FormischField>
+          <NumericField
+            form={form}
+            path={['treatmentEffect']}
+            label="Treatment effect value"
+            className="max-w-lg"
+          />
         </div>
         <CollapsibleInfoPanel title="About Outcome Parameters">
           <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">

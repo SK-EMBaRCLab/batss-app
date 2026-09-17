@@ -1,10 +1,9 @@
-import { Field as FormischField } from '@formisch/react'
 import { type ReactElement } from 'react'
 
 import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import type { SimulationFormStore } from '@/types/form-types'
+
+import { NumericField } from './numeric-field'
 
 export function ContinuousOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (
@@ -12,69 +11,15 @@ export function ContinuousOutcomeSection({ form }: { form: SimulationFormStore }
       <h3 className="font-semibold">Continuous Outcome Parameters</h3>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <FormischField of={form} path={['meanOutcome']}>
-            {(field) => (
-              <Field data-invalid={field.errors !== null}>
-                <FieldLabel>Mean Outcome in Control arm</FieldLabel>
-                <Input
-                  {...field.props}
-                  type="number"
-                  value={field.input ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
+          <NumericField form={form} path={['meanOutcome']} label="Mean Outcome in Control arm" />
 
-                {field.errors && (
-                  <FieldError
-                    errors={field.errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )}
-          </FormischField>
+          <NumericField form={form} path={['sd']} label="Standard Deviation of Outcome" />
 
-          <FormischField of={form} path={['sd']}>
-            {(field) => (
-              <Field data-invalid={field.errors !== null}>
-                <FieldLabel>Standard Deviation of Outcome</FieldLabel>
-                <Input
-                  {...field.props}
-                  type="number"
-                  value={field.input ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-                {field.errors && (
-                  <FieldError
-                    errors={field.errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )}
-          </FormischField>
-
-          <FormischField of={form} path={['meanDiff']}>
-            {(field) => (
-              <Field data-invalid={field.errors !== null}>
-                <FieldLabel>Mean Difference for the treatment effect</FieldLabel>
-                <Input
-                  {...field.props}
-                  type="number"
-                  value={field.input ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-                {field.errors && (
-                  <FieldError
-                    errors={field.errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )}
-          </FormischField>
+          <NumericField
+            form={form}
+            path={['meanDiff']}
+            label="Mean Difference for the treatment effect"
+          />
         </div>
         <CollapsibleInfoPanel title="About Outcome Parameters">
           <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">

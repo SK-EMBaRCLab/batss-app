@@ -1,6 +1,14 @@
+import { ShieldAlertIcon, ShieldCheckIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useDesign, useSelectedEntry } from '@/stores/design'
@@ -39,6 +47,13 @@ export function RunsHistory(): ReactElement | null {
                 key={entry.id}
                 render={
                   <a href="#">
+                    <ItemMedia variant="icon">
+                      {entry.result.status === 'success' ? (
+                        <ShieldCheckIcon className="text-green-700  dark:text-green-200" />
+                      ) : (
+                        <ShieldAlertIcon className="text-destructive" />
+                      )}
+                    </ItemMedia>
                     <ItemContent>
                       <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
                       <ItemDescription>

@@ -14,14 +14,14 @@ export const treatmentEffects = [
   },
   {
     value: 'riskDifference',
-    label: 'Risk Difference',
+    label: 'Risk Difference (under development)',
     symbol: 'RD',
     description:
       'Compares the probability of experiencing the event between treatment and control groups. A risk difference of 0 indicates no effect of treatment on the event probability; positive values increase the probability of the event, and negative values decrease it'
   },
   {
     value: 'riskRatio',
-    label: 'Risk Ratio',
+    label: 'Risk Ratio (under development)',
     symbol: 'RR',
     description:
       'Compares the probability of experiencing the event between treatment and control groups. An risk ratio of 1 indicates no effect of treatment on the event probability; values above 1 increase event probability, and values below 1 decrease them'
