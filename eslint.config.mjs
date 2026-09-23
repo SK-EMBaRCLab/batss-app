@@ -33,5 +33,13 @@ export default defineConfig(
       'simple-import-sort/exports': 'error'
     }
   },
+  {
+    files: ['src/renderer/src/components/ui/**/*.{ts,tsx}', 'src/renderer/src/hooks/use-mobile.ts'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/set-state-in-effect': 'off'
+    }
+  },
   eslintConfigPrettier
 )
