@@ -1,0 +1,3 @@
+outcomeType,N,m0,m,R,probability,treatmentEffectType,treatmentEffect,meanOutcome,sd,meanDiff,decisionRuleType,decisionRuleDirection,decisionRuleMargin,decisionRuleThreshold
+binary,216,60,12,10,0.3,oddsRatio,1.5,,,,superiority,greater,1,0.95
+continuous,216,60,12,10,,,,10,2.5,3,superiority,greater,0,0.95

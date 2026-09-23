@@ -1,4 +1,4 @@
-import { BarChart3, Info, LayoutDashboard, Play, Settings, Table } from 'lucide-react'
+import { BarChart3, FileUp, Info, LayoutDashboard, Play, Settings, Table } from 'lucide-react'
 
 export const navigationItems = [
   {
@@ -10,6 +10,11 @@ export const navigationItems = [
     title: 'Run Simulation',
     icon: Play,
     view: 'simulation'
+  },
+  {
+    title: 'Batch Processing',
+    icon: FileUp,
+    view: 'batch'
   },
   {
     title: 'Simulations Table',
