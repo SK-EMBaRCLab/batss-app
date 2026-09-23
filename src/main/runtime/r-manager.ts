@@ -176,16 +176,7 @@ export class RManager {
     onOutput?: OutputListener,
     options: ExecuteOptions = {}
   ): Promise<string> {
-    const { stdout } = await this.runProcess(
-      ['--vanilla', '-e', script],
-      await this.buildEnv(env),
-      onOutput,
-      options
-    ).catch((error) => {
-      throw this.toExecutionError(error)
-    })
-
-    return stdout.trim()
+    return this.runAndReadStdout(['--vanilla', '-e', script], env, onOutput, options)
   }
 
   async executeFile(
@@ -194,8 +185,17 @@ export class RManager {
     onOutput?: OutputListener,
     options: ExecuteOptions = {}
   ): Promise<string> {
+    return this.runAndReadStdout(['--vanilla', scriptPath], env, onOutput, options)
+  }
+
+  private async runAndReadStdout(
+    args: string[],
+    env: NodeJS.ProcessEnv,
+    onOutput?: OutputListener,
+    options: ExecuteOptions = {}
+  ): Promise<string> {
     const { stdout } = await this.runProcess(
-      ['--vanilla', scriptPath],
+      args,
       await this.buildEnv(env),
       onOutput,
       options
