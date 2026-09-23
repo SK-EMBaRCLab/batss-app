@@ -34,11 +34,10 @@ export const useBatch = create<BatchState>((set) => ({
   logs: [],
 
   start: async (inputs) => {
-    if (useEngine.getState().busy !== 'idle') {
+    if (!useEngine.getState().tryAcquire('batch')) {
       set({ status: 'error', message: describeBusy(useEngine.getState()) })
       return
     }
-    useEngine.setState({ busy: 'batch', startedAt: new Date().toISOString() })
 
     set({ status: 'running', entries: [], logs: [], completed: 0, total: inputs.length })
 
@@ -78,6 +77,7 @@ export const useBatch = create<BatchState>((set) => ({
       unsubscribeRow()
       unsubscribeLog()
       batcher.flush()
+      useEngine.getState().release()
     }
   },
 

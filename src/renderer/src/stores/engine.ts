@@ -1,9 +1,12 @@
-import type { EngineState } from '@shared/engine-types'
+import type { EngineBusy, EngineState } from '@shared/engine-types'
 import { create } from 'zustand'
 
 type EngineStore = EngineState & {
   initialized: boolean
   initialize: () => Promise<void>
+  /** Optimistically claim the engine. Returns false if already busy. */
+  tryAcquire: (kind: Exclude<EngineBusy, 'idle'>) => boolean
+  release: () => void
 }
 
 export const useEngine = create<EngineStore>((set, get) => ({
@@ -19,5 +22,13 @@ export const useEngine = create<EngineStore>((set, get) => ({
 
     // Catch up: if the renderer was reloaded mid-run, main is still busy.
     set(await window.engine.get())
-  }
+  },
+
+  tryAcquire: (kind) => {
+    if (get().busy !== 'idle') return false
+    set({ busy: kind, startedAt: new Date().toISOString() })
+    return true
+  },
+
+  release: () => set({ busy: 'idle', startedAt: null })
 }))

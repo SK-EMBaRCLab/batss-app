@@ -23,13 +23,11 @@ export const useSimulation = create<SimulationState>((set) => ({
   endedAt: null,
 
   run: async (input, formInput) => {
-    if (useEngine.getState().busy !== 'idle') {
+    if (!useEngine.getState().tryAcquire('simulation')) {
       return { status: 'error', message: describeBusy(useEngine.getState()) }
     }
 
     const startedAt = Date.now()
-
-    useEngine.setState({ busy: 'simulation', startedAt: new Date(startedAt).toISOString() })
 
     set({
       startedAt,
@@ -78,6 +76,7 @@ export const useSimulation = create<SimulationState>((set) => ({
       unsubscribe()
       batcher.flush()
       set((state) => ({ endedAt: state.endedAt ?? Date.now() }))
+      useEngine.getState().release()
     }
   },
 
