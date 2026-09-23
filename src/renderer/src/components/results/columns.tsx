@@ -3,7 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getTreatmentEffectLabel } from '@/lib/design-options'
+import { fieldsFor } from '@/lib/design-fields'
 
 import { EmptyCell } from '../table/empty-cell'
 import { renderCellValue } from '../table/render-cell-value'
@@ -11,6 +11,31 @@ import { type DataTableFeatures } from './data-table-features'
 
 // Use `accessor` for data columns and `display` for columns without one.
 const columnHelper = createColumnHelper<DataTableFeatures, SimulationResultEntry>()
+
+const outcomeScopedColumnIds = [
+  'treatmentEffectType',
+  'treatmentEffect',
+  'meanOutcome',
+  'meanDiff',
+  'sd'
+] as const
+
+const outcomeScopedColumns = outcomeScopedColumnIds.map((key) => {
+  const binaryField = fieldsFor('binary').find((f) => f.key === key)
+  const continuousField = fieldsFor('continuous').find((f) => f.key === key)
+  const field = binaryField ?? continuousField!
+
+  return columnHelper.accessor(`input.${key}` as const, {
+    id: key,
+    meta: { label: field.label },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={field.label} />,
+    cell: ({ row, getValue }) => {
+      const matches = row.original.input.outcomeType === (binaryField ? 'binary' : 'continuous')
+      if (!matches) return <EmptyCell state="not-applicable" />
+      return renderCellValue(field.value(row.original.input) ?? getValue())
+    }
+  })
+})
 
 export const columns = columnHelper.columns([
   columnHelper.display({
@@ -63,96 +88,7 @@ export const columns = columnHelper.columns([
       return filterValue.includes(row.getValue(columnId))
     }
   }),
-  columnHelper.accessor('input.treatmentEffectType', {
-    id: 'treatmentEffectType',
-    meta: {
-      label: 'Treatment Effect'
-    },
-    header: 'Treatment Effect',
-    cell: ({ row, getValue }) => {
-      const value = getValue()
-      const outcomeType = row.original.input.outcomeType
-      if (outcomeType !== 'binary') {
-        return <EmptyCell state="not-applicable" />
-      }
-      if (value == null) {
-        return <EmptyCell />
-      }
-      return getTreatmentEffectLabel(value)
-    }
-  }),
-  columnHelper.accessor('input.treatmentEffect', {
-    id: 'treatmentEffect',
-    meta: {
-      label: 'Treatment Effect Value'
-    },
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Treatment Effect Value" />
-    },
-    cell: ({ row, getValue }) => {
-      const outcomeType = row.original.input.outcomeType
-
-      if (outcomeType !== 'binary') {
-        return <EmptyCell state="not-applicable" />
-      }
-
-      return renderCellValue(getValue())
-    }
-  }),
-  columnHelper.accessor('input.meanOutcome', {
-    id: 'meanOutcome',
-    meta: {
-      label: 'Mean Outcome'
-    },
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Mean Outcome in control arm" />
-    },
-    cell: ({ row, getValue }) => {
-      const outcomeType = row.original.input.outcomeType
-
-      if (outcomeType !== 'continuous') {
-        return <EmptyCell state="not-applicable" />
-      }
-
-      return renderCellValue(getValue())
-    }
-  }),
-  columnHelper.accessor('input.meanDiff', {
-    id: 'meanDiff',
-    meta: {
-      label: 'Mean Difference'
-    },
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Mean Difference in treatment effect" />
-    },
-    cell: ({ row, getValue }) => {
-      const outcomeType = row.original.input.outcomeType
-
-      if (outcomeType !== 'continuous') {
-        return <EmptyCell state="not-applicable" />
-      }
-
-      return renderCellValue(getValue())
-    }
-  }),
-  columnHelper.accessor('input.sd', {
-    id: 'sd',
-    meta: {
-      label: 'Standard Deviation'
-    },
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Standard Deviation" />
-    },
-    cell: ({ row, getValue }) => {
-      const outcomeType = row.original.input.outcomeType
-
-      if (outcomeType !== 'continuous') {
-        return <EmptyCell state="not-applicable" />
-      }
-
-      return renderCellValue(getValue())
-    }
-  }),
+  ...outcomeScopedColumns,
   columnHelper.accessor('input.N', {
     id: 'maxSampleSize',
     meta: {
