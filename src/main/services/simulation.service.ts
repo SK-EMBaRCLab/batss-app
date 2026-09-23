@@ -1,7 +1,15 @@
+import { mkdtemp, readFile, rm } from 'fs/promises'
+import os from 'os'
+import path from 'path'
+
+import simulationScriptPath from '../../../resources/r/batss-simulation.R?asset'
+import { describeBusy } from '../../shared/engine-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
 import { OutputListener, rManager } from '../runtime/r-manager'
+import { engineService } from './engine.service'
 
 const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
+const BATSS_OUTPUT_ENV = 'ALBATROSS_BATSS_OUTPUT'
 
 // BATSS/INLA runs are usually seconds to a few minutes, but a
 // pathological set of inputs (huge N/R, a model that fails to
@@ -13,27 +21,13 @@ const SIMULATION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
 export class SimulationService {
   private readonly r = rManager
 
-  // Tracks the currently in-flight run, if any. Doubles as both the
-  // cancellation handle for cancel() and a lock: runExample() refuses
-  // to start a second run while this is set, so two overlapping
-  // simulation:run IPC calls can't spawn concurrent Rscript processes
-  // and compete for the machine's resources.
+  // Cancellation handle for whichever Rscript is currently alive. This
+  // is no longer the "busy" lock — engineService is — it's just how we
+  // reach the process to abort it.
   private activeRun: { controller: AbortController } | null = null
 
-  isRunning(): boolean {
-    return this.activeRun !== null
-  }
-
-  // Aborts the in-flight run, if any. Returns false if nothing was
-  // running so the IPC handler can tell "cancelled" apart from
-  // "nothing to cancel".
-  cancel(): boolean {
-    if (!this.activeRun) {
-      return false
-    }
-
-    this.activeRun.controller.abort(new Error('Simulation cancelled by user'))
-    return true
+  private getSimulationScriptPath(): string {
+    return simulationScriptPath
   }
 
   /**
@@ -52,17 +46,34 @@ export class SimulationService {
    * `onOutput`, if provided, receives each line of R/INLA output as it
    * streams, so the caller can forward it to the GUI live.
    */
-  async runExample(
+  async runSimulation(
     input: SimulationRunInput,
     onOutput?: OutputListener
   ): Promise<SimulationRunResult> {
-    if (this.activeRun) {
-      return {
-        status: 'error',
-        message: 'A simulation is already running. Wait for it to finish or cancel it first.'
-      }
+    if (!engineService.acquire('simulation')) {
+      return { status: 'error', message: describeBusy(engineService.get()) }
     }
 
+    try {
+      return await this.execute(input, onOutput)
+    } finally {
+      engineService.release()
+    }
+  }
+
+  /** Cancel a standalone run. No-op (returns false) during a batch. */
+  cancel(): boolean {
+    if (engineService.get().busy !== 'simulation') return false
+    return this.abortActive('Simulation cancelled by user')
+  }
+  /**
+   * Runs exactly one Rscript. Does NOT touch the engine lock — the
+   * caller owns that (runSimulation above, or BatchService for a row).
+   */
+  async execute(
+    input: SimulationRunInput,
+    onOutput?: OutputListener
+  ): Promise<SimulationRunResult> {
     const controller = new AbortController()
     this.activeRun = { controller }
 
@@ -95,136 +106,22 @@ export class SimulationService {
         break
     }
 
-    const script = `
-      library(BATSS)
-      library(INLA)
+    const scriptPath = this.getSimulationScriptPath()
 
-      # Fix: INLA's automatic thread-count detection frequently
-      # misreads what's actually available inside a container (cgroup
-      # CPU limits vs. /proc/cpuinfo), which is one of the most common
-      # causes of "the inla-program exited with an error" with no
-      # further detail. Forcing a single thread sidesteps that whole
-      # class of failure.
-      # Docker only
-      if (file.exists("/.dockerenv")) {
-        inla.setOption(num.threads = "1:1")
-      }
-
-      # logit is a helper function
-      logit <- function(p) { log(p / (1 - p)) }
-
-      input <- jsonlite::fromJSON(Sys.getenv("${BATSS_INPUT_ENV}"), simplifyVector = FALSE)
-
-      varY <- switch(
-        input$varY,
-        rbinom = rbinom,
-        rnorm = rnorm,
-        stop("Unsupported outcome distribution")
-      )
-
-      rule <- input$decisionRules[[1]]
-
-      b <- rule$threshold
-
-      if(input$outcomeType == 'binary') {
-        varControl <- list(y = list(size = 1))
-        beta <- c(logit(input$probability), log(input$treatmentEffect))
-        delta.eff <- log(rule$margin)
-      } else if(input$outcomeType == 'continuous') {
-        varControl <- list(y = list(sd = input$sd))
-        beta <- c(input$meanOutcome, input$meanDiff)
-        delta.eff <- rule$margin
-      }
-
-      trials <- batss.glm(
-        model = y ~ group,
-        family = input$family,
-        link = input$link,
-        var = list(y = varY, group = alloc.balanced),
-        var.control = varControl,
-        prob0 = c(Control = 1, Experimental = 1),
-        alternative = input$alternative,
-        beta = beta,
-        which = 2,
-        eff.arm = eff.arm.simple,
-        eff.arm.control = list(b = b),
-        delta.eff = delta.eff,
-        fut.arm = NULL,
-        N = input$N,
-        interim = list(recruited = list(m0 = input$m0, m = input$m)),
-        R = input$R,
-        extended = 2,
-        computation = 'parallel'
-      )
-
-      summary1 <- summary(trials)
-
-      df <- rbind(
-        data.frame(
-          Scenario = "Null Effect",
-          Outcome = summary1$H0$scenario$groupExperimental,
-          Proportion = summary1$H0$scenario$overall
-        ),
-        data.frame(
-          Scenario = "Target Effect",
-          Outcome = summary1$H1$scenario$groupExperimental,
-          Proportion = summary1$H1$scenario$overall
-        )
-      )
-
-      df$Outcome <- factor(
-        df$Outcome,
-        levels = c(0, 1),
-        labels = c("Inconclusive", "Experimental Superior")
-      )
-
-
-      # reshape to frontend table:
-      # Outcome | Null Effect proportions | Target Effect proportions
-
-      wide <- reshape(
-        df,
-        idvar = "Outcome",
-        timevar = "Scenario",
-        direction = "wide"
-      )
-
-      names(wide) <- c(
-        "Outcome",
-        "Null Effect",
-        "Target Effect"
-      )
-
-
-      result <- list(
-        status = "success",
-        package = as.character(packageVersion("BATSS")),
-        table = wide,
-        chart = df,
-        sampleSize = list(
-          H0 = list(
-            control = trials$H0$sample$Control,
-            experimental = trials$H0$sample$Experimental
-          ),
-          H1 = list(
-            control = trials$H1$sample$Control,
-            experimental = trials$H1$sample$Experimental
-          )
-        )
-      )
-
-      cat(jsonlite::toJSON(result, auto_unbox = TRUE, force = TRUE, null = "null"))
-    `
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
+    const outputPath = path.join(tmpDir, 'result.json')
 
     try {
-      const output = await this.r.execute(
-        script,
-        { [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }) },
+      await this.r.executeFile(
+        scriptPath,
+        {
+          [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }),
+          [BATSS_OUTPUT_ENV]: outputPath
+        },
         onOutput,
         { signal: controller.signal, timeoutMs: SIMULATION_TIMEOUT_MS }
       )
-
-      return JSON.parse(output) as SimulationRunResult
+      return JSON.parse(await readFile(outputPath, 'utf8')) as SimulationRunResult
     } catch (error) {
       return {
         status: 'error',
@@ -232,6 +129,15 @@ export class SimulationService {
       }
     } finally {
       this.activeRun = null
+      await rm(tmpDir, { recursive: true, force: true })
     }
   }
+  /** Abort whatever Rscript is alive, regardless of who owns the engine. */
+  abortActive(reason: string): boolean {
+    if (!this.activeRun) return false
+    this.activeRun.controller.abort(new Error(reason))
+    return true
+  }
 }
+
+export const simulationService = new SimulationService()
