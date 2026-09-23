@@ -58,11 +58,10 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
   const data = useMemo(() => {
     // This is only visual spread.
     // It is NOT the statistical SE.
-    const spread = 0.25
-
-    const min = Math.max(0, value - 4 * spread)
-
-    const max = value + 4 * spread
+    const spread = Math.max(0.25, Math.abs(value - rule.margin) / 3)
+    const lo = Math.min(value, rule.margin) - 3 * spread
+    const min = type === 'binary' ? Math.max(0, lo) : lo
+    const max = Math.max(value, rule.margin) + 3 * spread
 
     const points = 200
 

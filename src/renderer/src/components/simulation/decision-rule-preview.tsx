@@ -20,7 +20,9 @@ export function DecisionRulePreview({
     <div className="space-y-3">
       <div>
         <h3 className="text-sm font-medium">Treatment effect</h3>
-        <p className="text-xs text-muted-foreground">Estimated odds ratio and decision margin</p>
+        <p className="text-xs text-muted-foreground">
+          {type === 'continuous' ? 'Mean difference' : 'Odds ratio'} and decision margin
+        </p>
       </div>
 
       <div className="h-40 rounded-lg border bg-muted/20 p-2">

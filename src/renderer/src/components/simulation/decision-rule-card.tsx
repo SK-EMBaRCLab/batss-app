@@ -1,20 +1,12 @@
 import { useField } from '@formisch/react'
 import type { DecisionRule } from '@shared/simulation-types'
-import { Trash2 } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import { Button } from '@/components/ui/button'
 import { decisionRuleFormula } from '@/lib/utils'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleFields } from './decision-rule-fields'
 import { DecisionRulePreview } from './decision-rule-preview'
-
-type DecisionRuleCardProps = {
-  form: SimulationFormStore
-  index: number
-  onRemove: () => void
-}
 
 function getDecisionRule(
   type: string | undefined,
@@ -49,38 +41,15 @@ function getDecisionRule(
   }
 }
 
-export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProps): ReactElement {
-  const typeField = useField(form, {
-    path: ['decisionRules', index, 'type']
-  })
-
-  const directionField = useField(form, {
-    path: ['decisionRules', index, 'direction']
-  })
-
-  const marginField = useField(form, {
-    path: ['decisionRules', index, 'margin']
-  })
-
-  const thresholdField = useField(form, {
-    path: ['decisionRules', index, 'threshold']
-  })
-
-  const treatmentEffectType = useField(form, {
-    path: ['treatmentEffectType']
-  })
-
-  const outcomeType = useField(form, {
-    path: ['outcomeType']
-  })
-
-  const treatmentEffect = useField(form, {
-    path: ['treatmentEffect']
-  })
-
-  const meanDiffInput = useField(form, {
-    path: ['meanDiff']
-  })
+export function DecisionRuleCard({ form }: { form: SimulationFormStore }): ReactElement {
+  const typeField = useField(form, { path: ['decisionRules', 0, 'type'] })
+  const directionField = useField(form, { path: ['decisionRules', 0, 'direction'] })
+  const marginField = useField(form, { path: ['decisionRules', 0, 'margin'] })
+  const thresholdField = useField(form, { path: ['decisionRules', 0, 'threshold'] })
+  const treatmentEffectType = useField(form, { path: ['treatmentEffectType'] })
+  const outcomeType = useField(form, { path: ['outcomeType'] })
+  const treatmentEffect = useField(form, { path: ['treatmentEffect'] })
+  const meanDiffInput = useField(form, { path: ['meanDiff'] })
 
   const rule = getDecisionRule(
     typeField.input,
@@ -118,24 +87,11 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
 
   return (
     <div className="rounded-lg border bg-background">
-      <div className="flex items-center justify-between border-b px-6 py-4">
-        <div>
-          <h2 className="text-base font-semibold">Decision Rule {index + 1}</h2>
-          <p className="text-sm text-muted-foreground">
-            Define the conditions that determine whether the trial adapts
-          </p>
-        </div>
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          aria-label={`Remove decision rule ${index + 1}`}
-          disabled={index === 0}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+      <div className="border-b px-6 py-4">
+        <h2 className="text-base font-semibold">Decision Rule</h2>
+        <p className="text-sm text-muted-foreground">
+          Define the conditions that determine whether the trial adapts
+        </p>
       </div>
       <div className="p-6">
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">

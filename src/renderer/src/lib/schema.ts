@@ -1,4 +1,4 @@
-import { DesignInput } from '@shared/simulation-types'
+import { DecisionRule, DesignInput } from '@shared/simulation-types'
 import * as v from 'valibot'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -67,16 +67,19 @@ const binaryDesignSchema = v.object({
 
   probability: v.pipe(
     requiredNumber('Control arm event probability'),
-    v.minValue(0, 'Probability must be at least 0.'),
-    v.maxValue(1, 'Probability must be at most 1.')
+    v.gtValue(0, 'Probability must be greater than 0.'),
+    v.ltValue(1, 'Probability must be less than 1.')
   ),
 
-  treatmentEffectType: v.picklist(
-    ['oddsRatio', 'riskDifference', 'riskRatio'],
-    'Please select a treatment effect.'
+  treatmentEffectType: v.pipe(
+    v.picklist(['oddsRatio', 'riskDifference', 'riskRatio'], 'Please select a treatment effect.'),
+    v.check((t) => t === 'oddsRatio', 'Only odds ratio is currently supported.')
   ),
 
-  treatmentEffect: requiredNumber('Treatment effect'),
+  treatmentEffect: v.pipe(
+    requiredNumber('Treatment effect'),
+    v.gtValue(0, 'Odds ratio must be greater than 0.')
+  ),
 
   ...commonDesignFields
 })
@@ -90,7 +93,7 @@ const continuousDesignSchema = v.object({
 
   sd: v.pipe(
     requiredNumber('Standard deviation'),
-    v.minValue(0, 'Standard deviation must be greater than 0.')
+    v.gtValue(0, 'Standard deviation must be greater than 0.')
   ),
 
   ...commonDesignFields
@@ -131,6 +134,14 @@ export const designSchema = v.pipe(
       'Number of intermim patients must be less than the difference between max sample size and burn-in'
     ),
     ['m']
+  ),
+
+  v.forward(
+    v.check(
+      (data) => data.outcomeType !== 'binary' || data.decisionRules.every((r) => r.margin > 0),
+      'Superiority margin must be greater than 0 for an odds ratio.'
+    ),
+    ['decisionRules', 0, 'margin']
   )
 )
 
@@ -184,6 +195,13 @@ export const runnableDesignSchema = v.variant('outcomeType', [
   runnableOrdinalSchema
 ])
 
+export const defaultDecisionRule: DecisionRule = {
+  type: 'superiority',
+  direction: 'greater',
+  margin: 1,
+  threshold: 0.95
+}
+
 export const initialDesignInput: DesignInput = {
   outcomeType: undefined,
 
@@ -203,5 +221,5 @@ export const initialDesignInput: DesignInput = {
 
   R: 10,
 
-  decisionRules: []
+  decisionRules: [defaultDecisionRule]
 }

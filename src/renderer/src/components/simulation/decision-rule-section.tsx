@@ -1,8 +1,8 @@
 import { useField } from '@formisch/react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useEffect } from 'react'
 
 import { CollapsibleInfoPanel } from '@/components/common/collapsible-info-panel'
-import { Button } from '@/components/ui/button'
+import { defaultDecisionRule } from '@/lib/schema'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleCard } from './decision-rule-card'
@@ -11,30 +11,25 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
   const rules = useField(form, {
     path: ['decisionRules']
   })
+  const ruleCount = rules.input?.length ?? 0
 
-  const addRule = (): void => {
-    const current = rules.input ?? []
-
-    rules.onChange([
-      ...current,
-      {
-        type: 'superiority',
-        direction: 'greater',
-        margin: 1,
-        threshold: 0.95
-      }
-    ])
-  }
+  // Only one decision rule is supported today — BATSS's futility arm
+  // isn't wired up yet (see batss-simulation.R: fut.arm is hard-coded
+  // NULL and only decisionRules[[1]] is ever read). The array shape is
+  // kept in the schema/file format for forward compatibility; the form
+  // only ever edits index 0. This guards against a design saved before
+  // this default existed, or before the wizard's first save, loading
+  // with zero rules.
+  useEffect(() => {
+    if (ruleCount === 0) {
+      rules.onChange([defaultDecisionRule])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ruleCount])
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
-      <div className="flex shrink-0 items-center justify-between">
-        <h3 className="font-semibold">Decision Rules</h3>
-
-        <Button type="button" onClick={addRule} disabled={rules.input.length > 0}>
-          Add decision rule
-        </Button>
-      </div>
+      <h3 className="shrink-0 font-semibold">Decision Rules</h3>
 
       {rules.errors?.[0] && <p className="text-sm text-destructive">{rules.errors[0]}</p>}
 
@@ -138,22 +133,7 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
             </div>
           </div>
         </CollapsibleInfoPanel>
-        {(rules.input ?? []).map((_, index) => (
-          <DecisionRuleCard
-            key={index}
-            form={form}
-            index={index}
-            onRemove={() => {
-              const current = rules.input ?? []
-
-              if (current.length === 1) {
-                return
-              }
-
-              rules.onChange(current.filter((_, i) => i !== index))
-            }}
-          />
-        ))}
+        {ruleCount > 0 && <DecisionRuleCard form={form} />}
       </div>
     </div>
   )
