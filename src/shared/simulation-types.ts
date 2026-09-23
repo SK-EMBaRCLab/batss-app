@@ -74,15 +74,15 @@ export interface SimulationResultEntry {
 }
 
 export type DesignInput = {
-  outcomeType: 'binary' | 'continuous' | 'ordinal' | undefined
+  outcomeType?: 'binary' | 'continuous' | 'ordinal'
 
-  probability: number | undefined
-  treatmentEffectType: 'oddsRatio' | 'riskDifference' | 'riskRatio' | undefined
-  treatmentEffect: number | undefined
+  probability?: number
+  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+  treatmentEffect?: number
 
-  meanOutcome: number | undefined
-  meanDiff: number | undefined
-  sd: number | undefined
+  meanOutcome?: number
+  meanDiff?: number
+  sd?: number
 
   N: number
   m0: number

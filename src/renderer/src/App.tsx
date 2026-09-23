@@ -13,12 +13,15 @@ import { useNavigation } from '@/stores/navigation'
 import { useRuntime } from '@/stores/runtime'
 import { useTheme } from '@/stores/theme'
 
+import { useEngine } from './stores/engine'
+
 export default function App(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
-  const status = useRuntime((state) => state.status)
   const design = useDesign((state) => state.design)
   const initialize = useRuntime((state) => state.initialize)
   const initializeTheme = useTheme((state) => state.initialize)
+  const initializeEngine = useEngine((s) => s.initialize)
+  const bootstrapped = useRuntime((state) => state.bootstrapped)
 
   useCommandShortcuts()
 
@@ -29,6 +32,10 @@ export default function App(): ReactElement {
   useEffect(() => {
     initializeTheme()
   }, [initializeTheme])
+
+  useEffect(() => {
+    initializeEngine()
+  }, [initializeEngine])
 
   useEffect(() => {
     const cleanup = window.design.onSaveRequested(async () => {
@@ -42,7 +49,7 @@ export default function App(): ReactElement {
     return cleanup
   }, [])
 
-  if (status === 'checking' || status === 'installing') {
+  if (!bootstrapped) {
     return <RuntimeScreen />
   }
 

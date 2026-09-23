@@ -6,15 +6,19 @@ type Theme = 'system' | 'light' | 'dark'
 type ThemeState = {
   theme: Theme
   isDark: boolean
+  initialized: boolean
   initialize: () => Promise<void>
   setTheme: (theme: Theme) => Promise<void>
 }
 
-export const useTheme = create<ThemeState>((set) => ({
+export const useTheme = create<ThemeState>((set, get) => ({
   theme: 'system',
   isDark: false,
+  initialized: false,
 
   initialize: async () => {
+    if (get().initialized) return
+    set({ initialized: true })
     const { source, dark } = await window.theme.get()
 
     set({

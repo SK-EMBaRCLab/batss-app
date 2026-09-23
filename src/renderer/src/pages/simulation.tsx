@@ -1,70 +1,37 @@
-import { SimulationRunInput } from '@shared/simulation-types'
+import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { ChevronDown, Square } from 'lucide-react'
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { SimulationForm } from '@/components/simulation/form'
 import { LogPanel } from '@/components/simulation/log-panel'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { formatDuration } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
+import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
+import { useSimulation } from '@/stores/simulation'
 
 export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const design = useDesign((s) => s.design)
-  const isRunning = useDesign((s) => s.isRunning)
-  const runSimulation = useDesign((s) => s.runSimulation)
-  const cancelSimulation = useDesign((s) => s.cancelSimulation)
-  const [logs, setLogs] = useState<string[]>([])
-  const [logsOpen, setLogsOpen] = useState(false)
+  const busy = useEngine((s) => s.busy)
+  const isRunning = busy === 'simulation'
+  const logs = useSimulation((s) => s.logs)
+  const startedAt = useSimulation((s) => s.startedAt)
+  const endedAt = useSimulation((s) => s.endedAt)
+  const run = useSimulation((s) => s.run)
+  const cancel = useSimulation((s) => s.cancel)
 
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [logsOpen, setLogsOpen] = useState(isRunning)
 
-  useEffect(() => {
-    const unsubscribe = window.simulation.onLog((line) => {
-      setLogs((prev) => [...prev, line])
-    })
-
-    return unsubscribe
-  }, [])
-
-  const handleRun = async (runnableInput: SimulationRunInput, formInput): Promise<void> => {
+  const handleRun = async (input: SimulationRunInput, formInput: DesignInput): Promise<void> => {
     setLogsOpen(true)
-    setLogs([])
-    setElapsedSeconds(0)
+    const result = await run(input, formInput)
 
-    setLogs([
-      '> Starting BATSS simulation',
-      `> Outcome: ${runnableInput.outcomeType}`,
-      `> Sample size: N=${runnableInput.N}, m0=${runnableInput.m0}, m=${runnableInput.m}`,
-      `> Simulation runs: ${runnableInput.R}`,
-      `> Decision rules: ${runnableInput.decisionRules.length}`,
-      ''
-    ])
-
-    const start = performance.now()
-
-    const timer = window.setInterval(() => {
-      setElapsedSeconds((performance.now() - start) / 1000)
-    }, 100)
-
-    try {
-      const response = await runSimulation(runnableInput, formInput)
-
-      if (response.status === 'success') {
-        navigate('results')
-      } else {
-        setLogs((prev) => [...prev, '', `> Error: ${response.message}`])
-      }
-    } finally {
-      const elapsed = (performance.now() - start) / 1000
-
-      clearInterval(timer)
-      setElapsedSeconds(elapsed)
-
-      setLogs((prev) => [...prev, '', `> Completed in ${formatDuration(elapsed)}`])
+    // Only auto-jump if the user is still on this page.
+    if (result.status === 'success' && useNavigation.getState().currentView === 'simulation') {
+      navigate('results')
     }
   }
 
@@ -82,7 +49,7 @@ export default function Simulation(): ReactElement {
               )}
             </CardTitle>
             {isRunning && (
-              <Button variant="destructive" size="sm" onClick={() => cancelSimulation()}>
+              <Button variant="destructive" size="sm" onClick={() => cancel()}>
                 <Square className="mr-1.5 h-3.5 w-3.5" />
                 Cancel
               </Button>
@@ -111,7 +78,7 @@ export default function Simulation(): ReactElement {
 
           <CollapsibleContent>
             <CardContent className="h-64 overflow-hidden">
-              <LogPanel logs={logs} isRunning={isRunning} elapsedSeconds={elapsedSeconds} />
+              <LogPanel logs={logs} isRunning={isRunning} startedAt={startedAt} endedAt={endedAt} />
             </CardContent>
           </CollapsibleContent>
         </Collapsible>

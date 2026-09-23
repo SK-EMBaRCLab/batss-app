@@ -10,7 +10,7 @@ import { DecisionRuleSection } from '@/components/simulation/decision-rule-secti
 import { Button } from '@/components/ui/button'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
-import { useDesign } from '@/stores/design'
+import { useEngine } from '@/stores/engine'
 
 import { OutcomeParametersSection } from './outcome-parameters-section'
 import { OutcomeTypeSection } from './outcome-type-section'
@@ -19,7 +19,7 @@ import { SampleSizeSection } from './sample-size-section'
 import { hasAnyFieldError } from './utils'
 
 type SimulationFormProps = {
-  onRun: (input: SimulationRunInput, output) => Promise<void>
+  onRun: (input: SimulationRunInput, outputt: DesignInput) => Promise<void>
   initialInput?: DesignInput
 }
 
@@ -56,7 +56,8 @@ const stepFields: Record<number, string[]> = {
 }
 
 export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
-  const isRunning = useDesign((s) => s.isRunning)
+  const busy = useEngine((s) => s.busy)
+  const isRunning = busy === 'simulation'
   const [step, setStep] = useState(0)
   const form = useForm({
     schema: designSchema,

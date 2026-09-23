@@ -15,13 +15,13 @@ import {
 } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { navigationItems } from '@/config/navigation'
-import { useDesign } from '@/stores/design'
+import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
 
 export function AppSidebar(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
-  const isRunning = useDesign((s) => s.isRunning)
+  const busy = useEngine((s) => s.busy)
 
   return (
     <Sidebar collapsible="icon" variant="floating">
@@ -65,11 +65,13 @@ export function AppSidebar(): ReactElement {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          {isRunning && (
+          {busy !== 'idle' && (
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Simulation running">
+              <SidebarMenuButton
+                tooltip={busy === 'batch' ? 'Batch running' : 'Simulation running'}
+              >
                 <Spinner />
-                <span>Running</span>
+                <span>{busy === 'batch' ? 'Batch running' : 'Running'}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}

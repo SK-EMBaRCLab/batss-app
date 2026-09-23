@@ -1,11 +1,8 @@
 import { create } from 'zustand'
 
-import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
+import { appendLogs, createLogBatcher } from '@/lib/log-buffer'
 
-// Keep only the most recent N log lines in memory. A full source build
-// (fmesher, sf, etc.) can produce thousands of compiler lines; nothing
-// downstream needs more than a scrollback window of recent output.
-const MAX_LOG_LINES = 2000
+import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
 
 type RuntimeState = {
   status: RuntimeStatus
@@ -16,6 +13,7 @@ type RuntimeState = {
   error?: string
   initialized: boolean
   appVersion: string
+  bootstrapped: boolean
   loadAppVersion: () => Promise<void>
 
   initialize: () => Promise<void>
@@ -44,14 +42,10 @@ async function runTrackedOperation(
     })
   })
 
-  const unsubscribeLog = window.runtime.onLog((line: string) => {
-    set((state) => ({
-      logs:
-        state.logs.length >= MAX_LOG_LINES
-          ? [...state.logs.slice(state.logs.length - MAX_LOG_LINES + 1), line]
-          : [...state.logs, line]
-    }))
-  })
+  const batcher = createLogBatcher((lines) =>
+    set((state) => ({ logs: appendLogs(state.logs, lines) }))
+  )
+  const unsubscribeLog = window.runtime.onLog(batcher.push)
 
   try {
     const result = await operation()
@@ -77,6 +71,7 @@ async function runTrackedOperation(
   } finally {
     unsubscribeUpdate()
     unsubscribeLog()
+    batcher.flush()
   }
 }
 
@@ -88,6 +83,7 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
   logs: [],
   initialized: false,
   appVersion: '',
+  bootstrapped: false,
 
   initialize: async () => {
     if (get().initialized) {
@@ -103,11 +99,14 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
       message: 'Starting runtime check',
       logs: []
     })
-
-    await runTrackedOperation(set, () => window.runtime.check(), {
-      ready: 'Runtime ready',
-      failed: 'One or more packages failed to install'
-    })
+    try {
+      await runTrackedOperation(set, () => window.runtime.check(), {
+        ready: 'Runtime ready',
+        failed: 'One or more packages failed to install'
+      })
+    } finally {
+      set({ bootstrapped: true })
+    }
   },
 
   updatePackages: async () => {
