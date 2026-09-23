@@ -1,11 +1,33 @@
 import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { formatDuration } from '@/lib/utils'
 import { useRuntime } from '@/stores/runtime'
 
 import { LogViewer } from './log-viewer'
+
+function useElapsedSeconds(active: boolean): number {
+  const [seconds, setSeconds] = useState(0)
+
+  useEffect(() => {
+    if (!active) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSeconds(0)
+      return
+    }
+
+    const startedAt = Date.now()
+    const id = window.setInterval(() => {
+      setSeconds(Math.floor((Date.now() - startedAt) / 1000))
+    }, 1000)
+
+    return () => window.clearInterval(id)
+  }, [active])
+
+  return seconds
+}
 
 export function RuntimeScreen(): ReactElement {
   const status = useRuntime((state) => state.status)
@@ -23,6 +45,8 @@ export function RuntimeScreen(): ReactElement {
   const isReady = status === 'ready'
 
   const isError = status === 'error'
+
+  const elapsed = useElapsedSeconds(isChecking || isInstalling)
 
   return (
     <div
@@ -92,6 +116,13 @@ export function RuntimeScreen(): ReactElement {
               {message}
             </div>
 
+            {(isChecking || isInstalling) && (
+              <div className="text-center text-xs text-muted-foreground">
+                {formatDuration(elapsed)} elapsed
+                {elapsed > 60 && ' — first-time installs of R packages can take several minutes'}
+              </div>
+            )}
+
             {(isChecking || isInstalling) && <Progress value={progress} />}
           </div>
 
@@ -111,8 +142,16 @@ export function RuntimeScreen(): ReactElement {
             </div>
           )}
 
-          {logs.length > 0 && (isChecking || isInstalling || isError) && (
-            <LogViewer logs={logs} className="h-48" />
+          {(isChecking || isInstalling || isError) && (
+            <LogViewer
+              logs={logs}
+              className="h-48"
+              header={
+                logs.length === 0 ? (
+                  <div className="text-muted-foreground">Waiting for output…</div>
+                ) : undefined
+              }
+            />
           )}
         </CardContent>
       </Card>
