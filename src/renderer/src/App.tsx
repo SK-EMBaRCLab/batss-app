@@ -9,11 +9,10 @@ import { views } from '@/config/views'
 import { useCommandShortcuts } from '@/hooks/use-command-shortcuts'
 import { AppLayout } from '@/layouts/app-layout'
 import { useDesign } from '@/stores/design'
+import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
 import { useRuntime } from '@/stores/runtime'
 import { useTheme } from '@/stores/theme'
-
-import { useEngine } from './stores/engine'
 
 export default function App(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
@@ -27,15 +26,9 @@ export default function App(): ReactElement {
 
   useEffect(() => {
     initialize()
-  }, [initialize])
-
-  useEffect(() => {
     initializeTheme()
-  }, [initializeTheme])
-
-  useEffect(() => {
     initializeEngine()
-  }, [initializeEngine])
+  }, [initialize, initializeEngine, initializeTheme])
 
   useEffect(() => {
     const cleanup = window.design.onSaveRequested(async () => {
