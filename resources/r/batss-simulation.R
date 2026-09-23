@@ -80,6 +80,45 @@ trials <- batss.glm(
 
 summary1 <- summary(trials)
 
+# With a small number of simulated trials (R), it's possible for every
+# replicate under one scenario to land in the same outcome category by
+# chance, leaving BATSS's summary() with no row at all for the other
+# category. Left unchecked, that surfaces several lines further down
+# as a cryptic "arguments imply differing number of rows" error from
+# data.frame(). Catch it here and report something the user can act on.
+validate_scenario <- function(scenario, label) {
+  outcome <- scenario$groupExperimental
+  proportion <- scenario$overall
+
+  if (length(outcome) == 0 || length(proportion) == 0 || length(outcome) != length(proportion)) {
+    return(paste0(
+      "BATSS produced no usable results for the ", label, " scenario. ",
+      "This can happen when the number of simulated trials (R) is very ",
+      "small and, by chance, every simulated trial landed in the same ",
+      "outcome category. Try increasing the number of simulated trials."
+    ))
+  }
+
+  NULL
+}
+
+scenario_error <- validate_scenario(summary1$H0$scenario, "Null Effect")
+if (is.null(scenario_error)) {
+  scenario_error <- validate_scenario(summary1$H1$scenario, "Target Effect")
+}
+
+if (!is.null(scenario_error)) {
+  writeLines(
+    jsonlite::toJSON(
+      list(status = "error", message = scenario_error),
+      auto_unbox = TRUE
+    ),
+    Sys.getenv("ALBATROSS_BATSS_OUTPUT")
+  )
+
+  quit(save = "no", status = 0)
+}
+
 df <- rbind(
   data.frame(
     Scenario = "Null Effect",
