@@ -20,7 +20,7 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
-  icon: build/icons.icns
+  icon: build/icon.icns
   identity: null
   hardenedRuntime: false
   gatekeeperAssess: false

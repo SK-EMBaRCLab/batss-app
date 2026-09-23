@@ -1,9 +1,9 @@
 node_modules
 dist
 out
-build
 .DS_Store
 .eslintcache
 *.log*
 .env
 *.design
+*.tsbuildinfo
