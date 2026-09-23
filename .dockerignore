@@ -1,0 +1,38 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (installed fresh in the container / mounted via the
+# node_modules named volume in docker-compose.yml — copying the host's
+# node_modules in would also risk shipping native modules built for
+# the wrong platform)
+node_modules
+
+# Build output
+dist
+out
+
+# Packaging assets (icons, entitlements) — only needed by electron-builder
+# when producing installers, not for `npm run dev` inside the container
+build
+
+# Editor / OS cruft
+.vscode
+.DS_Store
+
+# Logs and caches
+*.log*
+.eslintcache
+*.tsbuildinfo
+
+# Local env and generated data files — never bake these into an image
+.env
+.env.*
+*.design
+
+# Not needed inside the container
+.github
+README.md
+CHANGELOG.md
+Dockerfile
+docker-compose.yml
