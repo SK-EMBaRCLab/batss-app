@@ -4,6 +4,7 @@ import path from 'path'
 
 import { parseStudyDesignFile } from '../../shared/design-file-schema'
 import { IPC } from '../../shared/ipc-channels'
+import { StudyDesign } from '../../shared/simulation-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
@@ -66,8 +67,8 @@ export function registerAlbatrossFilesIPC(): void {
     }
   })
 
-  ipcMain.handle(IPC.design.saveResult, async (_, data) => {
-    const designName = typeof data?.name === 'string' ? data.name : 'Untitled Design'
+  ipcMain.handle(IPC.design.saveResult, async (_, data: StudyDesign) => {
+    const designName = data.name || 'Untitled Design'
     const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
 
     const defaultPath = path.join(

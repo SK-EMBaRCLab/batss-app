@@ -4,7 +4,7 @@ import { getSettingsPath } from './filesystem/app-paths'
 
 class SettingsService {
   private settingsPath?: string
-  private cache?: Record<string, any>
+  private cache?: Record<string, unknown>
 
   private get path(): string {
     if (!this.settingsPath) {
@@ -17,7 +17,7 @@ class SettingsService {
   get<T>(key: string, defaultValue: T): T {
     const settings = this.load()
 
-    return settings[key] ?? defaultValue
+    return (settings[key] as T | undefined) ?? defaultValue
   }
 
   set(key: string, value: unknown): void {
@@ -29,12 +29,12 @@ class SettingsService {
     writeFileSync(this.path, JSON.stringify(settings, null, 2))
   }
 
-  private load(): Record<string, any> {
+  private load(): Record<string, unknown> {
     if (this.cache) {
       return this.cache
     }
 
-    let settings: Record<string, any> = {}
+    let settings: Record<string, unknown> = {}
 
     if (existsSync(this.path)) {
       try {
