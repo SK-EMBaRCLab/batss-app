@@ -56,12 +56,18 @@ function getChartType(type: 'binary' | 'continuous' | 'ordinal' | undefined): {
 
 export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactElement {
   const data = useMemo(() => {
-    // This is only visual spread.
-    // It is NOT the statistical SE.
-    const spread = Math.max(0.25, Math.abs(value - rule.margin) / 3)
-    const lo = Math.min(value, rule.margin) - 3 * spread
+    // Visual spread only — NOT the statistical SE. Scales with the
+    // treatment effect itself, not with the margin: moving the
+    // decision boundary should pan/zoom the chart, not change how
+    // "confident" the curve looks.
+    const curveSpread = Math.max(0.1, Math.abs(value) * 0.25)
+
+    // The viewport has to fit both the effect estimate and the margin
+    // reference line, with enough padding around each to read clearly.
+    const padding = Math.max(curveSpread * 4, Math.abs(value - rule.margin) * 0.5)
+    const lo = Math.min(value, rule.margin) - padding
     const min = type === 'binary' ? Math.max(0, lo) : lo
-    const max = Math.max(value, rule.margin) + 3 * spread
+    const max = Math.max(value, rule.margin) + padding
 
     const points = 200
     const key = getChartType(type).key
@@ -69,7 +75,7 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
     return Array.from({ length: points + 1 }, (_, index) => {
       const x = min + ((max - min) * index) / points
 
-      const distribution = normalDensity(x, value, spread)
+      const distribution = normalDensity(x, value, curveSpread)
 
       const isDecisionRegion = rule.direction === 'greater' ? x >= rule.margin : x <= rule.margin
 
