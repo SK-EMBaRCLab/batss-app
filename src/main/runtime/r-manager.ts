@@ -10,8 +10,6 @@ import { REQUIRED_R_VERSION } from './r-config'
 
 const execFileAsync = promisify(execFile)
 
-const R_LIBRARY_PATH_ENV = 'ALBATROSS_R_LIBRARY_PATH'
-
 type ExecuteResult = { stdout: string; stderr: string }
 
 /** Called with each complete line of output as it arrives, tagged with
@@ -99,7 +97,7 @@ export class RManager {
 
       try {
         const entries = await fs.readdir(rDir)
-        const preferred = entries.find((v) => v === REQUIRED_R_VERSION)
+        const preferred = entries.find((v) => v === `R-${REQUIRED_R_VERSION}`)
         if (preferred) {
           candidates.push(path.join(rDir, preferred, 'bin', 'x64', 'Rscript.exe'))
         }
@@ -178,16 +176,27 @@ export class RManager {
     onOutput?: OutputListener,
     options: ExecuteOptions = {}
   ): Promise<string> {
-    const wrappedScript = this.wrapScript(script)
-    const libraryPath = getRLibraryPath()
-
     const { stdout } = await this.runProcess(
-      ['-e', wrappedScript],
-      {
-        ...process.env,
-        [R_LIBRARY_PATH_ENV]: libraryPath,
-        ...env
-      },
+      ['--vanilla', '-e', script],
+      await this.buildEnv(env),
+      onOutput,
+      options
+    ).catch((error) => {
+      throw this.toExecutionError(error)
+    })
+
+    return stdout.trim()
+  }
+
+  async executeFile(
+    scriptPath: string,
+    env: NodeJS.ProcessEnv = {},
+    onOutput?: OutputListener,
+    options: ExecuteOptions = {}
+  ): Promise<string> {
+    const { stdout } = await this.runProcess(
+      ['--vanilla', scriptPath],
+      await this.buildEnv(env),
       onOutput,
       options
     ).catch((error) => {
@@ -220,25 +229,21 @@ export class RManager {
     return JSON.parse(result) as T
   }
 
-  private wrapScript(script: string): string {
-    return `
-      library_path <- Sys.getenv("${R_LIBRARY_PATH_ENV}")
+  // R honours R_LIBS_USER natively at interpreter startup (see
+  // `?Startup` / `?.libPaths`) — no need to inject a `.libPaths()`
+  // prologue into every script by hand. Node creates the directory
+  // first, since R only auto-prepends R_LIBS_USER to .libPaths() if it
+  // already exists when Rscript launches.
+  private async buildEnv(env: NodeJS.ProcessEnv): Promise<NodeJS.ProcessEnv> {
+    const libraryPath = getRLibraryPath()
 
-      dir.create(
-        library_path,
-        recursive = TRUE,
-        showWarnings = FALSE
-      )
+    await fs.mkdir(libraryPath, { recursive: true })
 
-      .libPaths(
-        c(
-          library_path,
-          .libPaths()
-        )
-      )
-
-      ${script}
-    `
+    return {
+      ...process.env,
+      R_LIBS_USER: libraryPath,
+      ...env
+    }
   }
 
   // Runs Rscript via spawn() (not execFile) so stdout/stderr can be read
@@ -276,8 +281,23 @@ export class RManager {
 
       const child = spawn(executable, args, {
         env: childEnv,
-        signal: controller.signal
+        detached: process.platform !== 'win32', // own process group → forked/PSOCK workers included
+        windowsHide: true
       })
+
+      const killTree = (): void => {
+        if (!child.pid) return
+        if (process.platform === 'win32') {
+          spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'])
+        } else {
+          try {
+            process.kill(-child.pid, 'SIGTERM')
+          } catch {
+            /* already gone */
+          }
+        }
+      }
+      controller.signal.addEventListener('abort', killTree, { once: true })
 
       let stdoutBuffer = ''
       let stderrBuffer = ''
@@ -379,7 +399,9 @@ export class RManager {
 
     if (error && typeof error === 'object') {
       const err = error as { message?: string; stderr?: string; stdout?: string }
-      const detail = (err.stderr || err.stdout || '').trim()
+      const tail = (text: string, lines = 25): string =>
+        text.trim().split(/\r?\n/).slice(-lines).join('\n')
+      const detail = tail(err.stderr || err.stdout || '')
 
       if (detail) {
         return new Error(`R execution failed: ${detail}`)
