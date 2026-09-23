@@ -10,10 +10,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { NumericField } from './numeric-field'
-import { treatmentEffects } from './utils'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (
@@ -67,7 +67,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                         <SelectItem
                           key={effect.value}
                           value={effect.value}
-                          disabled={effect.value !== 'oddsRatio'}
+                          disabled={!effect.enabled}
                         >
                           {effect.label}
                         </SelectItem>

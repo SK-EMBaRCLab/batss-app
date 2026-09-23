@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-import { treatmentEffects } from '@/components/simulation/utils'
+import { treatmentEffects } from '@/lib/design-options'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))

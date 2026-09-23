@@ -1,10 +1,9 @@
 import { SimulationResultEntry } from '@shared/simulation-types'
 import { createColumnHelper } from '@tanstack/react-table'
-import { ChartSpline, CircleDot, ListOrdered } from 'lucide-react'
 
-import { getTreatmentEffectLabel } from '@/components/simulation/utils'
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 import { Checkbox } from '@/components/ui/checkbox'
+import { getTreatmentEffectLabel } from '@/lib/design-options'
 
 import { EmptyCell } from '../table/empty-cell'
 import { renderCellValue } from '../table/render-cell-value'
@@ -191,21 +190,3 @@ export const columns = columnHelper.columns([
     }
   })
 ])
-
-export const outcomeTypes = [
-  {
-    value: 'binary',
-    label: 'Binary',
-    icon: CircleDot
-  },
-  {
-    value: 'continuous',
-    label: 'Continuous',
-    icon: ChartSpline
-  },
-  {
-    value: 'ordinal',
-    label: 'Ordinal',
-    icon: ListOrdered
-  }
-]

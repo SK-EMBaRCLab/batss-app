@@ -10,10 +10,9 @@ import {
   ItemTitle
 } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { outcomeTypes } from '@/lib/design-options'
 import { cn } from '@/lib/utils'
 import { useDesign, useSelectedEntry } from '@/stores/design'
-
-import { outcomeTypes } from './columns'
 
 export function RunsHistory(): ReactElement | null {
   const design = useDesign((state) => state.design)

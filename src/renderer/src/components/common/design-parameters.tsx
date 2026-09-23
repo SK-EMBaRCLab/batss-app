@@ -1,82 +1,44 @@
-import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
+import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { Separator } from '@/components/ui/separator'
-import { decisionRuleFormula } from '@/lib/utils'
-
-import { getTreatmentEffectLabel } from '../simulation/utils'
+import { decisionRuleSummary, fieldsFor } from '@/lib/design-fields'
 
 export function DesignParams({
   input
 }: {
   input: SimulationRunInput | DesignInput
 }): ReactElement | null {
-  const rule = input?.decisionRules[0]
-  let formula = ''
-  if (input?.outcomeType === 'binary') {
-    formula = decisionRuleFormula({
-      ...rule,
-      treatmentEffectType: input?.treatmentEffectType
-    })
-  } else if (input?.outcomeType === 'continuous') {
-    formula = decisionRuleFormula({
-      ...rule,
-      treatmentEffectType: 'meanDifference'
-    })
-  }
-  if (input?.outcomeType === 'binary') {
-    return (
-      <div className="space-y-6">
-        <ParameterSection title="Outcome & Treatment Effect">
-          <Parameter label="Outcome Type" value={input.outcomeType} />
-          <Parameter label="Control arm event probability" value={input.probability} />
-          <Parameter
-            label="Treatment Effect"
-            value={getTreatmentEffectLabel(input.treatmentEffectType)}
-          />
-          <Parameter label="Treatment Effect value" value={input.treatmentEffect} />
-        </ParameterSection>
-        <Separator className="h-px" />
-
-        <ParameterSection title="Simulation Design">
-          <Parameter label="Burn-in" value={input.m0} />
-          <Parameter label="Patients between interims" value={input.m} />
-          <Parameter label="Maximum sample size" value={input.N} />
-        </ParameterSection>
-
-        <Separator className="h-px" />
-
-        <ParameterSection title="Decision & Simulation">
-          <Parameter label="Decision Rule" value={formula} />
-          <Parameter label="Number of simulations" value={input.R} />
-        </ParameterSection>
-      </div>
-    )
-  } else if (input?.outcomeType === 'continuous') {
-    return (
-      <div className="space-y-6">
-        <ParameterSection title="Outcome & Treatment Effect">
-          <Parameter label="Outcome Type" value={input.outcomeType} />
-          <Parameter label="Mean outcome in control arm" value={input.meanOutcome} />
-          <Parameter label="Standard Deviation" value={input.sd} />
-          <Parameter label="Mean Difference for the treatment effect" value={input.meanDiff} />
-        </ParameterSection>
-        <Separator className="h-px" />
-        <ParameterSection title="Simulation Design">
-          <Parameter label="Burn-in" value={input.m0} />
-          <Parameter label="Patients between interims" value={input.m} />
-          <Parameter label="Maximum sample size" value={input.N} />
-        </ParameterSection>
-        <Separator className="h-px" />
-        <ParameterSection title="Decision & Simulation">
-          <Parameter label="Decision Rule" value={formula} />
-          <Parameter label="Number of simulations" value={input.R} />
-        </ParameterSection>
-      </div>
-    )
+  if (input.outcomeType !== 'binary' && input.outcomeType !== 'continuous') {
+    return null
   }
 
-  return null
+  return (
+    <div className="space-y-6">
+      <ParameterSection title="Outcome & Treatment Effect">
+        {fieldsFor(input.outcomeType, 'outcome').map((field) => (
+          <Parameter key={field.key} label={field.label} value={field.value(input)} />
+        ))}
+      </ParameterSection>
+
+      <Separator className="h-px" />
+
+      <ParameterSection title="Simulation Design">
+        {fieldsFor(input.outcomeType, 'sampleSize').map((field) => (
+          <Parameter key={field.key} label={field.label} value={field.value(input)} />
+        ))}
+      </ParameterSection>
+
+      <Separator className="h-px" />
+
+      <ParameterSection title="Decision & Simulation">
+        <Parameter label="Decision Rule" value={decisionRuleSummary(input)} />
+        {fieldsFor(input.outcomeType, 'simulation').map((field) => (
+          <Parameter key={field.key} label={field.label} value={field.value(input)} />
+        ))}
+      </ParameterSection>
+    </div>
+  )
 }
 
 function ParameterSection({

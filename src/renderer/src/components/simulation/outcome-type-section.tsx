@@ -15,11 +15,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { outcomeTypes } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
-const outcomeTypes = ['binary', 'continuous', 'ordinal'] as const
-
-type OutcomeType = (typeof outcomeTypes)[number]
+type OutcomeType = (typeof outcomeTypes)[number]['value']
 
 export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (
@@ -38,7 +37,7 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
                 <Select
                   value={field.input ?? ''}
                   onValueChange={(value) => {
-                    if (outcomeTypes.includes(value as OutcomeType)) {
+                    if (outcomeTypes.some((type) => type.value === value)) {
                       field.onChange(value as OutcomeType)
                     }
                   }}
@@ -48,13 +47,12 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="binary">Binary</SelectItem>
-
-                    <SelectItem value="continuous">Continuous</SelectItem>
-
-                    <SelectItem value="ordinal" disabled>
-                      Ordinal (under development)
-                    </SelectItem>
+                    {outcomeTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value} disabled={!type.enabled}>
+                        {type.label}
+                        {!type.enabled && ' (under development)'}
+                      </SelectItem>
+                    ))}
 
                     <SelectItem value="count" disabled>
                       Count (under development)
