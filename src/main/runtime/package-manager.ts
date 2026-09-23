@@ -151,89 +151,27 @@ export class PackageManager {
   }
 
   async installPackages(packages: string[]): Promise<void> {
-    this.reporter.log(`Installing ${packages.length} package(s)`)
-    const total = packages.length
-
-    for (const [index, pkg] of packages.entries()) {
-      this.reporter.log(`Attempting ${pkg}`)
-
-      const progress = 40 + Math.round(((index + 1) / total) * 50)
-
-      this.reporter.installing(`Installing ${pkg}`, progress)
-
-      const repos = this.getRepositories(pkg)
-
-      await this.r.execute(
-        `
-      pkg <- Sys.getenv("${PACKAGE_NAME_ENV}")
-      repos <- strsplit(Sys.getenv("${PACKAGE_REPOS_ENV}"), ",")[[1]]
-
-      install_lib <- .libPaths()[1]
-
-      pkg_type <- if (
-        .Platform$OS.type == "windows" ||
-        Sys.info()[["sysname"]] == "Darwin"
-      ) {
-        "binary"
-      } else {
-        "source"
-      }
-
-      if (!requireNamespace(
-        pkg,
-        quietly = TRUE,
-        lib.loc = install_lib
-      )) {
-        install.packages(
-          pkg,
-          repos = repos,
-          lib = install_lib,
-          dependencies = c("Depends", "Imports", "LinkingTo"),
-          type = pkg_type
-        )
-      }
-    `,
-        {
-          [PACKAGE_NAME_ENV]: pkg,
-          [PACKAGE_REPOS_ENV]: repos.join(',')
-        },
-        (line) => this.reporter.log(line)
-      )
-    }
+    await this.installOrUpdate(packages, { verb: 'Installing', skipIfPresent: true })
   }
-  async updatePackages(packages: string[]): Promise<void> {
-    this.reporter.log(`Updating ${packages.length} package(s)`)
 
+  async updatePackages(packages: string[]): Promise<void> {
+    await this.installOrUpdate(packages, { verb: 'Updating', skipIfPresent: false })
+  }
+
+  private async installOrUpdate(
+    packages: string[],
+    { verb, skipIfPresent }: { verb: string; skipIfPresent: boolean }
+  ): Promise<void> {
+    this.reporter.log(`${verb} ${packages.length} package(s)`)
     const total = packages.length
 
     for (const [index, pkg] of packages.entries()) {
-      this.reporter.log(`Updating ${pkg}`)
-
+      this.reporter.log(`${verb} ${pkg}`)
       const progress = 40 + Math.round(((index + 1) / total) * 50)
-
-      this.reporter.installing(`Updating ${pkg}`, progress)
-
+      this.reporter.installing(`${verb} ${pkg}`, progress)
       const repos = this.getRepositories(pkg)
 
-      await this.r.execute(
-        `
-        pkg <- Sys.getenv("${PACKAGE_NAME_ENV}")
-        repos <- strsplit(
-          Sys.getenv("${PACKAGE_REPOS_ENV}"),
-          ","
-        )[[1]]
-
-        install_lib <- .libPaths()[1]
-
-        pkg_type <- if (
-          .Platform$OS.type == "windows" ||
-          Sys.info()[["sysname"]] == "Darwin"
-        ) {
-          "binary"
-        } else {
-          "source"
-        }
-
+      const install = `
         install.packages(
           pkg,
           repos = repos,
@@ -241,11 +179,25 @@ export class PackageManager {
           dependencies = c("Depends", "Imports", "LinkingTo"),
           type = pkg_type
         )
-      `,
-        {
-          [PACKAGE_NAME_ENV]: pkg,
-          [PACKAGE_REPOS_ENV]: repos.join(',')
-        },
+      `
+
+      await this.r.execute(
+        `
+          pkg <- Sys.getenv("${PACKAGE_NAME_ENV}")
+          repos <- strsplit(Sys.getenv("${PACKAGE_REPOS_ENV}"), ",")[[1]]
+          install_lib <- .libPaths()[1]
+          pkg_type <- if (
+            .Platform$OS.type == "windows" ||
+            Sys.info()[["sysname"]] == "Darwin"
+          ) "binary" else "source"
+
+          ${
+            skipIfPresent
+              ? `if (!requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)) { ${install} }`
+              : install
+          }
+        `,
+        { [PACKAGE_NAME_ENV]: pkg, [PACKAGE_REPOS_ENV]: repos.join(',') },
         (line) => this.reporter.log(line)
       )
     }
