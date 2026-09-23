@@ -24,15 +24,18 @@ export class BatchService {
     onRowDone: (entry: BatchRunEntry) => void,
     onOutput?: OutputListener
   ): Promise<BatchUpdate> {
+    const emit = (update: BatchUpdate): BatchUpdate => {
+      onUpdate(update)
+      return update
+    }
+
     if (!engineService.acquire('batch')) {
-      const update: BatchUpdate = {
+      return emit({
         status: 'error',
         completed: 0,
         total: inputs.length,
         message: describeBusy(engineService.get())
-      }
-      onUpdate(update)
-      return update
+      })
     }
 
     this.cancelled = false
@@ -48,14 +51,12 @@ export class BatchService {
 
       for (const [index, { input, rowIndex }] of inputs.entries()) {
         if (this.cancelled) {
-          const update: BatchUpdate = {
+          return emit({
             status: 'cancelled',
             completed: index,
             total,
             message: `Batch cancelled after ${index}/${total} run(s)`
-          }
-          onUpdate(update)
-          return update
+          })
         }
 
         onUpdate({
@@ -75,14 +76,7 @@ export class BatchService {
         })
       }
 
-      const update: BatchUpdate = {
-        status: 'done',
-        completed: total,
-        total,
-        message: 'Batch complete'
-      }
-      onUpdate(update)
-      return update
+      return emit({ status: 'done', completed: total, total, message: 'Batch complete' })
     } finally {
       this.cancelled = false
       engineService.release()
