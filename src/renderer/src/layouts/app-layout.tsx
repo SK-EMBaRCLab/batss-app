@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react'
 
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/toast'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppBanner } from '@/layouts/app-banner'
 import { AppHeader } from '@/layouts/app-header'
@@ -20,6 +21,7 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
           <TooltipProvider>{children}</TooltipProvider>
         </main>
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   )
 }

@@ -2,6 +2,8 @@ import type { DesignInput, SimulationResultEntry, StudyDesign } from '@shared/si
 import { useMemo } from 'react'
 import { create } from 'zustand'
 
+import { toast } from '@/components/ui/toast'
+
 function makeId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()
@@ -116,6 +118,10 @@ export const useDesign = create<DesignState>((set, get) => {
       }
 
       setDirty(false)
+      toast.add({
+        type: 'success',
+        description: `Design saved ${design.name}`
+      })
 
       return true
     },
