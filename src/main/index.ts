@@ -78,18 +78,22 @@ function createWindow(): void {
 
   let saveBoundsTimer: NodeJS.Timeout | null = null
 
+  const persistBounds = (): void => {
+    if (!mainWindow?.isMinimized()) {
+      settingsService.set('windowState', {
+        bounds: mainWindow?.getBounds(),
+        isMaximized: mainWindow?.isMaximized()
+      })
+    }
+  }
+
   const saveBounds = (): void => {
     if (saveBoundsTimer) {
       clearTimeout(saveBoundsTimer)
     }
 
     saveBoundsTimer = setTimeout(() => {
-      if (!mainWindow?.isMinimized()) {
-        settingsService.set('windowState', {
-          bounds: mainWindow?.getBounds(),
-          isMaximized: mainWindow?.isMaximized()
-        })
-      }
+      persistBounds()
       saveBoundsTimer = null
     }, 300)
   }
@@ -101,12 +105,7 @@ function createWindow(): void {
     if (saveBoundsTimer) {
       clearTimeout(saveBoundsTimer)
       saveBoundsTimer = null
-      if (!mainWindow?.isMinimized()) {
-        settingsService.set('windowState', {
-          bounds: mainWindow?.getBounds(),
-          isMaximized: mainWindow?.isMaximized()
-        })
-      }
+      persistBounds()
     }
 
     if (forceClose) {
@@ -199,27 +198,20 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // App IPC
   registerAppIPC()
 
-  // Runtime bootstrap IPC
   registerRuntimeIPC()
 
-  // Settings IPC (output folder, etc.)
   registerSettingsIPC()
 
-  // Albatross save load results
   registerAlbatrossFilesIPC()
 
-  // Batch processing
   registerBatchIPC()
 
   registerEngineIPC()
 
-  // Simulation run/cancel IPC
   registerSimulationIPC()
 
-  // Theme get/set/broadcast IPC
   registerThemeIPC()
 
   ipcMain.on(IPC.design.closeConfirmed, () => {
