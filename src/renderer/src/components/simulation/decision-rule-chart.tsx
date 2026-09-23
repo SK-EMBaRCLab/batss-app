@@ -64,6 +64,7 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
     const max = Math.max(value, rule.margin) + 3 * spread
 
     const points = 200
+    const key = getChartType(type).key
 
     return Array.from({ length: points + 1 }, (_, index) => {
       const x = min + ((max - min) * index) / points
@@ -72,20 +73,8 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
       const isDecisionRegion = rule.direction === 'greater' ? x >= rule.margin : x <= rule.margin
 
-      if (type === 'binary') {
-        return {
-          oddsRatio: x,
-          distribution,
-
-          // IMPORTANT:
-          // null means Recharts doesn't draw
-          // the decision area on this side.
-          decisionRegion: isDecisionRegion ? distribution : null
-        }
-      }
-
       return {
-        meanDiff: x,
+        [key]: x,
         distribution,
 
         // IMPORTANT:
