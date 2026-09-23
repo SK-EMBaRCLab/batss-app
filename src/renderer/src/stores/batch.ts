@@ -7,7 +7,7 @@ import type {
 import { describeBusy } from '@shared/engine-types'
 import { create } from 'zustand'
 
-import { appendLogs, createLogBatcher } from '@/lib/log-buffer'
+import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 
 import { useDesign } from './design'
 import { useEngine } from './engine'
@@ -59,10 +59,9 @@ export const useBatch = create<BatchState>((set) => ({
       })
     })
 
-    const batcher = createLogBatcher((lines) =>
+    const teardownLog = subscribeLogs(window.runtime.onLog, (lines) =>
       set((state) => ({ logs: appendLogs(state.logs, lines) }))
     )
-    const unsubscribeLog = window.batch.onLog(batcher.push)
 
     try {
       const final = await window.batch.run(inputs)
@@ -75,8 +74,7 @@ export const useBatch = create<BatchState>((set) => ({
     } finally {
       unsubscribeUpdate()
       unsubscribeRow()
-      unsubscribeLog()
-      batcher.flush()
+      teardownLog()
       useEngine.getState().release()
     }
   },

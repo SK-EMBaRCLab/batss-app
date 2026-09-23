@@ -2,7 +2,7 @@ import { describeBusy } from '@shared/engine-types'
 import type { DesignInput, SimulationRunInput, SimulationRunResult } from '@shared/simulation-types'
 import { create } from 'zustand'
 
-import { appendLogs, createLogBatcher } from '@/lib/log-buffer'
+import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { formatDuration, toError } from '@/lib/utils'
 
 import { useDesign } from './design'
@@ -42,10 +42,9 @@ export const useSimulation = create<SimulationState>((set) => ({
       ]
     })
 
-    const batcher = createLogBatcher((lines) =>
+    const teardownLog = subscribeLogs(window.runtime.onLog, (lines) =>
       set((state) => ({ logs: appendLogs(state.logs, lines) }))
     )
-    const unsubscribe = window.simulation.onLog(batcher.push)
 
     try {
       const result = await window.simulation
@@ -59,7 +58,6 @@ export const useSimulation = create<SimulationState>((set) => ({
       design.updateInput(formInput)
       design.appendResult({ createdAt: new Date().toISOString(), input, result })
 
-      batcher.flush()
       const endedAt = Date.now()
 
       set((state) => ({
@@ -73,8 +71,7 @@ export const useSimulation = create<SimulationState>((set) => ({
 
       return result
     } finally {
-      unsubscribe()
-      batcher.flush()
+      teardownLog()
       set((state) => ({ endedAt: state.endedAt ?? Date.now() }))
       useEngine.getState().release()
     }

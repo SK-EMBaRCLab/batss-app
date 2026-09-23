@@ -39,3 +39,22 @@ export function createLogBatcher(onFlush: (lines: string[]) => void, waitMs = 50
     flush
   }
 }
+
+/**
+ * Wires a batched log listener to an IPC onLog subscription and
+ * returns a single teardown function (unsubscribe + final flush).
+ * Used by every store that streams R output (runtime, simulation,
+ * batch) so the subscribe/unsubscribe/flush dance lives in one place.
+ */
+export function subscribeLogs(
+  onLog: (callback: (line: string) => void) => () => void,
+  appendTo: (lines: string[]) => void
+): () => void {
+  const batcher = createLogBatcher(appendTo)
+  const unsubscribe = onLog(batcher.push)
+
+  return () => {
+    unsubscribe()
+    batcher.flush()
+  }
+}

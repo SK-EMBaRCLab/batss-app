@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { appendLogs, createLogBatcher } from '@/lib/log-buffer'
+import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 
 import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
 
@@ -41,10 +41,9 @@ async function runTrackedOperation(
     })
   })
 
-  const batcher = createLogBatcher((lines) =>
+  const teardownLog = subscribeLogs(window.runtime.onLog, (lines) =>
     set((state) => ({ logs: appendLogs(state.logs, lines) }))
   )
-  const unsubscribeLog = window.runtime.onLog(batcher.push)
 
   try {
     const result = await operation()
@@ -69,8 +68,7 @@ async function runTrackedOperation(
     })
   } finally {
     unsubscribeUpdate()
-    unsubscribeLog()
-    batcher.flush()
+    teardownLog()
   }
 }
 
