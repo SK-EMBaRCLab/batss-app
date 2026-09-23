@@ -131,7 +131,7 @@ export const designSchema = v.pipe(
   v.forward(
     v.check(
       (data) => data.m < data.N - data.m0,
-      'Number of intermim patients must be less than the difference between max sample size and burn-in'
+      'Number of interim patients must be less than the difference between max sample size and burn-in'
     ),
     ['m']
   ),

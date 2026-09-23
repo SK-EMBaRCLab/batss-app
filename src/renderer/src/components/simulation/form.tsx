@@ -19,7 +19,7 @@ import { SampleSizeSection } from './sample-size-section'
 import { hasAnyFieldError } from './utils'
 
 type SimulationFormProps = {
-  onRun: (input: SimulationRunInput, outputt: DesignInput) => Promise<void>
+  onRun: (input: SimulationRunInput, output: DesignInput) => Promise<void>
   initialInput?: DesignInput
 }
 
