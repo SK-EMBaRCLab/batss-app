@@ -26,10 +26,6 @@ export class SimulationService {
   // reach the process to abort it.
   private activeRun: { controller: AbortController } | null = null
 
-  private getSimulationScriptPath(): string {
-    return simulationScriptPath
-  }
-
   /**
    * Runs the 2-arm binomial BATSS design (batss.glm with rbinom /
    * alloc.balanced / eff.arm.simple) using parameters supplied by the
@@ -106,14 +102,12 @@ export class SimulationService {
         break
     }
 
-    const scriptPath = this.getSimulationScriptPath()
-
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
     const outputPath = path.join(tmpDir, 'result.json')
 
     try {
       await this.r.executeFile(
-        scriptPath,
+        simulationScriptPath,
         {
           [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }),
           [BATSS_OUTPUT_ENV]: outputPath

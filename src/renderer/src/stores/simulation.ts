@@ -15,7 +15,6 @@ type SimulationState = {
 
   run: (input: SimulationRunInput, formInput: DesignInput) => Promise<SimulationRunResult>
   cancel: () => Promise<void>
-  clearLogs: () => void
 }
 
 export const useSimulation = create<SimulationState>((set) => ({
@@ -86,7 +85,5 @@ export const useSimulation = create<SimulationState>((set) => ({
   // "cancelled" error result once main aborts the Rscript process.
   cancel: async () => {
     await window.simulation.cancelSimulation()
-  },
-
-  clearLogs: () => set({ logs: [] })
+  }
 }))

@@ -21,5 +21,3 @@ export const useEngine = create<EngineStore>((set, get) => ({
     set(await window.engine.get())
   }
 }))
-
-export const useEngineBusy = (): boolean => useEngine((s) => s.busy !== 'idle')

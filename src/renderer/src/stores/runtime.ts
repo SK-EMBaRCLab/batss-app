@@ -19,7 +19,6 @@ type RuntimeState = {
   initialize: () => Promise<void>
   checkRuntime: () => Promise<void>
   updatePackages: () => Promise<void>
-  clearLogs: () => void
 }
 
 // Runs a tracked runtime operation (initial check or package update):
@@ -133,7 +132,6 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
     )
   },
 
-  clearLogs: () => set({ logs: [] }),
   loadAppVersion: async () => {
     const version = await window.app.version()
 
