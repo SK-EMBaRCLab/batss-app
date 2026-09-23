@@ -1,20 +1,25 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme, screen, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 
 import icon from '../../resources/icon.png?asset'
-import { SimulationRunInput } from '../shared/simulation-types'
+import { IPC } from '../shared/ipc-channels'
 import {
   clearUnsavedDesignChanges,
   hasUnsavedDesignChanges,
   registerAlbatrossFilesIPC
 } from './ipc/albatross-files.ipc'
 import { registerAppIPC } from './ipc/app.ipc'
+import { registerBatchIPC } from './ipc/batch.ipc'
+import { registerEngineIPC } from './ipc/engine.ipc'
 import { registerRuntimeIPC } from './ipc/runtime.ipc'
 import { registerSettingsIPC } from './ipc/settings.ipc'
+import { registerSimulationIPC } from './ipc/simulation.ipc'
+import { registerThemeIPC } from './ipc/theme.ipc'
+import { batchService } from './services/batch.service'
 import { settingsService } from './services/settings.service'
-import { SimulationService } from './services/simulation.service'
+import { simulationService } from './services/simulation.service'
 
 let mainWindow: BrowserWindow | null = null
 let forceClose = false
@@ -42,8 +47,6 @@ if (isHeadlessContainer) {
   app.commandLine.appendSwitch('use-angle', 'swiftshader')
   app.commandLine.appendSwitch('enable-unsafe-swiftshader')
 }
-
-const simulationService = new SimulationService()
 
 function createWindow(): void {
   const { workAreaSize } = screen.getPrimaryDisplay()
@@ -127,7 +130,7 @@ function createWindow(): void {
 
     switch (result.response) {
       case 0:
-        mainWindow?.webContents.send('design:save-requested')
+        mainWindow?.webContents.send(IPC.design.saveRequested)
         break
 
       case 1:
@@ -138,12 +141,9 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-
-    return {
-      action: 'deny'
-    }
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url)
+    return { action: 'deny' }
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -154,6 +154,7 @@ function createWindow(): void {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+    forceClose = false
   })
 }
 
@@ -210,7 +211,18 @@ app.whenReady().then(() => {
   // Albatross save load results
   registerAlbatrossFilesIPC()
 
-  ipcMain.on('design:close-confirmed', () => {
+  // Batch processing
+  registerBatchIPC()
+
+  registerEngineIPC()
+
+  // Simulation run/cancel IPC
+  registerSimulationIPC()
+
+  // Theme get/set/broadcast IPC
+  registerThemeIPC()
+
+  ipcMain.on(IPC.design.closeConfirmed, () => {
     clearUnsavedDesignChanges()
 
     forceClose = true
@@ -218,50 +230,12 @@ app.whenReady().then(() => {
     mainWindow?.close()
   })
 
-  ipcMain.removeHandler('simulation:run')
-  ipcMain.removeHandler('simulation:cancel')
-
-  ipcMain.handle('simulation:run', async (event, input: SimulationRunInput) => {
-    return await simulationService.runExample(input, (line) => {
-      event.sender.send('simulation:log', line)
-    })
-  })
-
-  ipcMain.handle('simulation:cancel', () => {
-    return simulationService.cancel()
-  })
-
   app.setName('albatross')
-
-  ipcMain.handle('theme:get', () => ({
-    source: nativeTheme.themeSource,
-    dark: nativeTheme.shouldUseDarkColors
-  }))
-
-  ipcMain.handle('theme:set', (_event, theme: 'system' | 'light' | 'dark') => {
-    nativeTheme.themeSource = theme
-
-    return {
-      source: nativeTheme.themeSource,
-      dark: nativeTheme.shouldUseDarkColors
-    }
-  })
-
-  nativeTheme.on('updated', () => {
-    const payload = {
-      source: nativeTheme.themeSource,
-      dark: nativeTheme.shouldUseDarkColors
-    }
-
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send('theme:updated', payload)
-    }
-  })
 
   createWindow()
 
   if (!is.dev) {
-    autoUpdater.checkForUpdatesAndNotify()
+    autoUpdater.checkForUpdates()
   }
 
   app.on('activate', () => {
@@ -275,4 +249,12 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+// Kill any in-flight R work before the process exits. Rscript now runs
+// detached in its own process group (see RManager.runProcess), so without
+// this a running simulation would outlive the app.
+app.on('before-quit', () => {
+  batchService.cancel()
+  simulationService.cancel()
 })

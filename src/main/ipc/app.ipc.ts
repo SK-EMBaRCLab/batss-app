@@ -1,15 +1,13 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 
-export function registerAppIPC(): void {
-  ipcMain.removeHandler('app:version')
-  ipcMain.removeHandler('app:reload')
-  ipcMain.removeHandler('app:quit')
+import { IPC } from '../../shared/ipc-channels'
 
-  ipcMain.handle('app:version', () => {
+export function registerAppIPC(): void {
+  ipcMain.handle(IPC.app.version, () => {
     return app.getVersion()
   })
 
-  ipcMain.handle('app:reload', () => {
+  ipcMain.handle(IPC.app.reload, () => {
     const window = BrowserWindow.getFocusedWindow()
 
     if (window) {
@@ -17,7 +15,7 @@ export function registerAppIPC(): void {
     }
   })
 
-  ipcMain.handle('app:quit', () => {
+  ipcMain.handle(IPC.app.quit, () => {
     app.quit()
   })
 }

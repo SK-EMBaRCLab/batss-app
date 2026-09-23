@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 import { parseStudyDesignFile } from '../../shared/design-file-schema'
+import { IPC } from '../../shared/ipc-channels'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
@@ -34,15 +35,11 @@ export function clearUnsavedDesignChanges(): void {
 }
 
 export function registerAlbatrossFilesIPC(): void {
-  ipcMain.removeHandler('design:saveResult')
-  ipcMain.removeHandler('design:loadResult')
-  ipcMain.removeAllListeners('design:dirty')
-
-  ipcMain.on('design:dirty', (_event, dirty: boolean) => {
+  ipcMain.on(IPC.design.dirty, (_event, dirty: boolean) => {
     designHasUnsavedChanges = dirty
   })
 
-  ipcMain.handle('design:can-leave', async () => {
+  ipcMain.handle(IPC.design.canLeave, async () => {
     if (!designHasUnsavedChanges) {
       return true
     }
@@ -69,7 +66,7 @@ export function registerAlbatrossFilesIPC(): void {
     }
   })
 
-  ipcMain.handle('design:saveResult', async (_, data) => {
+  ipcMain.handle(IPC.design.saveResult, async (_, data) => {
     const designName = typeof data?.name === 'string' ? data.name : 'Untitled Design'
     const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
 
@@ -96,7 +93,7 @@ export function registerAlbatrossFilesIPC(): void {
     return true
   })
 
-  ipcMain.handle('design:loadResult', async () => {
+  ipcMain.handle(IPC.design.loadResult, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       filters: [
         {
