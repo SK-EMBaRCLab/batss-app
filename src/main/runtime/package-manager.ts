@@ -21,6 +21,20 @@ export class PackageManager {
     return extraRepo ? [defaultRepo, extraRepo] : [defaultRepo]
   }
 
+  private logStatus(status: RuntimePackage[]): void {
+    this.reporter.log(
+      status
+        .map(
+          (p) =>
+            `${p.name}: installed=${p.installed}, ` +
+            `version=${p.version ?? 'N/A'}, ` +
+            `latest=${p.latestVersion ?? 'N/A'}, ` +
+            `updateAvailable=${p.updateAvailable}`
+        )
+        .join('\n')
+    )
+  }
+
   async getStatus(): Promise<RuntimePackage[]> {
     const packageRepoMap = REQUIRED_R_PACKAGES.map((pkg) => {
       const repo = PACKAGE_REPOS[pkg] ?? 'https://cloud.r-project.org'
@@ -136,29 +150,6 @@ export class PackageManager {
       })
   }
 
-  async checkPackages(): Promise<string[]> {
-    try {
-      const status = await this.getStatus()
-
-      this.reporter.log(
-        status
-          .map(
-            (p) =>
-              `${p.name}: installed=${p.installed}, ` +
-              `version=${p.version ?? 'N/A'}, ` +
-              `latest=${p.latestVersion ?? 'N/A'}, ` +
-              `updateAvailable=${p.updateAvailable}`
-          )
-          .join('\n')
-      )
-
-      return status.filter((pkg) => !pkg.installed).map((pkg) => pkg.name)
-    } catch (error) {
-      this.reporter.log(`CHECK FAILED: ${error}`)
-      throw error
-    }
-  }
-
   async installPackages(packages: string[]): Promise<void> {
     this.reporter.log(`Installing ${packages.length} package(s)`)
     const total = packages.length
@@ -197,7 +188,7 @@ export class PackageManager {
           pkg,
           repos = repos,
           lib = install_lib,
-          dependencies = c("Depends", "Imports"),
+          dependencies = c("Depends", "Imports", "LinkingTo"),
           type = pkg_type
         )
       }
@@ -247,7 +238,7 @@ export class PackageManager {
           pkg,
           repos = repos,
           lib = install_lib,
-          dependencies = c("Depends", "Imports"),
+          dependencies = c("Depends", "Imports", "LinkingTo"),
           type = pkg_type
         )
       `,
@@ -260,25 +251,14 @@ export class PackageManager {
     }
   }
 
-  async updateAvailablePackages(): Promise<RuntimePackage[]> {
-    const status = await this.getStatus()
-
-    return status.filter((pkg) => pkg.updateAvailable)
-  }
-
   async ensurePackages(): Promise<RuntimePackage[]> {
     this.reporter.checking('Checking required R packages', 30)
-
-    const missing = await this.checkPackages()
-
-    this.reporter.log(`Missing packages: ${JSON.stringify(missing)}`)
-
-    if (missing.length > 0) {
-      await this.installPackages(missing)
-    }
-
     const status = await this.getStatus()
-
-    return status
+    this.logStatus(status)
+    const missing = status.filter((p) => !p.installed).map((p) => p.name)
+    this.reporter.log(`Missing packages: ${JSON.stringify(missing)}`)
+    if (missing.length === 0) return status
+    await this.installPackages(missing)
+    return this.getStatus()
   }
 }

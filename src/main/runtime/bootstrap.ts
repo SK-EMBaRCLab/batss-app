@@ -23,11 +23,7 @@ export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<Runti
 
     reporter.checking('Checking required packages', 25)
 
-    await packages.ensurePackages()
-
-    reporter.checking('Collecting package information', 90)
-
-    const status = await packages.getStatus()
+    const status = await packages.ensurePackages()
 
     reporter.ready()
 
