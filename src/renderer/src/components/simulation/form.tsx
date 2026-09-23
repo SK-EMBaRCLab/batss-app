@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
 import { useEngine } from '@/stores/engine'
+import { SimulationFormStore } from '@/types/form-types'
 
 import { OutcomeParametersSection } from './outcome-parameters-section'
 import { OutcomeTypeSection } from './outcome-type-section'
@@ -23,37 +24,47 @@ type SimulationFormProps = {
   initialInput?: DesignInput
 }
 
-const steps = [
+type WizardStep = {
+  id: string
+  title: string
+  fields: string[]
+  render: (form: SimulationFormStore) => ReactElement
+}
+
+const steps: WizardStep[] = [
   {
     id: 'outcome',
-    title: 'Outcome Type'
+    title: 'Outcome Type',
+    fields: ['outcomeType'],
+    render: (form) => <OutcomeTypeSection form={form} />
   },
   {
     id: 'parameters',
-    title: 'Outcome Parameters'
+    title: 'Outcome Parameters',
+    fields: [
+      'probability',
+      'treatmentEffectType',
+      'treatmentEffect',
+      'meanOutcome',
+      'sd',
+      'meanDiff'
+    ],
+    render: (form) => <OutcomeParametersSection form={form} />
   },
   {
     id: 'sample-size',
-    title: 'Sample Size'
+    title: 'Sample Size',
+    fields: ['N', 'm0', 'm', 'R'],
+    render: (form) => <SampleSizeSection form={form} />
   },
   {
     id: 'rules',
-    title: 'Decision Rules'
+    title: 'Decision Rules',
+    fields: ['decisionRules'],
+    render: (form) => <DecisionRuleSection form={form} />
   },
-  {
-    id: 'review',
-    title: 'Review'
-  }
+  { id: 'review', title: 'Review', fields: [], render: (form) => <ReviewSection form={form} /> }
 ]
-
-// in SimulationForm, module scope
-const stepFields: Record<number, string[]> = {
-  0: ['outcomeType'],
-  1: ['probability', 'treatmentEffectType', 'treatmentEffect', 'meanOutcome', 'sd', 'meanDiff'],
-  2: ['N', 'm0', 'm', 'R'],
-  3: ['decisionRules'],
-  4: []
-}
 
 export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
   const busy = useEngine((s) => s.busy)
@@ -71,7 +82,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
 
     const errors = getDeepErrorEntries(form)
 
-    return !hasAnyFieldError(errors, stepFields[step] ?? [])
+    return !hasAnyFieldError(errors, steps[step].fields)
   }
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
@@ -103,28 +114,6 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
     submit(form)
   }
 
-  const renderStep = (): ReactElement | null => {
-    switch (step) {
-      case 0:
-        return <OutcomeTypeSection form={form} />
-
-      case 1:
-        return <OutcomeParametersSection form={form} />
-
-      case 2:
-        return <SampleSizeSection form={form} />
-
-      case 3:
-        return <DecisionRuleSection form={form} />
-
-      case 4:
-        return <ReviewSection form={form} />
-
-      default:
-        return null
-    }
-  }
-
   const runButton = (): ReactElement => {
     if (isRunning) {
       return (
@@ -152,7 +141,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       <div className="shrink-0 pb-6">
         <Stepper steps={steps} currentStep={step} onStepClick={setStep} className="shrink-0 pb-4" />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-6">{renderStep()}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto p-6">{steps[step].render(form)}</div>
 
       <div className="flex justify-between border-t pt-4">
         <Button type="button" variant="outline" disabled={step === 0} onClick={handleBack}>
