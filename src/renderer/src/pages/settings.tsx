@@ -67,6 +67,7 @@ export default function Settings(): ReactElement {
           <ItemActions>
             <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
               {isDark ? <Sun /> : <Moon />}
+              <span className="sr-only">Toggle theme</span>
             </Button>
           </ItemActions>
         </Item>

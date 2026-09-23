@@ -71,6 +71,7 @@ export default function Simulation(): ReactElement {
                   <ChevronDown
                     className={`h-4 w-4 transition-transform ${logsOpen ? 'rotate-180' : ''}`}
                   />
+                  <span className="sr-only">Toggle log panel</span>
                 </Button>
               }
             ></CollapsibleTrigger>

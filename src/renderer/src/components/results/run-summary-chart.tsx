@@ -58,6 +58,7 @@ export function RunSummaryChart(): ReactElement | null {
               render={
                 <Button variant="ghost" size="icon">
                   <MoreHorizontal />
+                  <span className="sr-only">Chart options</span>
                 </Button>
               }
             />

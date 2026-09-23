@@ -75,6 +75,7 @@ export function Banner({
           {dismissible && (
             <Button size="icon" variant="ghost" onClick={onDismiss} className="h-7 w-7">
               <X className="h-4 w-4" />
+              <span className="sr-only">Close banner</span>
             </Button>
           )}
         </div>
