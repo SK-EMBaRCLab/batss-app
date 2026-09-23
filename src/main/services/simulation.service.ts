@@ -1,8 +1,8 @@
+import { app } from 'electron'
 import { mkdtemp, readFile, rm } from 'fs/promises'
 import os from 'os'
 import path from 'path'
 
-import simulationScriptPath from '../../../resources/r/batss-simulation.R?asset'
 import { describeBusy } from '../../shared/engine-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
 import { OutputListener, rManager } from '../runtime/r-manager'
@@ -17,6 +17,29 @@ const BATSS_OUTPUT_ENV = 'ALBATROSS_BATSS_OUTPUT'
 // leaves the UI stuck in "Running" forever with no way out but
 // restarting the app.
 const SIMULATION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
+
+// resources/** is asarUnpack'd (see electron-builder.yml), so in a
+// packaged build the real, directly-openable file lives next to
+// app.asar (under app.asar.unpacked), not inside it. Rscript is an
+// external, non-Electron process with no asar awareness at all —
+// handing it any path that lexically resolves inside app.asar (e.g.
+// one built from compiled main-process code's own __dirname, which
+// itself lives inside app.asar) fails with ENOTDIR, since app.asar is
+// an ordinary file, not a real directory, to every process but
+// Electron's own patched Node.
+function getSimulationScriptPath(): string {
+  if (app.isPackaged) {
+    return path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'resources',
+      'r',
+      'batss-simulation.R'
+    )
+  }
+
+  return path.join(process.cwd(), 'resources', 'r', 'batss-simulation.R')
+}
 
 export class SimulationService {
   private readonly r = rManager
@@ -107,7 +130,7 @@ export class SimulationService {
 
     try {
       await this.r.executeFile(
-        simulationScriptPath,
+        getSimulationScriptPath(),
         {
           [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }),
           [BATSS_OUTPUT_ENV]: outputPath
