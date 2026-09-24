@@ -1,5 +1,38 @@
 # Changelog
 
+## [4.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.2.0...v4.3.0) (2026-09-24)
+
+
+### Features
+
+* add ability to cancel simulation run as well as self-termination for hung process ([3e9f942](https://github.com/SK-EMBaRCLab/batss-app/commit/3e9f94255b0c3e76b13d9cecdcf9c2fbcba9f6e2))
+* add feadback toast for saving ([984957e](https://github.com/SK-EMBaRCLab/batss-app/commit/984957e03242b152f4ed8ccd997200159f8e81e5))
+* add schema validation for loading .design files ([d6fff02](https://github.com/SK-EMBaRCLab/batss-app/commit/d6fff0217c82a8caabf5f7d89acecac86cf1e326))
+* **batch:** add CSV batch processing page ([77e7706](https://github.com/SK-EMBaRCLab/batss-app/commit/77e7706b914b5f59368fa011f693335716b345e3))
+* improve runtime screen to show elapsed time and log panel visible from begnining for better feedback to user ([fcd4cf8](https://github.com/SK-EMBaRCLab/batss-app/commit/fcd4cf84b7bc3d6114539c6bdc74b398a7bc7595))
+* **main:** add a single engine-busy service shared by simulation and batch ([5c75503](https://github.com/SK-EMBaRCLab/batss-app/commit/5c75503382fe5b9345a0e21bd5f6bac381d66da3))
+* **main:** add batch processing service ([46153d7](https://github.com/SK-EMBaRCLab/batss-app/commit/46153d7bfaeeb34fbec4c5d61e5ebce9df9fa779))
+* **preload:** expose engine/batch bridges and derive Window types from the bridge ([7446817](https://github.com/SK-EMBaRCLab/batss-app/commit/7446817ab03bbdeeee3074b246a081e87339d66c))
+* **shared:** add IPC channel registry and engine/batch type contracts ([bbfb896](https://github.com/SK-EMBaRCLab/batss-app/commit/bbfb896a8355165ebc0ebf08fa43ad97a688b59f))
+
+
+### Bug Fixes
+
+* add accessible labels for icon-only buttons ([5b3d7eb](https://github.com/SK-EMBaRCLab/batss-app/commit/5b3d7eb4cb3f48df9886df4bb31fb03b4fbafd67))
+* add default sorting by created at date for table ([38a1b6d](https://github.com/SK-EMBaRCLab/batss-app/commit/38a1b6d16c4c74c1c009ebc8ea41bef18c1a0b0d))
+* add N/A for empty cells in table ([dcc77a2](https://github.com/SK-EMBaRCLab/batss-app/commit/dcc77a2822482eb63aea78405f197921d67085e8))
+* bug that allowed you to continue simulation even if Superiority margin and decision threshold had invalid values ([8e7882c](https://github.com/SK-EMBaRCLab/batss-app/commit/8e7882c8d39480ab5d2ecc3acaad8cd15dd5c1c6))
+* correct typos in form callback parameter and validation message ([b3ded19](https://github.com/SK-EMBaRCLab/batss-app/commit/b3ded192d3f9e57da6ad8d654f78d9d4e7dc985b))
+* **main:** resolve packaged R script path and read results from a temp file ([6e8206b](https://github.com/SK-EMBaRCLab/batss-app/commit/6e8206bfb2e1a6c94d2725f19628d5ca58a20532))
+* **main:** resolve the bundled R script path correctly in packaged builds ([eddd46d](https://github.com/SK-EMBaRCLab/batss-app/commit/eddd46d4c398b55ef0a52711df6aa27a58828939))
+* **main:** type settings cache and design:saveResult payload correctly ([806090a](https://github.com/SK-EMBaRCLab/batss-app/commit/806090a970986d40494ccb5a0ade776d9dac1d93))
+* **renderer:** decouple decision-rule chart curve width from the margin ([2c384a8](https://github.com/SK-EMBaRCLab/batss-app/commit/2c384a8aeb7cf7b405c7bff4497d53412d533b5d))
+* **renderer:** tighten design validation and collapse to a single decision rule ([cec776a](https://github.com/SK-EMBaRCLab/batss-app/commit/cec776adced6e61e8290e86f620eb1f28f1cdbad))
+* **r:** surface a clear error when a scenario produces no results ([fa8dcee](https://github.com/SK-EMBaRCLab/batss-app/commit/fa8dceed90ea6d04e3163902061e77664138ad66))
+* **runtime:** de-duplicate package status checks and improve source installs ([65af4ed](https://github.com/SK-EMBaRCLab/batss-app/commit/65af4ed16d353ee8c985c629bdd81735abdac5d4))
+* **runtime:** rework R process execution, cancellation, and error reporting ([c97ef6e](https://github.com/SK-EMBaRCLab/batss-app/commit/c97ef6e4cc6b8a571ed1a216281cb3d2f9eab2dc))
+* update banner will reappear every reload. Now we remember in localstorage when it was dismissed ([8447347](https://github.com/SK-EMBaRCLab/batss-app/commit/8447347d0f0e9fe8a78f4c576b0fa89b71b62547))
+
 ## [4.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.1.5...v4.2.0) (2026-09-11)
 
 ### Features
