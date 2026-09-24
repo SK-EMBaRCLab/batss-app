@@ -14,19 +14,24 @@ export function AboutHeader(): ReactElement {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">About</h1>
-      <p className="text-muted-foreground">Albatross version {appVersion}</p>
+      <small className="text-muted-foreground">Version {appVersion}</small>
+      <h1 className="text-6xl font-semibold">Albatross</h1>
       <p>
         A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design using
         Integrated Nested Laplace Approximations (INLA): ABC-INLA
       </p>
-      <Button onClick={() => checkRuntime()} disabled={status === 'checking'} className="max-w-xs">
+      <Button
+        onClick={() => checkRuntime()}
+        disabled={status === 'checking'}
+        className="max-w-xs justify-self-center"
+      >
         Recheck / Install Missing Packages
       </Button>
       <Button
         onClick={() => updatePackages()}
         disabled={status === 'checking' || status === 'installing' || !hasUpdates}
-        className="max-w-xs"
+        className="max-w-xs justify-self-center"
+        variant={hasUpdates ? 'secondary' : 'ghost'}
       >
         {hasUpdates ? 'Update Packages' : 'Packages Up to Date'}
       </Button>

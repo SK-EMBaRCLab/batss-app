@@ -1,4 +1,4 @@
-import { FolderOpen, Moon, Sun } from 'lucide-react'
+import { FolderOpen } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,7 +6,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
-import { useTheme } from '@/stores/theme'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Theme, useTheme } from '@/stores/theme'
+
+const items: { label: string; value: Theme }[] = [
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' },
+  { label: 'System', value: 'system' }
+]
 
 export default function Settings(): ReactElement {
   const [outputPath, setOutputPath] = useState('')
@@ -14,8 +28,14 @@ export default function Settings(): ReactElement {
   const [isSaving, setIsSaving] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
 
-  const isDark = useTheme((state) => state.isDark)
+  const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
+
+  const handleThemeChange = (value: Theme | null): void => {
+    if (value) {
+      void setTheme(value)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -53,22 +73,36 @@ export default function Settings(): ReactElement {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+    <div className="p-28">
+      <h1 className="text-xl font-semibold">Settings</h1>
 
-      <p className="text-muted-foreground mt-2">Application settings.</p>
+      <p className="text-muted-foreground mt-2">
+        Customize preferences and theme and default behaviour.
+      </p>
 
-      <div className="flex flex-col gap-4 mt-4 max-w-2xl">
+      <div className="flex flex-col gap-4 mt-8 max-w-2xl">
         <Item variant="muted">
           <ItemContent>
-            <ItemTitle>Theme</ItemTitle>
-            <ItemDescription>Toggle between light and dark color scheme.</ItemDescription>
+            <ItemTitle>Color Scheme</ItemTitle>
+            <ItemDescription>
+              Choose wether Albatross follows the system, light, or dark theme.
+            </ItemDescription>
           </ItemContent>
           <ItemActions>
-            <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
-              {isDark ? <Sun /> : <Moon />}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <Select items={items} value={theme} onValueChange={handleThemeChange}>
+              <SelectTrigger className="w-45">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {items.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </ItemActions>
         </Item>
 

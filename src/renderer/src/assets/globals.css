@@ -49,9 +49,9 @@
   --sidebar-border: oklch(0.9008 0.0146 213.1014);
   --sidebar-ring: var(--primary);
 
-  --font-sans: 'Google Sans Flex', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: ui-monospace, monospace;
 
   --radius: 0.625rem;
 

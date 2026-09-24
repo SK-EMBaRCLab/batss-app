@@ -16,9 +16,9 @@ export function AboutPackages(): ReactElement {
   const packages = useRuntime((state) => state.packages)
 
   return (
-    <ItemGroup className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 content-center">
+    <ItemGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 content-around">
       {packages.map((pkg) => (
-        <Item key={pkg.name} variant="outline" size="xs" className="min-w-0 items-start">
+        <Item key={pkg.name} variant="outline" size="xs" className="min-w-0">
           <ItemMedia>
             {pkg.installed ? (
               <PackageCheck className="text-primary" />
