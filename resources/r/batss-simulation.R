@@ -1,6 +1,8 @@
 library(BATSS)
 library(INLA)
 
+Sys.setenv(R_LIBS_USER = Sys.getenv("R_LIBS_USER"))
+
 # Fix: INLA's automatic thread-count detection frequently
 # misreads what's actually available inside a container (cgroup
 # CPU limits vs. /proc/cpuinfo), which is one of the most common

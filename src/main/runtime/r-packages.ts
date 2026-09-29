@@ -15,7 +15,7 @@ export const R_PACKAGES = {
   //     present.
   //   BATSS   — from CRAN, now that its INLA dependency is satisfied.
   //   jsonlite
-  ordered: ['fmesher', 'INLA', 'BATSS', 'jsonlite']
+  ordered: ['fmesher', 'INLA', 'BATSS', 'jsonlite', 'R.utils']
 } as const
 
 export const REQUIRED_R_PACKAGES = [...R_PACKAGES.ordered] as const
