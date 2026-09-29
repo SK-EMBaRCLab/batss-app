@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.0...v4.3.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* add r.utils to install packages as well as make workers inherit the library path ([5044c61](https://github.com/SK-EMBaRCLab/batss-app/commit/5044c6114c6716ba6265943cab8b6584a75a1e71))
+
 ## [4.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.2.0...v4.3.0) (2026-09-29)
 
 
