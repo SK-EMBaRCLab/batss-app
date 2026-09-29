@@ -19,7 +19,7 @@ export default function About(): ReactElement {
       <AboutHeader />
       <h3>R Packages status:</h3>
       <AboutPackages />
-      {logs.length > 0 && <LogViewer logs={logs} className="h-48 text-start" />}
+      <LogViewer logs={logs} className="h-48 text-start" />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import type { SubmitHandler } from '@formisch/react'
 import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
 import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { Play } from 'lucide-react'
+import { Play, Square } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 import * as v from 'valibot'
 
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
 import { useEngine } from '@/stores/engine'
+import { useSimulation } from '@/stores/simulation'
 import { SimulationFormStore } from '@/types/form-types'
 
 import { OutcomeParametersSection } from './outcome-parameters-section'
@@ -68,6 +69,7 @@ const steps: WizardStep[] = [
 
 export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
   const busy = useEngine((s) => s.busy)
+  const cancel = useSimulation((s) => s.cancel)
   const isRunning = busy === 'simulation'
   const [step, setStep] = useState(0)
   const form = useForm({
@@ -117,15 +119,24 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
   const runButton = (): ReactElement => {
     if (isRunning) {
       return (
-        <>
-          <Play className="mr-2 h-5 w-5 transition-transform animate-pulse scale-110" /> Running
-        </>
+        <Button variant="destructive" onClick={() => cancel()}>
+          <Square className="mr-2 h-5 w-5 transition-transform animate-pulse scale-110" /> Cancel
+        </Button>
       )
     }
+
+    if (step === steps.length - 1) {
+      return (
+        <Button type="button" onClick={handlePrimaryAction}>
+          <Play className="mr-2 h-5 w-5 transition-transform" /> Run Simulation
+        </Button>
+      )
+    }
+
     return (
-      <>
-        <Play className="mr-2 h-5 w-5 transition-transform" /> Run Simulation
-      </>
+      <Button type="button" onClick={handlePrimaryAction}>
+        Next
+      </Button>
     )
   }
 
@@ -148,9 +159,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
           Back
         </Button>
 
-        <Button type="button" onClick={handlePrimaryAction} disabled={isRunning}>
-          {step === steps.length - 1 ? runButton() : 'Next'}
-        </Button>
+        {runButton()}
       </div>
     </Form>
   )

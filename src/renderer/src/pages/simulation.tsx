@@ -1,5 +1,5 @@
 import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { ChevronDown, Square } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 
 import { SimulationForm } from '@/components/simulation/form'
@@ -21,7 +21,6 @@ export default function Simulation(): ReactElement {
   const startedAt = useSimulation((s) => s.startedAt)
   const endedAt = useSimulation((s) => s.endedAt)
   const run = useSimulation((s) => s.run)
-  const cancel = useSimulation((s) => s.cancel)
 
   const [logsOpen, setLogsOpen] = useState(isRunning)
 
@@ -48,12 +47,6 @@ export default function Simulation(): ReactElement {
                 </span>
               )}
             </CardTitle>
-            {isRunning && (
-              <Button variant="destructive" size="sm" onClick={() => cancel()}>
-                <Square className="mr-1.5 h-3.5 w-3.5" />
-                Cancel
-              </Button>
-            )}
           </div>
         </CardHeader>
         <CardContent className="min-h-0 flex-1 overflow-hidden">
