@@ -14,9 +14,14 @@ import { useEngine } from '@/stores/engine'
 import { useSimulation } from '@/stores/simulation'
 import { SimulationFormStore } from '@/types/form-types'
 
+import { ScrollArea } from '../ui/scroll-area'
+import { DecisionRuleHelp } from './decision-rule-help'
+import { OutcomeParametersHelp } from './outcome-parameters-help'
 import { OutcomeParametersSection } from './outcome-parameters-section'
+import { OutcomeTypeHelp } from './outcome-type-help'
 import { OutcomeTypeSection } from './outcome-type-section'
 import { ReviewSection } from './review-section'
+import { SampleSizeHelp } from './sample-size-help'
 import { SampleSizeSection } from './sample-size-section'
 import { hasAnyFieldError } from './utils'
 
@@ -30,6 +35,7 @@ type WizardStep = {
   title: string
   fields: string[]
   render: (form: SimulationFormStore) => ReactElement
+  help: (form: SimulationFormStore) => ReactElement | null
 }
 
 const steps: WizardStep[] = [
@@ -37,7 +43,8 @@ const steps: WizardStep[] = [
     id: 'outcome',
     title: 'Outcome Type',
     fields: ['outcomeType'],
-    render: (form) => <OutcomeTypeSection form={form} />
+    render: (form) => <OutcomeTypeSection form={form} />,
+    help: (form) => <OutcomeTypeHelp form={form} />
   },
   {
     id: 'parameters',
@@ -50,21 +57,30 @@ const steps: WizardStep[] = [
       'sd',
       'meanDiff'
     ],
-    render: (form) => <OutcomeParametersSection form={form} />
+    render: (form) => <OutcomeParametersSection form={form} />,
+    help: (form) => <OutcomeParametersHelp form={form} />
   },
   {
     id: 'sample-size',
     title: 'Sample Size',
     fields: ['N', 'm0', 'm', 'R'],
-    render: (form) => <SampleSizeSection form={form} />
+    render: (form) => <SampleSizeSection form={form} />,
+    help: () => <SampleSizeHelp />
   },
   {
     id: 'rules',
     title: 'Decision Rules',
     fields: ['decisionRules'],
-    render: (form) => <DecisionRuleSection form={form} />
+    render: (form) => <DecisionRuleSection form={form} />,
+    help: () => <DecisionRuleHelp />
   },
-  { id: 'review', title: 'Review', fields: [], render: (form) => <ReviewSection form={form} /> }
+  {
+    id: 'review',
+    title: 'Review',
+    fields: [],
+    render: (form) => <ReviewSection form={form} />,
+    help: () => null
+  }
 ]
 
 export function SimulationForm({ onRun, initialInput }: SimulationFormProps): ReactElement {
@@ -152,7 +168,23 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       <div className="shrink-0 pb-6">
         <Stepper steps={steps} currentStep={step} onStepClick={setStep} className="shrink-0 pb-4" />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-6">{steps[step].render(form)}</div>
+      <div
+        className={`grid min-h-0 flex-1 gap-6 transition-[grid-template-columns] duration-300 ${
+          step === 4 ? 'lg:grid-cols-[minmax(0,1fr)_0fr]' : 'lg:grid-cols-[minmax(0,1fr)_22rem]'
+        }`}
+      >
+        <div className="min-h-0 overflow-y-auto p-6">{steps[step].render(form)}</div>
+
+        <aside
+          className={`min-h-0 overflow-hidden border-l transition-opacity duration-300 ${
+            step === 4 ? 'border-transparent opacity-0' : 'opacity-100'
+          }`}
+        >
+          <ScrollArea className="h-full">
+            <div className="p-4">{steps[step].help(form)}</div>
+          </ScrollArea>
+        </aside>
+      </div>
 
       <div className="flex justify-between border-t pt-4">
         <Button type="button" variant="outline" disabled={step === 0} onClick={handleBack}>

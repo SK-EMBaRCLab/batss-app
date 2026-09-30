@@ -53,30 +53,37 @@ export default function Simulation(): ReactElement {
           <SimulationForm onRun={handleRun} initialInput={design?.input} />
         </CardContent>
       </Card>
-      <Card className="shrink-0">
-        <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Simulation Log</CardTitle>
+      {isRunning && (
+        <Card className="shrink-0">
+          <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Simulation Log</CardTitle>
 
-            <CollapsibleTrigger
-              render={
-                <Button variant="ghost" size="icon">
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${logsOpen ? 'rotate-180' : ''}`}
-                  />
-                  <span className="sr-only">Toggle log panel</span>
-                </Button>
-              }
-            ></CollapsibleTrigger>
-          </CardHeader>
+              <CollapsibleTrigger
+                render={
+                  <Button variant="ghost" size="icon">
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${logsOpen ? 'rotate-180' : ''}`}
+                    />
+                    <span className="sr-only">Toggle log panel</span>
+                  </Button>
+                }
+              ></CollapsibleTrigger>
+            </CardHeader>
 
-          <CollapsibleContent>
-            <CardContent className="h-64 overflow-hidden">
-              <LogPanel logs={logs} isRunning={isRunning} startedAt={startedAt} endedAt={endedAt} />
-            </CardContent>
-          </CollapsibleContent>
-        </Collapsible>
-      </Card>
+            <CollapsibleContent>
+              <CardContent className="h-64 overflow-hidden">
+                <LogPanel
+                  logs={logs}
+                  isRunning={isRunning}
+                  startedAt={startedAt}
+                  endedAt={endedAt}
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
+      )}
     </div>
   )
 }
