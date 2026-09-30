@@ -7,12 +7,18 @@ import { NumericField } from './numeric-field'
 export function SampleSizeSection({ form }: { form: SimulationFormStore }): ReactElement {
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold">Sample Size Parameters</h3>
+      <div className="space-y-2">
+        <h3 className="font-semibold">Sample Size Parameters</h3>
+        <p>
+          The following inputs specify the sample size parameters for the full study rather than the
+          number per arm.
+        </p>
+      </div>
       <div className="space-y-6">
         <NumericField
           form={form}
           path={['m0']}
-          label="Burn-in"
+          label="Burn-in sample size"
           min={1}
           step={1}
           className="max-w-lg"

@@ -5,7 +5,7 @@ export function SampleSizeHelp(): ReactElement {
     <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
       <div className="space-y-5">
         <div className="space-y-2">
-          <h4 className="font-medium text-primary">Burn-in</h4>
+          <h4 className="font-medium text-primary">Burn-in sample size</h4>
 
           <p className="space-y-2 pl-5 leading-relaxed">
             The number of patients that must be enrolled before the trial may adapt based on
