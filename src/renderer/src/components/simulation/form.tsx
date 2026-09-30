@@ -1,20 +1,21 @@
 import type { SubmitHandler } from '@formisch/react'
 import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
 import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { Play, Square } from 'lucide-react'
+import { Info, Play, Square } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 import * as v from 'valibot'
 
 import { Stepper } from '@/components/common/stepper'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
 import { useEngine } from '@/stores/engine'
 import { useSimulation } from '@/stores/simulation'
 import { SimulationFormStore } from '@/types/form-types'
 
-import { ScrollArea } from '../ui/scroll-area'
 import { DecisionRuleHelp } from './decision-rule-help'
 import { OutcomeParametersHelp } from './outcome-parameters-help'
 import { OutcomeParametersSection } from './outcome-parameters-section'
@@ -176,7 +177,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
         <div className="min-h-0 overflow-y-auto p-6">{steps[step].render(form)}</div>
 
         <aside
-          className={`min-h-0 overflow-hidden border-l transition-opacity duration-300 ${
+          className={`hidden min-h-0 overflow-hidden border-l lg:block transition-opacity duration-300 ${
             step === 4 ? 'border-transparent opacity-0' : 'opacity-100'
           }`}
         >
@@ -184,6 +185,24 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
             <div className="p-4">{steps[step].help(form)}</div>
           </ScrollArea>
         </aside>
+
+        <div className={`lg:hidden ${step === 4 ? 'hidden' : ''}`}>
+          <Sheet>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="sm">
+                  <Info /> Help
+                </Button>
+              }
+            />
+            <SheetContent side="right" className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>{steps[step].title}</SheetTitle>
+              </SheetHeader>
+              <ScrollArea className="min-h-0 flex-1 px-6 pb-6">{steps[step].help(form)}</ScrollArea>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       <div className="flex justify-between border-t pt-4">
