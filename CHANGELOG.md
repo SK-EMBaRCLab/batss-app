@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.1...v4.4.0) (2026-10-01)
+
+
+### Features
+
+* change how the info panel is displayed as a side by side column instead of collapsible ([a2d036b](https://github.com/SK-EMBaRCLab/batss-app/commit/a2d036b3aad767d151ca879bb10cb1e34d1054ad))
+
+
+### Bug Fixes
+
+* issue with installing dependences for R packages ([67128eb](https://github.com/SK-EMBaRCLab/batss-app/commit/67128eb53fdda70117d026e971a6cbd4bb5e521c))
+* show help on simulation page using sheet for small screen size ([b28516f](https://github.com/SK-EMBaRCLab/batss-app/commit/b28516f3328fb0e322f30e9c1398aaaabbf4d4fa))
+
 ## [4.3.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.0...v4.3.1) (2026-09-29)
 
 ### Bug Fixes
