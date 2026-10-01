@@ -35,7 +35,7 @@ export function WelcomeScreen(): ReactElement {
     try {
       const loaded = await loadDesign()
       if (loaded) {
-        navigate('results')
+        navigate('dashboard')
       }
     } finally {
       setIsLoading(false)

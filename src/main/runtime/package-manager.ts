@@ -79,7 +79,8 @@ export class PackageManager {
       }
 
       for (pkg in packages) {
-        is_installed <- pkg %in% rownames(installed)
+        is_installed <- pkg %in% rownames(installed) &&
+          requireNamespace(pkg, quietly = TRUE, lib.loc = install_lib)
 
         installed_version <- if (is_installed) {
           as.character(
@@ -176,7 +177,7 @@ export class PackageManager {
           pkg,
           repos = repos,
           lib = install_lib,
-          dependencies = c("Depends", "Imports", "LinkingTo"),
+          dependencies = TRUE,
           type = pkg_type
         )
       `
