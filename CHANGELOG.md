@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.0...v4.4.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* use dependencies true for installing BATTS only ([244b427](https://github.com/SK-EMBaRCLab/batss-app/commit/244b4276907bc7f2f278782423c738a16bcc4ed0))
+
 ## [4.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.1...v4.4.0) (2026-10-01)
 
 
