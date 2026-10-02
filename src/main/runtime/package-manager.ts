@@ -8,6 +8,10 @@ const PACKAGE_NAME_ENV = 'ALBATROSS_R_PACKAGE_NAME'
 const PACKAGE_REPOS_ENV = 'ALBATROSS_R_PACKAGE_REPOS'
 const PACKAGE_REPO_MAP_ENV = 'ALBATROSS_R_PACKAGE_REPO_MAP'
 
+const PACKAGES_WITH_ALL_DEPENDENCIES = new Set(['BATSS'])
+
+const HARD_DEPENDENCIES = 'c("Depends", "Imports", "LinkingTo")'
+
 export class PackageManager {
   constructor(
     private readonly r: RManager,
@@ -172,12 +176,14 @@ export class PackageManager {
       this.reporter.installing(`${verb} ${pkg}`, progress)
       const repos = this.getRepositories(pkg)
 
+      const dependencies = PACKAGES_WITH_ALL_DEPENDENCIES.has(pkg) ? 'TRUE' : HARD_DEPENDENCIES
+
       const install = `
         install.packages(
           pkg,
           repos = repos,
           lib = install_lib,
-          dependencies = TRUE,
+          dependencies = ${dependencies},
           type = pkg_type
         )
       `
