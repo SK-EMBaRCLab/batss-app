@@ -12,6 +12,13 @@ const PACKAGES_WITH_ALL_DEPENDENCIES = new Set(['BATSS'])
 
 const HARD_DEPENDENCIES = 'c("Depends", "Imports", "LinkingTo")'
 
+// Check the same package type that we install. A newer source release may
+// exist before its macOS/Windows binary is available.
+const PACKAGE_TYPE = `if (
+  .Platform$OS.type == "windows" ||
+  Sys.info()[["sysname"]] == "Darwin"
+) "binary" else "source"`
+
 export class PackageManager {
   constructor(
     private readonly r: RManager,
@@ -73,12 +80,14 @@ export class PackageManager {
       )
 
       unique_repos <- unique(unlist(package_repos))
+      pkg_type <- ${PACKAGE_TYPE}
 
       available_by_repo <- list()
 
       for (repo in unique_repos) {
         available_by_repo[[repo]] <- available.packages(
-          repos = repo
+          repos = repo,
+          type = pkg_type
         )
       }
 
@@ -193,10 +202,7 @@ export class PackageManager {
           pkg <- Sys.getenv("${PACKAGE_NAME_ENV}")
           repos <- strsplit(Sys.getenv("${PACKAGE_REPOS_ENV}"), ",")[[1]]
           install_lib <- .libPaths()[1]
-          pkg_type <- if (
-            .Platform$OS.type == "windows" ||
-            Sys.info()[["sysname"]] == "Darwin"
-          ) "binary" else "source"
+          pkg_type <- ${PACKAGE_TYPE}
 
           ${
             skipIfPresent

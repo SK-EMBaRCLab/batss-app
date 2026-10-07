@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.2...v4.4.3) (2026-10-07)
+
+
+### Bug Fixes
+
+* **runtime:** match package update checks to installer type ([ac3d525](https://github.com/SK-EMBaRCLab/batss-app/commit/ac3d525fd67a014e76be7043b230a1d9b8bcf4fe))
+
 ## [4.4.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.1...v4.4.2) (2026-10-07)
 
 ### Bug Fixes
