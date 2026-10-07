@@ -236,4 +236,8 @@
   a {
     @apply cursor-pointer;
   }
+
+  [data-slot='slider-thumb'] input[type='range'] {
+    position: absolute !important;
+  }
 }

@@ -38,7 +38,7 @@ export function RunsHistory(): ReactElement | null {
       </p>
 
       <ScrollArea className="min-h-0 flex-1">
-        <div className="flex flex-col gap-2 pr-2">
+        <div className="flex flex-col gap-2 pr-4">
           {[...list].reverse().map((entry) => {
             const Icon = outcomeTypes.find((type) => type.value === entry.input.outcomeType)?.icon
             return (

@@ -17,7 +17,7 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
 
         <AppBanner />
 
-        <main className="min-h-0 min-w-0 flex-1 overflow-hidden">
+        <main className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
           <TooltipProvider>{children}</TooltipProvider>
         </main>
       </SidebarInset>

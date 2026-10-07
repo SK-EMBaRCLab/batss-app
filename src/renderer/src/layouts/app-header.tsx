@@ -64,8 +64,8 @@ export function AppHeader(): ReactElement {
             Load
           </Button>
 
-          {design && (
-            <Button variant="ghost" size="sm" onClick={saveDesign} disabled={!isDirty}>
+          {design && isDirty && (
+            <Button variant="secondary" size="sm" onClick={saveDesign} disabled={!isDirty}>
               <Save />
               Save
             </Button>
