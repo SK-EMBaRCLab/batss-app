@@ -21,7 +21,8 @@ nsis:
   createDesktopShortcut: always
 mac:
   icon: build/icon.icns
-  identity: null
+  # Ad hoc signing needs no Apple account, but users must still allow the app.
+  identity: '-'
   hardenedRuntime: false
   gatekeeperAssess: false
   entitlementsInherit: build/entitlements.mac.plist

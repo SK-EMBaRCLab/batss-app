@@ -90,6 +90,23 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 ## Quick Start
 
+### Opening a downloaded macOS release
+
+macOS releases are ad hoc signed, without an Apple Developer ID or Apple
+notarization. macOS may therefore block the first launch even when the app's
+signature is valid.
+
+1. Download the DMG from this repository's releases and drag Albatross into
+   **Applications**.
+2. Try opening Albatross once.
+3. If macOS blocks it, open **System Settings → Privacy & Security**, find the
+   Albatross message, and choose **Open Anyway** if available. Confirm the prompt
+   only if you trust the download.
+
+For an older release that reports the app as damaged, download a newer release
+containing the signing fix. Ad hoc signing checks the app's integrity; it does
+not verify the publisher or mean Apple has checked the app for malware.
+
 ### Local Development
 
 1. **Install dependencies:**
