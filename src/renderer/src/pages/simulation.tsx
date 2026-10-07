@@ -28,6 +28,10 @@ export default function Simulation(): ReactElement {
     setLogsOpen(true)
     const result = await run(input, formInput)
 
+    if (result.status !== 'success') {
+      setLogsOpen(true)
+    }
+
     // Only auto-jump if the user is still on this page.
     if (result.status === 'success' && useNavigation.getState().currentView === 'simulation') {
       navigate('results')
@@ -53,7 +57,7 @@ export default function Simulation(): ReactElement {
           <SimulationForm onRun={handleRun} initialInput={design?.input} />
         </CardContent>
       </Card>
-      {isRunning && (
+      {logs.length > 0 && (
         <Card className="shrink-0">
           <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
             <CardHeader className="flex flex-row items-center justify-between">
