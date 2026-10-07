@@ -12,6 +12,7 @@ function makeId(): string {
 
 interface DesignState {
   design: StudyDesign | null
+  filePath: string | null
   selectedResultId: string | null
   selectedResults: string[] | null
   isDirty: boolean
@@ -24,6 +25,7 @@ interface DesignState {
   selectResult: (id: string) => void
   selectResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
+  saveDesignAs: () => Promise<boolean>
   loadDesign: () => Promise<boolean>
   closeDesign: () => void
 }
@@ -36,6 +38,7 @@ export const useDesign = create<DesignState>((set, get) => {
 
   return {
     design: null,
+    filePath: null,
     selectedResultId: null,
     selectedResults: null,
     isDirty: false,
@@ -68,11 +71,7 @@ export const useDesign = create<DesignState>((set, get) => {
         results: []
       }
 
-      set({
-        design,
-        selectedResultId: null,
-        selectedResults: null
-      })
+      set({ design, filePath: null, selectedResultId: null, selectedResults: null })
 
       setDirty(true)
     },
@@ -108,15 +107,16 @@ export const useDesign = create<DesignState>((set, get) => {
     selectResults: (ids) => set({ selectedResults: ids }),
 
     saveDesign: async () => {
-      const { design } = get()
+      const { design, filePath } = get()
       if (!design) return true
 
-      const saved = await window.design.saveResult(design)
+      const result = await window.design.saveResult(design, filePath ?? undefined)
 
-      if (!saved) {
+      if (!result.saved) {
         return false
       }
 
+      set({ filePath: result.filePath ?? null })
       setDirty(false)
       toast.add({
         type: 'success',
@@ -126,17 +126,34 @@ export const useDesign = create<DesignState>((set, get) => {
       return true
     },
 
+    // Always shows the picker, regardless of a remembered path.
+    saveDesignAs: async () => {
+      const { design } = get()
+      if (!design) return true
+
+      const result = await window.design.saveResult(design)
+
+      if (!result.saved) return false
+
+      set({ filePath: result.filePath ?? null })
+      setDirty(false)
+      toast.add({ type: 'success', description: `Design saved ${design.name}` })
+
+      return true
+    },
+
     loadDesign: async () => {
       const allowed = await window.design.canLeave()
 
       if (!allowed) return false
 
-      const saved = await window.design.loadResult()
-      if (!saved) return false
+      const loaded = await window.design.loadResult()
+      if (!loaded) return false
 
       set({
-        design: saved,
-        selectedResultId: saved.results.at(-1)?.id ?? null
+        design: loaded.design,
+        filePath: loaded.filePath,
+        selectedResultId: loaded.design.results.at(-1)?.id ?? null
       })
 
       setDirty(false)
@@ -148,6 +165,7 @@ export const useDesign = create<DesignState>((set, get) => {
     closeDesign: () => {
       set({
         design: null,
+        filePath: null,
         selectedResultId: null,
         selectedResults: null
       })

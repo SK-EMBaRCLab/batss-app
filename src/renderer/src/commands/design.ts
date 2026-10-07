@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, Save } from 'lucide-react'
+import { FilePlus2, FolderOpen, Save, SavePen } from 'lucide-react'
 
 import { initialDesignInput } from '@/lib/schema'
 import { useDesign } from '@/stores/design'
@@ -48,6 +48,19 @@ export const designCommands: AppCommand[] = [
     enabled: () => useDesign.getState().isDirty,
     action: async () => {
       await useDesign.getState().saveDesign()
+    }
+  },
+  {
+    id: 'save-design-as',
+    label: 'Save Design As…',
+    group: 'Design',
+    icon: SavePen,
+    shortcut: { binding: 'mod+shift+s' },
+    showInPalette: true,
+    showInMenu: true,
+    enabled: () => !!useDesign.getState().design,
+    action: async () => {
+      await useDesign.getState().saveDesignAs()
     }
   }
 ]

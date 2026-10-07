@@ -10,6 +10,7 @@ import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
 
 const DESIGN_FILE_EXTENSION = 'design'
+export type SaveResultResponse = { saved: boolean; filePath?: string }
 
 function sanitizeFileName(name: string): string {
   const withoutControlChars = Array.from(name)
@@ -23,6 +24,24 @@ function sanitizeFileName(name: string): string {
     .replace(/^\.+|\.+$/g, '')
 
   return cleaned.length > 0 ? cleaned : 'Untitled Design'
+}
+
+async function saveViaDialog(data: StudyDesign): Promise<SaveResultResponse> {
+  const designName = data.name || 'Untitled Design'
+  const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
+
+  const defaultPath = path.join(settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()), fileName)
+
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    defaultPath,
+    filters: [{ name: 'Albatross Study Design', extensions: [DESIGN_FILE_EXTENSION] }]
+  })
+
+  if (canceled || !filePath) return { saved: false }
+
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8')
+  designHasUnsavedChanges = false
+  return { saved: true, filePath }
 }
 
 let designHasUnsavedChanges = false
@@ -67,32 +86,23 @@ export function registerAlbatrossFilesIPC(): void {
     }
   })
 
-  ipcMain.handle(IPC.design.saveResult, async (_, data: StudyDesign) => {
-    const designName = data.name || 'Untitled Design'
-    const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
-
-    const defaultPath = path.join(
-      settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
-      fileName
-    )
-    const { canceled, filePath } = await dialog.showSaveDialog({
-      defaultPath,
-      filters: [
-        {
-          name: 'Albatross Study Design',
-          extensions: [DESIGN_FILE_EXTENSION]
-        }
-      ]
-    })
-
-    if (canceled || !filePath) return false
-
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8')
-
-    designHasUnsavedChanges = false
-
-    return true
-  })
+  ipcMain.handle(
+    IPC.design.saveResult,
+    async (_, data: StudyDesign, knownPath?: string): Promise<SaveResultResponse> => {
+      if (!knownPath) {
+        return saveViaDialog(data)
+      }
+      try {
+        await fs.writeFile(knownPath, JSON.stringify(data, null, 2), 'utf8')
+        designHasUnsavedChanges = false
+        return { saved: true, filePath: knownPath }
+      } catch {
+        // Remembered path is gone (moved/deleted outside the app) —
+        // fall back to the picker instead of failing with no recovery.
+        return saveViaDialog(data)
+      }
+    }
+  )
 
   ipcMain.handle(IPC.design.loadResult, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -107,7 +117,8 @@ export function registerAlbatrossFilesIPC(): void {
 
     if (canceled || filePaths.length === 0) return null
 
-    const text = await fs.readFile(filePaths[0], 'utf8')
+    const filePath = filePaths[0]
+    const text = await fs.readFile(filePath, 'utf8')
 
     let parsed: unknown
 
@@ -137,6 +148,6 @@ export function registerAlbatrossFilesIPC(): void {
       return null
     }
 
-    return validation.data
+    return { design: validation.data, filePath }
   })
 }

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+import { SaveResultResponse } from '../main/ipc/albatross-files.ipc'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
 import { EngineState } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
@@ -44,10 +45,11 @@ const runtime = {
 const design = {
   setDirty: (dirty: boolean) => ipcRenderer.send(IPC.design.dirty, dirty),
 
-  saveResult: (data: StudyDesign): Promise<boolean> =>
-    ipcRenderer.invoke(IPC.design.saveResult, data),
+  saveResult: (data: StudyDesign, filePath?: string): Promise<SaveResultResponse> =>
+    ipcRenderer.invoke(IPC.design.saveResult, data, filePath),
 
-  loadResult: (): Promise<StudyDesign | null> => ipcRenderer.invoke(IPC.design.loadResult),
+  loadResult: (): Promise<{ design: StudyDesign; filePath: string } | null> =>
+    ipcRenderer.invoke(IPC.design.loadResult),
 
   onSaveRequested: (callback: () => void) => {
     const listener = (): void => callback()
