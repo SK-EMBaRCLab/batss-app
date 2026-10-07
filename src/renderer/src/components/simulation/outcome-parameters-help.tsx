@@ -15,7 +15,7 @@ export function OutcomeParametersHelp({
 
   if (outcomeType.input === 'binary') {
     return (
-      <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
+      <div className=" px-4 pb-4 pt-3 text-sm text-foreground/80">
         <div className="space-y-5">
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Control arm event probability</h4>

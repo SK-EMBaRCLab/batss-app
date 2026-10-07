@@ -10,7 +10,7 @@ export function OutcomeTypeHelp({ form }: { form: SimulationFormStore }): ReactE
 
   const selectedOutcomeType = outcomeType.input
   return (
-    <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
+    <div className=" px-4 pb-4 pt-3 text-sm text-foreground/80">
       <div className="space-y-3">
         <div
           className={`rounded-md border-l-2 p-3 transition-colors ${

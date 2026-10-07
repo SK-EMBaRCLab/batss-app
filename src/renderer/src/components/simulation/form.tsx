@@ -9,6 +9,7 @@ import { Stepper } from '@/components/common/stepper'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
@@ -169,6 +170,7 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       <div className="shrink-0 pb-6">
         <Stepper steps={steps} currentStep={step} onStepClick={setStep} className="shrink-0 pb-4" />
       </div>
+      <Separator className="h-px" />
       <div
         className={`grid min-h-0 flex-1 gap-6 transition-[grid-template-columns] duration-300 ${
           step === 4 ? 'lg:grid-cols-[minmax(0,1fr)_0fr]' : 'lg:grid-cols-[minmax(0,1fr)_22rem]'
@@ -177,11 +179,11 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
         <div className="min-h-0 overflow-y-auto p-6">{steps[step].render(form)}</div>
 
         <aside
-          className={`hidden min-h-0 overflow-hidden border-l lg:block transition-opacity duration-300 ${
+          className={`hidden min-h-0 min-w-0 border-l lg:block transition-opacity duration-300 ${
             step === 4 ? 'border-transparent opacity-0' : 'opacity-100'
           }`}
         >
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-full w-full">
             <div className="p-4">{steps[step].help(form)}</div>
           </ScrollArea>
         </aside>

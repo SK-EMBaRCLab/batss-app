@@ -2,7 +2,7 @@ import { type ReactElement } from 'react'
 
 export function DecisionRuleHelp(): ReactElement {
   return (
-    <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
+    <div className=" px-4 pb-4 pt-3 text-sm text-foreground/80">
       <div className="space-y-5">
         <p className="leading-relaxed">
           Decision rules are predefined conditions that determine whether the trial adapts. When a

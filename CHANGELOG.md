@@ -2,31 +2,27 @@
 
 ## [4.4.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.1...v4.4.2) (2026-10-07)
 
-
 ### Bug Fixes
 
-* **mac:** ad hoc sign release app bundles ([ee9d2e2](https://github.com/SK-EMBaRCLab/batss-app/commit/ee9d2e2bc7c4be6de97b5fa62db16fe5c007019b))
-* **mac:** ad hoc sign release app bundles ([b58296d](https://github.com/SK-EMBaRCLab/batss-app/commit/b58296d4bd62830ebf8a9841ea6a1aef2fca8b40))
+- **mac:** ad hoc sign release app bundles ([ee9d2e2](https://github.com/SK-EMBaRCLab/batss-app/commit/ee9d2e2bc7c4be6de97b5fa62db16fe5c007019b))
+- **mac:** ad hoc sign release app bundles ([b58296d](https://github.com/SK-EMBaRCLab/batss-app/commit/b58296d4bd62830ebf8a9841ea6a1aef2fca8b40))
 
 ## [4.4.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.0...v4.4.1) (2026-10-02)
 
-
 ### Bug Fixes
 
-* use dependencies true for installing BATTS only ([244b427](https://github.com/SK-EMBaRCLab/batss-app/commit/244b4276907bc7f2f278782423c738a16bcc4ed0))
+- use dependencies true for installing BATTS only ([244b427](https://github.com/SK-EMBaRCLab/batss-app/commit/244b4276907bc7f2f278782423c738a16bcc4ed0))
 
 ## [4.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.1...v4.4.0) (2026-10-01)
 
-
 ### Features
 
-* change how the info panel is displayed as a side by side column instead of collapsible ([a2d036b](https://github.com/SK-EMBaRCLab/batss-app/commit/a2d036b3aad767d151ca879bb10cb1e34d1054ad))
-
+- change how the info panel is displayed as a side by side column instead of collapsible ([a2d036b](https://github.com/SK-EMBaRCLab/batss-app/commit/a2d036b3aad767d151ca879bb10cb1e34d1054ad))
 
 ### Bug Fixes
 
-* issue with installing dependences for R packages ([67128eb](https://github.com/SK-EMBaRCLab/batss-app/commit/67128eb53fdda70117d026e971a6cbd4bb5e521c))
-* show help on simulation page using sheet for small screen size ([b28516f](https://github.com/SK-EMBaRCLab/batss-app/commit/b28516f3328fb0e322f30e9c1398aaaabbf4d4fa))
+- issue with installing dependences for R packages ([67128eb](https://github.com/SK-EMBaRCLab/batss-app/commit/67128eb53fdda70117d026e971a6cbd4bb5e521c))
+- show help on simulation page using sheet for small screen size ([b28516f](https://github.com/SK-EMBaRCLab/batss-app/commit/b28516f3328fb0e322f30e9c1398aaaabbf4d4fa))
 
 ## [4.3.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.3.0...v4.3.1) (2026-09-29)
 

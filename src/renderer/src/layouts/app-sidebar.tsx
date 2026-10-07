@@ -71,7 +71,7 @@ export function AppSidebar(): ReactElement {
                 tooltip={busy === 'batch' ? 'Batch running' : 'Simulation running'}
               >
                 <Spinner />
-                <span>{busy === 'batch' ? 'Batch running' : 'Running'}</span>
+                <span>{busy === 'batch' ? 'Batch running' : 'Simulation running'}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}

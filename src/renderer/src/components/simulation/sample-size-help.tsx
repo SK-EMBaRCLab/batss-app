@@ -2,7 +2,7 @@ import { type ReactElement } from 'react'
 
 export function SampleSizeHelp(): ReactElement {
   return (
-    <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
+    <div className=" px-4 pb-4 pt-3 text-sm text-foreground/80">
       <div className="space-y-5">
         <div className="space-y-2">
           <h4 className="font-medium text-primary">Burn-in sample size</h4>
