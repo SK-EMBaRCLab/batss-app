@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.4.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.1...v4.4.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **mac:** ad hoc sign release app bundles ([ee9d2e2](https://github.com/SK-EMBaRCLab/batss-app/commit/ee9d2e2bc7c4be6de97b5fa62db16fe5c007019b))
+* **mac:** ad hoc sign release app bundles ([b58296d](https://github.com/SK-EMBaRCLab/batss-app/commit/b58296d4bd62830ebf8a9841ea6a1aef2fca8b40))
+
 ## [4.4.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.0...v4.4.1) (2026-10-02)
 
 
