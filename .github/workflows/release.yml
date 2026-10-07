@@ -60,6 +60,16 @@ jobs:
 
       - run: npm run ${{ matrix.script }}
 
+      - name: Verify macOS app signatures
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          apps=(dist/mac*/albatross.app)
+          for app in "${apps[@]}"; do
+            test -d "$app"
+            codesign --verify --deep --strict --verbose=2 "$app"
+          done
+
       - name: Upload artifacts to release
         uses: softprops/action-gh-release@v2
         with:
