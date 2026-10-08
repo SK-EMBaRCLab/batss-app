@@ -7,7 +7,8 @@ export const IPC = {
   app: {
     version: 'app:version',
     reload: 'app:reload',
-    quit: 'app:quit'
+    quit: 'app:quit',
+    setDocumentEdited: 'app:set-document-edited'
   },
   runtime: {
     check: 'runtime:check',

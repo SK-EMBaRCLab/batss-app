@@ -7,6 +7,7 @@ import { ViewErrorBoundary } from '@/components/common/view-error-boundary'
 import { WelcomeScreen } from '@/components/common/welcome-screen'
 import { views } from '@/config/views'
 import { useCommandShortcuts } from '@/hooks/use-command-shortcuts'
+import { useDocumentTitle } from '@/hooks/use-document-title'
 import { AppLayout } from '@/layouts/app-layout'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
@@ -23,6 +24,7 @@ export default function App(): ReactElement {
   const bootstrapped = useRuntime((state) => state.bootstrapped)
 
   useCommandShortcuts()
+  useDocumentTitle()
 
   useEffect(() => {
     initialize()

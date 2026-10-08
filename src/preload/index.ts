@@ -15,7 +15,8 @@ import type {
 const app = {
   version: () => ipcRenderer.invoke(IPC.app.version),
   reload: () => ipcRenderer.invoke(IPC.app.reload),
-  quit: () => ipcRenderer.invoke(IPC.app.quit)
+  quit: () => ipcRenderer.invoke(IPC.app.quit),
+  setDocumentEdited: (edited: boolean) => ipcRenderer.send(IPC.app.setDocumentEdited, edited)
 }
 
 const runtime = {
