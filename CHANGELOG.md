@@ -2,24 +2,22 @@
 
 ## [4.5.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.4...v4.5.0) (2026-10-08)
 
-
 ### Features
 
-* **app:** reflect design name and dirty state in the window title ([dcbc66b](https://github.com/SK-EMBaRCLab/batss-app/commit/dcbc66bfd86fb474b3b2a6269fb4cb03500b3759))
-
+- **app:** reflect design name and dirty state in the window title ([dcbc66b](https://github.com/SK-EMBaRCLab/batss-app/commit/dcbc66bfd86fb474b3b2a6269fb4cb03500b3759))
 
 ### Bug Fixes
 
-* **batch:** toast batch completion, cancellation, and failure ([d485af2](https://github.com/SK-EMBaRCLab/batss-app/commit/d485af2af9417bd7a534ac8d17b0d982f3b8a6c4))
-* consistency and polish pass on navigation, forms, and tables ([c8870df](https://github.com/SK-EMBaRCLab/batss-app/commit/c8870df93c75a54c5b3150d6d1d0a673e22fd411))
-* copy, labeling, and accessibility polish pass ([c3c1c4d](https://github.com/SK-EMBaRCLab/batss-app/commit/c3c1c4d0ec7e6d01a85dd140fa5da56b58e65185))
-* **design:** navigate consistently after new/load and surface save/load feedback ([3cf85f6](https://github.com/SK-EMBaRCLab/batss-app/commit/3cf85f61c189305232dad06aa7281ae697c872d5))
-* **design:** save to last known path instead of always prompting ([a4c7e14](https://github.com/SK-EMBaRCLab/batss-app/commit/a4c7e14a4fb41d4b2c59e976a31947614f1dad0b))
-* **runtime:** add re-check and download R actions to the bootstrap error screen ([c909073](https://github.com/SK-EMBaRCLab/batss-app/commit/c9090737ac540b0eb08ad17a288f13ba89f592f1))
-* **settings:** validate output folder exists before saving ([df8800c](https://github.com/SK-EMBaRCLab/batss-app/commit/df8800cea4c8f8f431b10e00a515305341f619e7))
-* **simulation:** add a distinct cancelled status for stopped runs ([fe2ac53](https://github.com/SK-EMBaRCLab/batss-app/commit/fe2ac530d8688ee860652fbd2943c7af886fcf2d))
-* **simulation:** keep the run log visible after completion or failure ([f419194](https://github.com/SK-EMBaRCLab/batss-app/commit/f41919405d6343448e3973cd1bb4c6a6ab90712d))
-* **simulation:** route Enter key through step validation instead of native form submit ([75e58b9](https://github.com/SK-EMBaRCLab/batss-app/commit/75e58b93b98c3ad720af180520ea7a72279e6cd4))
+- **batch:** toast batch completion, cancellation, and failure ([d485af2](https://github.com/SK-EMBaRCLab/batss-app/commit/d485af2af9417bd7a534ac8d17b0d982f3b8a6c4))
+- consistency and polish pass on navigation, forms, and tables ([c8870df](https://github.com/SK-EMBaRCLab/batss-app/commit/c8870df93c75a54c5b3150d6d1d0a673e22fd411))
+- copy, labeling, and accessibility polish pass ([c3c1c4d](https://github.com/SK-EMBaRCLab/batss-app/commit/c3c1c4d0ec7e6d01a85dd140fa5da56b58e65185))
+- **design:** navigate consistently after new/load and surface save/load feedback ([3cf85f6](https://github.com/SK-EMBaRCLab/batss-app/commit/3cf85f61c189305232dad06aa7281ae697c872d5))
+- **design:** save to last known path instead of always prompting ([a4c7e14](https://github.com/SK-EMBaRCLab/batss-app/commit/a4c7e14a4fb41d4b2c59e976a31947614f1dad0b))
+- **runtime:** add re-check and download R actions to the bootstrap error screen ([c909073](https://github.com/SK-EMBaRCLab/batss-app/commit/c9090737ac540b0eb08ad17a288f13ba89f592f1))
+- **settings:** validate output folder exists before saving ([df8800c](https://github.com/SK-EMBaRCLab/batss-app/commit/df8800cea4c8f8f431b10e00a515305341f619e7))
+- **simulation:** add a distinct cancelled status for stopped runs ([fe2ac53](https://github.com/SK-EMBaRCLab/batss-app/commit/fe2ac530d8688ee860652fbd2943c7af886fcf2d))
+- **simulation:** keep the run log visible after completion or failure ([f419194](https://github.com/SK-EMBaRCLab/batss-app/commit/f41919405d6343448e3973cd1bb4c6a6ab90712d))
+- **simulation:** route Enter key through step validation instead of native form submit ([75e58b9](https://github.com/SK-EMBaRCLab/batss-app/commit/75e58b93b98c3ad720af180520ea7a72279e6cd4))
 
 ## [4.4.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.3...v4.4.4) (2026-10-07)
 

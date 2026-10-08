@@ -1,5 +1,5 @@
 import { DecisionRule } from '@shared/simulation-types'
-import { type ReactElement, useMemo } from 'react'
+import { type ReactElement, useMemo, useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -16,6 +16,7 @@ type DecisionChartProps = {
   rule: DecisionRule
   value: number
   type: 'binary' | 'continuous' | 'ordinal' | undefined
+  onMarginChange?: (margin: number) => void
 }
 
 const chartConfig = {
@@ -54,7 +55,13 @@ function getChartType(type: 'binary' | 'continuous' | 'ordinal' | undefined): {
   }
 }
 
-export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactElement {
+export function DecisionChart({
+  rule,
+  value,
+  type,
+  onMarginChange
+}: DecisionChartProps): ReactElement {
+  const [isDragging, setIsDragging] = useState(false)
   const data = useMemo(() => {
     // Visual spread only — NOT the statistical SE. Scales with the
     // treatment effect itself, not with the margin: moving the
@@ -93,6 +100,19 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
 
   const chartType = getChartType(type)
 
+  // Recharts hands us the x-axis value under the cursor as
+  // `activeLabel` (since XAxis is numeric) — no manual pixel math
+  // needed to turn a mouse position into a margin value.
+  const updateMarginFromChart = (chartState: { activeLabel?: string | number }): void => {
+    if (!onMarginChange || chartState.activeLabel === undefined) return
+
+    const next = Number(chartState.activeLabel)
+    if (!Number.isFinite(next)) return
+
+    // Match the numeric input's own step="0.01" convention.
+    onMarginChange(Math.round(next * 100) / 100)
+  }
+
   return (
     <ChartContainer config={chartConfig} className="h-40 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -104,6 +124,18 @@ export function DecisionChart({ rule, value, type }: DecisionChartProps): ReactE
             left: 10,
             bottom: 10
           }}
+          style={onMarginChange ? { cursor: isDragging ? 'grabbing' : 'ew-resize' } : undefined}
+          onMouseDown={(chartState) => {
+            if (!onMarginChange) return
+            setIsDragging(true)
+            updateMarginFromChart(chartState)
+          }}
+          onMouseMove={(chartState) => {
+            if (!isDragging) return
+            updateMarginFromChart(chartState)
+          }}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseLeave={() => setIsDragging(false)}
         >
           <CartesianGrid vertical={false} className="stroke-muted" />
 

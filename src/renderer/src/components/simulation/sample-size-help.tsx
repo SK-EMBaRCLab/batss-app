@@ -18,9 +18,9 @@ export function SampleSizeHelp(): ReactElement {
           <h4 className="font-medium text-primary">Patients between interim analyses</h4>
 
           <p className="space-y-2 pl-5 leading-relaxed">
-            The number of patients enrolled analyses of the accumulating trial data. Smaller values
-            allow the trial to response more quickly to new evidence but require more frequent
-            analyses.
+            The number of patients enrolled between analyses of the accumulating trial data. Smaller
+            values allow the trial to responsd more quickly to new evidence but require more
+            frequent analyses.
           </p>
         </div>
 

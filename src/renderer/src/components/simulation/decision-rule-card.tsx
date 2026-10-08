@@ -1,6 +1,6 @@
 import { useField } from '@formisch/react'
 import type { DecisionRule } from '@shared/simulation-types'
-import { type ReactElement } from 'react'
+import { type ReactElement, useEffect, useMemo, useState } from 'react'
 
 import { decisionRuleFormula } from '@/lib/utils'
 import type { SimulationFormStore } from '@/types/form-types'
@@ -41,6 +41,13 @@ function getDecisionRule(
   }
 }
 
+type PreviewSnapshot = {
+  rule: DecisionRule
+  value: number
+  formula: string
+  type: 'binary' | 'continuous' | 'ordinal' | undefined
+}
+
 export function DecisionRuleCard({ form }: { form: SimulationFormStore }): ReactElement {
   const typeField = useField(form, { path: ['decisionRules', 0, 'type'] })
   const directionField = useField(form, { path: ['decisionRules', 0, 'direction'] })
@@ -51,11 +58,15 @@ export function DecisionRuleCard({ form }: { form: SimulationFormStore }): React
   const treatmentEffect = useField(form, { path: ['treatmentEffect'] })
   const meanDiffInput = useField(form, { path: ['meanDiff'] })
 
-  const rule = getDecisionRule(
-    typeField.input,
-    directionField.input,
-    marginField.input,
-    thresholdField.input
+  const rule = useMemo(
+    () =>
+      getDecisionRule(
+        typeField.input,
+        directionField.input,
+        marginField.input,
+        thresholdField.input
+      ),
+    [typeField.input, directionField.input, marginField.input, thresholdField.input]
   )
 
   const value =
@@ -68,6 +79,26 @@ export function DecisionRuleCard({ form }: { form: SimulationFormStore }): React
           outcomeType.input === 'continuous' ? 'meanDifference' : treatmentEffectType.input
       })
     : ''
+
+  // Keep showing the last valid preview while margin/threshold are
+  // momentarily empty (e.g. the user selected-all and is retyping a
+  // number) instead of unmounting the whole chart + formula box, which
+  // reads as "did I break something?" rather than "I'm mid-edit."
+  // Only ever read when `rule` is currently null, so the one-render
+  // lag from committing this in an effect (rather than during render)
+  // is never visible — the snapshot was already captured on the prior
+  // render, back when the fields were last valid.
+  const [lastValidPreview, setLastValidPreview] = useState<PreviewSnapshot | null>(null)
+
+  useEffect(() => {
+    if (rule) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLastValidPreview({ rule, value, formula, type: outcomeType.input })
+    }
+  }, [rule, value, formula, outcomeType.input])
+
+  const preview = rule ? { rule, value, formula, type: outcomeType.input } : lastValidPreview
+  const isStale = !rule && !!preview
 
   const handleTypeChange = (type: 'superiority' | 'futility'): void => {
     typeField.onChange(type)
@@ -95,12 +126,14 @@ export function DecisionRuleCard({ form }: { form: SimulationFormStore }): React
       </div>
       <div className="p-6">
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-          {rule && (
+          {preview && (
             <DecisionRulePreview
-              rule={rule}
-              value={value}
-              formula={formula}
-              type={outcomeType.input}
+              rule={preview.rule}
+              value={preview.value}
+              formula={preview.formula}
+              type={preview.type}
+              stale={isStale}
+              onMarginChange={(margin) => marginField.onChange(String(margin))}
             />
           )}
 

@@ -19,7 +19,7 @@ export function RunOutcomeSummary(): ReactElement | null {
       <CardHeader>
         <CardTitle>Simulated Trial Outcome Probability Summary by Scenario</CardTitle>
         <CardDescription>
-          The following table summarizes that probabilities of each trial outcome across the
+          The following table summarizes the probabilities of each trial outcome across the
           simulated scenarios. Each column represents a scenario and the probabilities of each trial
           outcome
         </CardDescription>

@@ -88,7 +88,7 @@ export function RunSummaryChart(): ReactElement | null {
           </DropdownMenu>
         </div>
         <CardDescription>
-          The following graph summarizes that probabilities of each trial outcome across the
+          The following graph summarizes the probabilities of each trial outcome across the
           simulated scenarios. Each bar represents a scenario and the probabilities of each trial
           outcome
         </CardDescription>
