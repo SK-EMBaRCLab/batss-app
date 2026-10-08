@@ -15,7 +15,7 @@ export default function About(): ReactElement {
   }, [loadAppVersion])
 
   return (
-    <div className="overflow-y-auto p-28 grid gap-6 justify-center text-center">
+    <div className="overflow-y-auto p-6 lg:p-16 grid gap-6 justify-center text-center">
       <AboutHeader />
       <h3>R Packages status:</h3>
       <AboutPackages />

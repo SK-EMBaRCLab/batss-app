@@ -2,6 +2,7 @@ import { Pencil } from 'lucide-react'
 import { type ReactElement, useCallback, useState } from 'react'
 
 import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 export function EditableInPlaceInput({
@@ -57,17 +58,23 @@ export function EditableInPlaceInput({
   }
 
   return (
-    <button
-      type="button"
-      onClick={startEditing}
-      className={cn(
-        'group/rename flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
-        className
-      )}
-      title={title}
-    >
-      <span className="max-w-56 truncate">{name}</span>
-      <Pencil className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/rename:opacity-100" />
-    </button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            onClick={startEditing}
+            className={cn(
+              'group/rename flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
+              className
+            )}
+          >
+            <span className="max-w-56 truncate">{name}</span>
+            <Pencil className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/rename:opacity-100" />
+          </button>
+        }
+      />
+      <TooltipContent>{title}</TooltipContent>
+    </Tooltip>
   )
 }

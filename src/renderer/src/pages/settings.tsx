@@ -96,7 +96,7 @@ export default function Settings(): ReactElement {
   }
 
   return (
-    <div className="p-28">
+    <div className="p-6 lg:p-16">
       <h1 className="text-xl font-semibold">Settings</h1>
 
       <p className="text-muted-foreground mt-2">
@@ -108,7 +108,7 @@ export default function Settings(): ReactElement {
           <ItemContent>
             <ItemTitle>Color Scheme</ItemTitle>
             <ItemDescription>
-              Choose wether Albatross follows the system, light, or dark theme.
+              Choose whether Albatross follows the system, light, or dark theme.
             </ItemDescription>
           </ItemContent>
           <ItemActions>

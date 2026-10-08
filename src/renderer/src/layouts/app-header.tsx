@@ -6,6 +6,7 @@ import { HeaderOverflowMenu } from '@/components/common/header-overflow-menu'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { initialDesignInput } from '@/lib/schema'
 import { formatShortcut } from '@/lib/utils'
 import { useCommandPalette } from '@/stores/command-palette'
@@ -41,7 +42,12 @@ export function AppHeader(): ReactElement {
               onRename={renameDesign}
               title="Rename study design"
             />
-            {isDirty && <span className="size-2 rounded-full bg-primary" title="Unsaved changes" />}
+            {isDirty && (
+              <Tooltip>
+                <TooltipTrigger render={<span className="size-2 rounded-full bg-primary" />} />
+                <TooltipContent>Unsaved changes</TooltipContent>
+              </Tooltip>
+            )}
           </>
         )}
       </div>

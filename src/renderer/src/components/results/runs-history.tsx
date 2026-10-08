@@ -41,11 +41,12 @@ export function RunsHistory(): ReactElement | null {
         <div className="flex flex-col gap-2 pr-4">
           {[...list].reverse().map((entry) => {
             const Icon = outcomeTypes.find((type) => type.value === entry.input.outcomeType)?.icon
+            const isSelected = entry.id === selectedEntry?.id
             return (
               <Item
                 key={entry.id}
                 render={
-                  <a href="#">
+                  <button type="button" className="w-full text-left" aria-current={isSelected}>
                     <ItemMedia variant="icon">
                       {entry.result.status === 'success' ? (
                         <ShieldCheckIcon className="text-green-700 dark:text-green-200" />
@@ -66,10 +67,10 @@ export function RunsHistory(): ReactElement | null {
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions>{Icon ? <Icon /> : null}</ItemActions>
-                  </a>
+                  </button>
                 }
-                variant={entry.id === selectedEntry?.id ? 'outline' : 'muted'}
-                className={cn('border-border', entry.id === selectedEntry?.id && 'border-primary')}
+                variant={isSelected ? 'outline' : 'muted'}
+                className={cn('border-border hover:bg-muted', isSelected && 'border-primary')}
                 onClick={() => selectResult(entry.id)}
               />
             )
