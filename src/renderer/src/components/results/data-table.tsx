@@ -2,6 +2,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
   type ColumnVisibilityState,
+  type Row,
   type SortingState,
   useTable
 } from '@tanstack/react-table'
@@ -70,7 +71,19 @@ export function DataTable<TData extends DataTableRow>({
     }
   })
 
-  function selectRow(row): void {
+  // While nothing is checked, a row click drills straight into that
+  // result. Once the user has started checking rows to compare (the
+  // "View Results" multi-select flow in the toolbar), a plain row
+  // click toggles that row's checkbox instead of discarding the
+  // in-progress selection by navigating away.
+  function selectRow(row: Row<DataTableFeatures, TData>): void {
+    const hasSelection = table.getSelectedRowModel().rows.length > 0
+
+    if (hasSelection) {
+      row.toggleSelected()
+      return
+    }
+
     selectResult(row.original.id)
     selectResults([row.original.id])
     navigate('results')

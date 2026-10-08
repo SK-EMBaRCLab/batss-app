@@ -32,7 +32,6 @@ export function AppHeader(): ReactElement {
     <header className="flex h-14 overflow-hidden items-center border-b px-4 text-foreground">
       <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger />
-        {/* <AppBreadcrumb /> */}
 
         {design && (
           <>
@@ -59,7 +58,7 @@ export function AppHeader(): ReactElement {
             Load
           </Button>
 
-          {design && isDirty && (
+          {design && (
             <Button variant="secondary" size="sm" onClick={saveDesign} disabled={!isDirty}>
               <Save />
               Save

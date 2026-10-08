@@ -60,6 +60,9 @@ export function DataTableToolbar<TData extends DataTableRow>({
           </InputGroupAddon>
           <InputGroupAddon align="inline-end">{resultCount} results</InputGroupAddon>
         </InputGroup>
+        <span className="hidden text-xs text-muted-foreground sm:inline">
+          Click a row to open it, or check rows to compare them.
+        </span>
         {table.getColumn('outcomeType') && (
           <DataTableFacetedFilter column={table.getColumn('outcomeType')} title="Outcome Type" />
         )}

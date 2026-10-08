@@ -19,9 +19,13 @@ import { downloadCsv, parseCsvFile } from '@/lib/csv'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
+import { useNavigation } from '@/stores/navigation'
 
 export default function Batch(): ReactElement {
   const design = useDesign((s) => s.design)
+  const selectResult = useDesign((s) => s.selectResult)
+  const selectResults = useDesign((s) => s.selectResults)
+  const navigate = useNavigation((s) => s.navigate)
 
   const [fileName, setFileName] = useState<string | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
@@ -57,6 +61,8 @@ export default function Batch(): ReactElement {
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0]
+    const input = event.target
+
     if (!file) return
 
     setParseError(null)
@@ -75,6 +81,9 @@ export default function Batch(): ReactElement {
     } catch (error) {
       setParseError(error instanceof Error ? error.message : 'Failed to parse CSV')
       setValidations([])
+    } finally {
+      // Reset so re-selecting the exact same file still fires onChange.
+      input.value = ''
     }
   }
 
@@ -191,7 +200,9 @@ export default function Batch(): ReactElement {
         <Card className="min-h-0 flex-1">
           <CardHeader>
             <CardTitle>Batch Results</CardTitle>
-            <CardDescription>{entries.length} run(s) completed so far.</CardDescription>
+            <CardDescription>
+              {entries.length} run(s) completed so far. Click a row to view its full results.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="min-h-0 overflow-auto">
@@ -205,23 +216,41 @@ export default function Batch(): ReactElement {
               </TableHeader>
 
               <TableBody>
-                {entries.map((entry) => (
-                  <TableRow key={entry.rowIndex}>
-                    <TableCell>{entry.rowIndex + 1}</TableCell>
-                    <TableCell>
-                      {entry.result.status === 'success'
-                        ? 'Success'
-                        : entry.result.status === 'cancelled'
-                          ? 'Cancelled'
-                          : 'Error'}
-                    </TableCell>
-                    <TableCell>
-                      {entry.result.status === 'success'
-                        ? `BATSS v${entry.result.package}`
-                        : entry.result.message}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {entries.map((entry) => {
+                  // BatchRunEntry doesn't carry the id design.appendResult()
+                  // generated for it — correlate by createdAt, which
+                  // stores/batch.ts passes through unchanged.
+                  const match = design?.results.find(
+                    (result) => result.createdAt === entry.createdAt
+                  )
+
+                  return (
+                    <TableRow
+                      key={entry.rowIndex}
+                      onClick={() => {
+                        if (!match) return
+                        selectResult(match.id)
+                        selectResults([match.id])
+                        navigate('results')
+                      }}
+                      className={match ? 'cursor-pointer hover:bg-muted/50' : undefined}
+                    >
+                      <TableCell>{entry.rowIndex + 1}</TableCell>
+                      <TableCell>
+                        {entry.result.status === 'success'
+                          ? 'Success'
+                          : entry.result.status === 'cancelled'
+                            ? 'Cancelled'
+                            : 'Error'}
+                      </TableCell>
+                      <TableCell>
+                        {entry.result.status === 'success'
+                          ? `BATSS v${entry.result.package}`
+                          : entry.result.message}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </CardContent>

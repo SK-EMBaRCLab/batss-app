@@ -58,7 +58,7 @@ export function DecisionRuleFields({
           <SelectContent>
             <SelectItem value="superiority">Superiority</SelectItem>
             <SelectItem value="futility" disabled>
-              Futility
+              Futility (under development)
             </SelectItem>
           </SelectContent>
         </Select>
