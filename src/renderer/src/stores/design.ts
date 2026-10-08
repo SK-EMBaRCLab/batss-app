@@ -4,6 +4,8 @@ import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
 
+import { useNavigation } from './navigation'
+
 function makeId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()
@@ -74,6 +76,11 @@ export const useDesign = create<DesignState>((set, get) => {
       set({ design, filePath: null, selectedResultId: null, selectedResults: null })
 
       setDirty(true)
+
+      // Always land on the wizard for a new design, regardless of
+      // whether this came from the Welcome screen, the header button,
+      // or the command palette/⌘N.
+      useNavigation.getState().navigate('simulation')
     },
 
     renameDesign: (name) => {
@@ -110,20 +117,26 @@ export const useDesign = create<DesignState>((set, get) => {
       const { design, filePath } = get()
       if (!design) return true
 
-      const result = await window.design.saveResult(design, filePath ?? undefined)
+      try {
+        const result = await window.design.saveResult(design, filePath ?? undefined)
 
-      if (!result.saved) {
+        if (!result.saved) {
+          return false
+        }
+
+        set({ filePath: result.filePath ?? null })
+        setDirty(false)
+        toast.add({ type: 'success', description: `Design saved: ${design.name}` })
+
+        return true
+      } catch (error) {
+        toast.add({
+          type: 'error',
+          title: 'Save failed',
+          description: error instanceof Error ? error.message : 'Could not save the design file.'
+        })
         return false
       }
-
-      set({ filePath: result.filePath ?? null })
-      setDirty(false)
-      toast.add({
-        type: 'success',
-        description: `Design saved ${design.name}`
-      })
-
-      return true
     },
 
     // Always shows the picker, regardless of a remembered path.
@@ -131,15 +144,24 @@ export const useDesign = create<DesignState>((set, get) => {
       const { design } = get()
       if (!design) return true
 
-      const result = await window.design.saveResult(design)
+      try {
+        const result = await window.design.saveResult(design)
 
-      if (!result.saved) return false
+        if (!result.saved) return false
 
-      set({ filePath: result.filePath ?? null })
-      setDirty(false)
-      toast.add({ type: 'success', description: `Design saved ${design.name}` })
+        set({ filePath: result.filePath ?? null })
+        setDirty(false)
+        toast.add({ type: 'success', description: `Design saved: ${design.name}` })
 
-      return true
+        return true
+      } catch (error) {
+        toast.add({
+          type: 'error',
+          title: 'Save failed',
+          description: error instanceof Error ? error.message : 'Could not save the design file.'
+        })
+        return false
+      }
     },
 
     loadDesign: async () => {
@@ -157,6 +179,10 @@ export const useDesign = create<DesignState>((set, get) => {
       })
 
       setDirty(false)
+      toast.add({ type: 'success', description: `Design loaded: ${loaded.design.name}` })
+
+      // Always land on Dashboard after a load, regardless of entry point.
+      useNavigation.getState().navigate('dashboard')
 
       return true
     },

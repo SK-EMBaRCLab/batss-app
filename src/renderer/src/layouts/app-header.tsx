@@ -7,12 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { initialDesignInput } from '@/lib/schema'
+import { formatShortcut } from '@/lib/utils'
 import { useCommandPalette } from '@/stores/command-palette'
 import { useDesign } from '@/stores/design'
-import { useNavigation } from '@/stores/navigation'
 
 export function AppHeader(): ReactElement {
-  const navigate = useNavigation((state) => state.navigate)
   const design = useDesign((s) => s.design)
   const renameDesign = useDesign((s) => s.renameDesign)
   const newDesign = useDesign((s) => s.newDesign)
@@ -23,14 +22,10 @@ export function AppHeader(): ReactElement {
 
   const handleNew = async (): Promise<void> => {
     await newDesign(initialDesignInput)
-    navigate('dashboard')
   }
 
   const handleLoad = async (): Promise<void> => {
-    const isLoaded = await loadDesign()
-    if (isLoaded) {
-      navigate('results')
-    }
+    await loadDesign()
   }
 
   return (
@@ -77,7 +72,9 @@ export function AppHeader(): ReactElement {
 
           <span className="hidden xl:inline">Search</span>
 
-          <kbd className="hidden xl:inline pointer-events-none font-mono text-xs">⌘K</kbd>
+          <kbd className="hidden xl:inline pointer-events-none font-mono text-xs">
+            {formatShortcut('mod+k')}
+          </kbd>
         </Button>
 
         <div className="lg:hidden">

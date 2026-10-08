@@ -7,18 +7,16 @@ import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/fie
 import { Input } from '@/components/ui/input'
 import { initialDesignInput } from '@/lib/schema'
 import { useDesign } from '@/stores/design'
-import { useNavigation } from '@/stores/navigation'
 
 export function WelcomeScreen(): ReactElement {
   const newDesign = useDesign((s) => s.newDesign)
   const loadDesign = useDesign((s) => s.loadDesign)
-  const navigate = useNavigation((s) => s.navigate)
 
   const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleNew = (): void => {
+  const handleNew = async (): Promise<void> => {
     const trimmed = name.trim()
 
     if (!trimmed) {
@@ -26,17 +24,14 @@ export function WelcomeScreen(): ReactElement {
       return
     }
 
-    newDesign(initialDesignInput, trimmed)
-    navigate('simulation')
+    await newDesign(initialDesignInput, trimmed)
   }
+
   const handleLoad = async (): Promise<void> => {
     setIsLoading(true)
 
     try {
-      const loaded = await loadDesign()
-      if (loaded) {
-        navigate('dashboard')
-      }
+      await loadDesign()
     } finally {
       setIsLoading(false)
     }
@@ -71,7 +66,7 @@ export function WelcomeScreen(): ReactElement {
                   if (error) setError(null)
                 }}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter') handleNew()
+                  if (event.key === 'Enter') void handleNew()
                 }}
                 aria-invalid={!!error}
                 autoFocus
@@ -83,7 +78,11 @@ export function WelcomeScreen(): ReactElement {
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" className="h-24 flex-col gap-2" onClick={handleNew}>
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => void handleNew()}
+            >
               <FilePlus2 className="h-6 w-6" />
               New Study Design
             </Button>
@@ -91,7 +90,7 @@ export function WelcomeScreen(): ReactElement {
             <Button
               variant="outline"
               className="h-24 flex-col gap-2"
-              onClick={handleLoad}
+              onClick={() => void handleLoad()}
               disabled={isLoading}
             >
               <FolderOpen className="h-6 w-6" />
