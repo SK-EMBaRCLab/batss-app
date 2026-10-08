@@ -165,6 +165,18 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       onSubmit={(e) => {
         handleSubmit(e)
       }}
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter') return
+
+        // Let Enter insert newlines in multi-line fields normally.
+        if ((event.target as HTMLElement).tagName === 'TEXTAREA') return
+
+        // Always route Enter through the same validate-then-advance
+        // path as the Next/Run button, instead of letting the browser
+        // decide whether to implicitly submit the native <form>.
+        event.preventDefault()
+        void handlePrimaryAction()
+      }}
       className="flex h-full min-h-0 flex-col"
     >
       <div className="shrink-0 pb-6">
