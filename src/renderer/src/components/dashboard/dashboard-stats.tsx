@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleAlert, Clock, Package, SquareStack } from 'lucide-react'
+import { CheckCircle2, CircleAlert, Clock, SquareStack } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import {
@@ -21,7 +21,7 @@ export function DashboardStats(): ReactElement | null {
   const latestRun = design.results.at(-1)
 
   return (
-    <ItemGroup className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <ItemGroup className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Item variant="outline" size="sm">
         <ItemMedia variant="icon">
           <SquareStack />
@@ -53,18 +53,6 @@ export function DashboardStats(): ReactElement | null {
         <ItemContent>
           <ItemDescription>Last Run</ItemDescription>
           <ItemTitle>{latestRun ? new Date(latestRun.createdAt).toLocaleString() : '—'}</ItemTitle>
-        </ItemContent>
-      </Item>
-
-      <Item variant="outline" size="sm">
-        <ItemMedia variant="icon">
-          <Package />
-        </ItemMedia>
-        <ItemContent>
-          <ItemDescription>BATSS Version</ItemDescription>
-          <ItemTitle>
-            {latestRun?.result.status === 'success' ? `v${latestRun.result.package}` : '—'}
-          </ItemTitle>
         </ItemContent>
       </Item>
     </ItemGroup>
