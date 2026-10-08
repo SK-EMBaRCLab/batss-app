@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { toast } from '@/components/ui/toast'
 import { Theme, useTheme } from '@/stores/theme'
 
 const items: { label: string; value: Theme }[] = [
@@ -67,6 +68,13 @@ export default function Settings(): ReactElement {
     try {
       await window.settings.setOutputPath(outputPath)
       setIsDirty(false)
+      toast.add({ type: 'success', description: 'Output folder updated.' })
+    } catch (error) {
+      toast.add({
+        type: 'error',
+        title: 'Could not save',
+        description: error instanceof Error ? error.message : 'Please try again.'
+      })
     } finally {
       setIsSaving(false)
     }

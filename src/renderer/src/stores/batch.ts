@@ -7,6 +7,7 @@ import type {
 import { describeBusy } from '@shared/engine-types'
 import { create } from 'zustand'
 
+import { toast } from '@/components/ui/toast'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 
 import { useDesign } from './design'
@@ -71,6 +72,14 @@ export const useBatch = create<BatchState>((set) => ({
         completed: final.completed,
         total: final.total
       })
+
+      if (final.status === 'done') {
+        toast.add({ type: 'success', title: 'Batch finished', description: final.message })
+      } else if (final.status === 'cancelled') {
+        toast.add({ type: 'info', title: 'Batch cancelled', description: final.message })
+      } else if (final.status === 'error') {
+        toast.add({ type: 'error', title: 'Batch failed', description: final.message })
+      }
     } finally {
       unsubscribeUpdate()
       unsubscribeRow()
