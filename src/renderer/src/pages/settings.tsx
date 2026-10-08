@@ -3,7 +3,13 @@ import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
 import {
@@ -28,6 +34,7 @@ export default function Settings(): ReactElement {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
+  const [pathError, setPathError] = useState<string | null>(null)
 
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
@@ -59,14 +66,22 @@ export default function Settings(): ReactElement {
     if (selected) {
       setOutputPath(selected)
       setIsDirty(true)
+      setPathError(null)
     }
   }
 
   const handleSave = async (): Promise<void> => {
     setIsSaving(true)
+    setPathError(null)
 
     try {
-      await window.settings.setOutputPath(outputPath)
+      const result = await window.settings.setOutputPath(outputPath)
+
+      if (!result.saved) {
+        setPathError(result.error ?? 'Could not save this folder.')
+        return
+      }
+
       setIsDirty(false)
       toast.add({ type: 'success', description: 'Output folder updated.' })
     } catch (error) {
@@ -124,7 +139,7 @@ export default function Settings(): ReactElement {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <Field orientation="responsive">
+            <Field data-invalid={!!pathError} orientation="responsive">
               <FieldContent>
                 <FieldLabel htmlFor="output-path">Output folder</FieldLabel>
 
@@ -135,10 +150,12 @@ export default function Settings(): ReactElement {
                     onChange={(event) => {
                       setOutputPath(event.target.value)
                       setIsDirty(true)
+                      if (pathError) setPathError(null)
                     }}
                     disabled={isLoading}
                     placeholder="Select a folder"
                     autoComplete="off"
+                    aria-invalid={!!pathError}
                   />
 
                   <Button
@@ -155,6 +172,8 @@ export default function Settings(): ReactElement {
                 <FieldDescription>
                   {isDirty ? 'Unsaved changes.' : 'Files created by Albatross are written here.'}
                 </FieldDescription>
+
+                {pathError && <FieldError>{pathError}</FieldError>}
               </FieldContent>
             </Field>
 

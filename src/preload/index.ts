@@ -5,6 +5,7 @@ import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/b
 import { EngineState } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
+import { SetOutputPathResult } from '../shared/settings-types'
 import type {
   SimulationRunInput,
   SimulationRunResult,
@@ -100,7 +101,7 @@ const theme = {
 const settings = {
   getOutputPath: (): Promise<string> => ipcRenderer.invoke(IPC.settings.getOutputPath),
 
-  setOutputPath: (outputPath: string): Promise<string> =>
+  setOutputPath: (outputPath: string): Promise<SetOutputPathResult> =>
     ipcRenderer.invoke(IPC.settings.setOutputPath, outputPath),
 
   selectOutputDirectory: (): Promise<string | null> =>

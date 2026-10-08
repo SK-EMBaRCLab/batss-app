@@ -1,6 +1,8 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { existsSync, statSync } from 'fs'
 
 import { IPC } from '../../shared/ipc-channels'
+import type { SetOutputPathResult } from '../../shared/settings-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
@@ -10,10 +12,24 @@ export function registerSettingsIPC(): void {
     return settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath())
   })
 
-  ipcMain.handle(IPC.settings.setOutputPath, (_event, outputPath: string) => {
-    settingsService.set(OUTPUT_PATH_KEY, outputPath)
+  ipcMain.handle(IPC.settings.setOutputPath, (_event, outputPath: string): SetOutputPathResult => {
+    const trimmed = outputPath.trim()
 
-    return outputPath
+    if (!trimmed) {
+      return { saved: false, error: 'Enter a folder path.' }
+    }
+
+    if (!existsSync(trimmed)) {
+      return { saved: false, error: 'This folder does not exist.' }
+    }
+
+    if (!statSync(trimmed).isDirectory()) {
+      return { saved: false, error: 'This path is a file, not a folder.' }
+    }
+
+    settingsService.set(OUTPUT_PATH_KEY, trimmed)
+
+    return { saved: true }
   })
 
   ipcMain.handle(IPC.settings.selectOutputDirectory, async (event) => {
