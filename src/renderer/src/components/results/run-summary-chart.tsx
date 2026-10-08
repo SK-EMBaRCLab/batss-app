@@ -42,7 +42,7 @@ export function RunSummaryChart(): ReactElement | null {
 
   const result = selectedEntry?.result
 
-  if (!result || result.status === 'error') {
+  if (!result || result.status !== 'success') {
     return null
   }
 

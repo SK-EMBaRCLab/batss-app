@@ -1,4 +1,4 @@
-import { ShieldAlertIcon, ShieldCheckIcon } from 'lucide-react'
+import { ShieldAlertIcon, ShieldCheckIcon, ShieldOffIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import {
@@ -48,7 +48,9 @@ export function RunsHistory(): ReactElement | null {
                   <a href="#">
                     <ItemMedia variant="icon">
                       {entry.result.status === 'success' ? (
-                        <ShieldCheckIcon className="text-green-700  dark:text-green-200" />
+                        <ShieldCheckIcon className="text-green-700 dark:text-green-200" />
+                      ) : entry.result.status === 'cancelled' ? (
+                        <ShieldOffIcon className="text-muted-foreground" />
                       ) : (
                         <ShieldAlertIcon className="text-destructive" />
                       )}
@@ -56,7 +58,11 @@ export function RunsHistory(): ReactElement | null {
                     <ItemContent>
                       <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
                       <ItemDescription>
-                        {entry.result.status === 'success' ? 'Success' : 'Error'}
+                        {entry.result.status === 'success'
+                          ? 'Success'
+                          : entry.result.status === 'cancelled'
+                            ? 'Cancelled'
+                            : 'Error'}
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions>{Icon ? <Icon /> : null}</ItemActions>

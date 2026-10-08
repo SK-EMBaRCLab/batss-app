@@ -208,7 +208,13 @@ export default function Batch(): ReactElement {
                 {entries.map((entry) => (
                   <TableRow key={entry.rowIndex}>
                     <TableCell>{entry.rowIndex + 1}</TableCell>
-                    <TableCell>{entry.result.status === 'success' ? 'Success' : 'Error'}</TableCell>
+                    <TableCell>
+                      {entry.result.status === 'success'
+                        ? 'Success'
+                        : entry.result.status === 'cancelled'
+                          ? 'Cancelled'
+                          : 'Error'}
+                    </TableCell>
                     <TableCell>
                       {entry.result.status === 'success'
                         ? `BATSS v${entry.result.package}`

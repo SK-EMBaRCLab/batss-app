@@ -10,7 +10,7 @@ export function RunSampleSizeSummary(): ReactElement | null {
 
   const result = selectedEntry?.result
 
-  if (!result || result.status === 'error') {
+  if (!result || result.status !== 'success') {
     return null
   }
 

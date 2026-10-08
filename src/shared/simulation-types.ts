@@ -64,6 +64,10 @@ export type SimulationRunResult =
       status: 'error'
       message: string
     }
+  | {
+      status: 'cancelled'
+      message: string
+    }
 
 /** A single simulation run recorded against a StudyDesign. */
 export interface SimulationResultEntry {

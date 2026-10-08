@@ -2,11 +2,10 @@
 
 ## [4.4.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.3...v4.4.4) (2026-10-07)
 
-
 ### Bug Fixes
 
-* scroll area scrollbars not showing ([3b3ba67](https://github.com/SK-EMBaRCLab/batss-app/commit/3b3ba670fe6b95b88ff830de6a6c06cc093accc4))
-* scrolling bug on results page as well as save button ([6b975be](https://github.com/SK-EMBaRCLab/batss-app/commit/6b975bef5467fd345e762cfae6385f291c54d401))
+- scroll area scrollbars not showing ([3b3ba67](https://github.com/SK-EMBaRCLab/batss-app/commit/3b3ba670fe6b95b88ff830de6a6c06cc093accc4))
+- scrolling bug on results page as well as save button ([6b975be](https://github.com/SK-EMBaRCLab/batss-app/commit/6b975bef5467fd345e762cfae6385f291c54d401))
 
 ## [4.4.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.2...v4.4.3) (2026-10-07)
 

@@ -19,5 +19,16 @@ export function RunError(): ReactElement | null {
     )
   }
 
+  if (result?.status === 'cancelled') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Simulation Cancelled</CardTitle>
+        </CardHeader>
+        <CardContent className="text-muted-foreground">{result.message}</CardContent>
+      </Card>
+    )
+  }
+
   return null
 }

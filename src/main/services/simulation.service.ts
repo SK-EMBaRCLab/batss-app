@@ -41,6 +41,18 @@ function getSimulationScriptPath(): string {
   return path.join(process.cwd(), 'resources', 'r', 'batss-simulation.R')
 }
 
+// `abortActive()` always passes a reason ending in "cancelled by
+// user" (see its call sites here and in batch.service.ts) — a timeout
+// abort (r-manager.ts) uses a distinct "R process timed out…"
+// message, so this check only matches genuine user cancellations.
+function isUserCancelled(error: unknown): error is Error {
+  return (
+    error instanceof Error &&
+    error.name === 'AbortError' &&
+    error.message.endsWith('cancelled by user')
+  )
+}
+
 export class SimulationService {
   private readonly r = rManager
 
@@ -140,6 +152,10 @@ export class SimulationService {
       )
       return JSON.parse(await readFile(outputPath, 'utf8')) as SimulationRunResult
     } catch (error) {
+      if (isUserCancelled(error)) {
+        return { status: 'cancelled', message: error.message }
+      }
+
       return {
         status: 'error',
         message: error instanceof Error ? error.message : 'Simulation run failed'
