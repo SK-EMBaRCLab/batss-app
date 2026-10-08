@@ -1,6 +1,7 @@
-import { CheckCircle2, CircleAlert, Loader2 } from 'lucide-react'
+import { CheckCircle2, CircleAlert, ExternalLink, Loader2, RefreshCw } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatDuration } from '@/lib/utils'
@@ -31,34 +32,20 @@ function useElapsedSeconds(active: boolean): number {
 
 export function RuntimeScreen(): ReactElement {
   const status = useRuntime((state) => state.status)
-
   const message = useRuntime((state) => state.message)
-
   const progress = useRuntime((state) => state.progress)
-
   const logs = useRuntime((state) => state.logs)
+  const checkRuntime = useRuntime((state) => state.checkRuntime)
 
   const isChecking = status === 'checking'
-
   const isInstalling = status === 'installing'
-
   const isReady = status === 'ready'
-
   const isError = status === 'error'
 
   const elapsed = useElapsedSeconds(isChecking || isInstalling)
 
   return (
-    <div
-      className="
-      flex
-      min-h-screen
-      items-center
-      justify-center
-      bg-background
-      p-6
-    "
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Albatross</CardTitle>
@@ -67,54 +54,18 @@ export function RuntimeScreen(): ReactElement {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <div
-            className="
-            flex
-            justify-center
-          "
-          >
+          <div className="flex justify-center">
             {(isChecking || isInstalling) && (
-              <Loader2
-                className="
-                  h-10
-                  w-10
-                  animate-spin
-                  text-primary
-                "
-              />
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
             )}
 
-            {isReady && (
-              <CheckCircle2
-                className="
-                  h-10
-                  w-10
-                  text-green-500
-                "
-              />
-            )}
+            {isReady && <CheckCircle2 className="h-10 w-10 text-green-500" />}
 
-            {isError && (
-              <CircleAlert
-                className="
-                  h-10
-                  w-10
-                  text-destructive
-                "
-              />
-            )}
+            {isError && <CircleAlert className="h-10 w-10 text-destructive" />}
           </div>
 
           <div className="space-y-2">
-            <div
-              className="
-              text-center
-              text-sm
-              text-muted-foreground
-            "
-            >
-              {message}
-            </div>
+            <div className="text-center text-sm text-muted-foreground">{message}</div>
 
             {(isChecking || isInstalling) && (
               <div className="text-center text-xs text-muted-foreground">
@@ -127,18 +78,26 @@ export function RuntimeScreen(): ReactElement {
           </div>
 
           {isError && (
-            <div
-              className="
-              rounded-md
-              border
-              border-destructive/50
-              bg-destructive/10
-              p-3
-              text-sm
-              text-destructive
-            "
-            >
-              R and BATSS are required to run simulations.
+            <div className="space-y-3">
+              <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                R and BATSS are required to run simulations. Make sure R is installed and try again,
+                or check the log below for details.
+              </div>
+
+              <div className="flex justify-center gap-2">
+                <Button onClick={() => checkRuntime()}>
+                  <RefreshCw className="mr-2 size-4" />
+                  Re-check
+                </Button>
+
+                <Button
+                  variant="outline"
+                  render={<a href="https://rig.r-lib.org/" target="_blank" rel="noreferrer" />}
+                >
+                  <ExternalLink className="mr-2 size-4" />
+                  Download R using rig
+                </Button>
+              </div>
             </div>
           )}
 
