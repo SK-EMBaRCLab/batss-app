@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
 
-import electronLogo from '@/assets/electron.svg'
+import albatrossMark from '@/assets/albatross-mark.svg'
 import {
   Sidebar,
   SidebarContent,
@@ -30,7 +30,7 @@ export function AppSidebar(): ReactElement {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Albatross">
               <img
-                src={electronLogo}
+                src={albatrossMark}
                 alt="Albatross"
                 className="size-12 rounded-lg object-contain"
               />
