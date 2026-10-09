@@ -21,7 +21,10 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { toast } from '@/components/ui/toast'
+import { updateButtonLabel } from '@/lib/update-label'
+import { useRuntime } from '@/stores/runtime'
 import { Theme, useTheme } from '@/stores/theme'
+import { useUpdate } from '@/stores/update'
 
 const items: { label: string; value: Theme }[] = [
   { label: 'Light', value: 'light' },
@@ -38,6 +41,15 @@ export default function Settings(): ReactElement {
 
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
+
+  const appVersion = useRuntime((state) => state.appVersion)
+  const loadAppVersion = useRuntime((state) => state.loadAppVersion)
+
+  const updateStatus = useUpdate((state) => state.status)
+  const updateProgress = useUpdate((state) => state.progress)
+  const checkForAppUpdate = useUpdate((state) => state.check)
+  const installAppUpdate = useUpdate((state) => state.install)
+  const isBusyCheckingForAppUpdate = updateStatus === 'checking' || updateStatus === 'downloading'
 
   const handleThemeChange = (value: Theme | null): void => {
     if (value) {
@@ -59,6 +71,10 @@ export default function Settings(): ReactElement {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    loadAppVersion()
+  }, [loadAppVersion])
 
   const handleBrowse = async (): Promise<void> => {
     const selected = await window.settings.selectOutputDirectory()
@@ -126,6 +142,25 @@ export default function Settings(): ReactElement {
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+          <ItemContent>
+            <ItemTitle>Software Updates</ItemTitle>
+            <ItemDescription>
+              {appVersion ? `You're on version ${appVersion}.` : 'Check for a newer version.'}
+            </ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Button
+              onClick={() =>
+                updateStatus === 'downloaded' ? installAppUpdate() : checkForAppUpdate()
+              }
+              disabled={isBusyCheckingForAppUpdate}
+            >
+              {updateButtonLabel(updateStatus, updateProgress)}
+            </Button>
           </ItemActions>
         </Item>
 
