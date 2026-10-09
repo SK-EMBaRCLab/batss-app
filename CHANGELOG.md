@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.7.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.6.0...v4.7.0) (2026-10-09)
+
+
+### Features
+
+* **settings:** add a Check for Updates control to the Settings page ([ffb544d](https://github.com/SK-EMBaRCLab/batss-app/commit/ffb544d14db9de7d138c8c07f38d0cdd39d4bc7e))
+
+
+### Bug Fixes
+
+* **ui:** close command palette before running a command ([564aa7c](https://github.com/SK-EMBaRCLab/batss-app/commit/564aa7cf8e83c0dbf2d6e2de55c741f289213fdb))
+
 ## [4.6.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.5.0...v4.6.0) (2026-10-09)
 
 ### Features
