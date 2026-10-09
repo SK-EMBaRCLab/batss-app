@@ -42,9 +42,15 @@ export function CommandPalette(): ReactElement {
                     key={command.id}
                     disabled={!enabled}
                     onSelect={() => {
-                      if (enabled) {
-                        command.action()
-                      }
+                      if (!enabled) return
+
+                      // Close first — otherwise the dialog's backdrop
+                      // (re-mounted fresh each time it opens) ends up
+                      // stacked above feedback like toasts that the
+                      // command triggers, hiding them until the
+                      // palette is closed.
+                      setOpen(false)
+                      command.action()
                     }}
                   >
                     {Icon && <Icon className="mr-2 h-4 w-4" />}
