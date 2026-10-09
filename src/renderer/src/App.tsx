@@ -14,6 +14,7 @@ import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
 import { useRuntime } from '@/stores/runtime'
 import { useTheme } from '@/stores/theme'
+import { useUpdate } from '@/stores/update'
 
 export default function App(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
@@ -21,6 +22,7 @@ export default function App(): ReactElement {
   const initialize = useRuntime((state) => state.initialize)
   const initializeTheme = useTheme((state) => state.initialize)
   const initializeEngine = useEngine((s) => s.initialize)
+  const initializeUpdate = useUpdate((s) => s.initialize)
   const bootstrapped = useRuntime((state) => state.bootstrapped)
 
   useCommandShortcuts()
@@ -30,7 +32,8 @@ export default function App(): ReactElement {
     initialize()
     initializeTheme()
     initializeEngine()
-  }, [initialize, initializeEngine, initializeTheme])
+    initializeUpdate()
+  }, [initialize, initializeEngine, initializeTheme, initializeUpdate])
 
   useEffect(() => {
     const cleanup = window.design.onSaveRequested(async () => {

@@ -11,6 +11,7 @@ import type {
   SimulationRunResult,
   StudyDesign
 } from '../shared/simulation-types'
+import type { UpdateState } from '../shared/update-types'
 
 const app = {
   version: () => ipcRenderer.invoke(IPC.app.version),
@@ -155,6 +156,24 @@ const engine = {
   }
 }
 
+const update = {
+  get: (): Promise<UpdateState> => ipcRenderer.invoke(IPC.update.get),
+
+  // User-initiated only — nothing calls this automatically on launch.
+  check: (): Promise<void> => ipcRenderer.invoke(IPC.update.check),
+
+  install: (): Promise<void> => ipcRenderer.invoke(IPC.update.install),
+
+  onStatus: (callback: (state: UpdateState) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, state: UpdateState): void =>
+      callback(state)
+    ipcRenderer.on(IPC.update.status, listener)
+    return (): void => {
+      ipcRenderer.removeListener(IPC.update.status, listener)
+    }
+  }
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('app', app)
@@ -165,6 +184,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('settings', settings)
     contextBridge.exposeInMainWorld('batch', batch)
     contextBridge.exposeInMainWorld('engine', engine)
+    contextBridge.exposeInMainWorld('update', update)
   } catch (error) {
     console.error(error)
   }
@@ -180,5 +200,6 @@ declare global {
     settings: typeof settings
     batch: typeof batch
     engine: typeof engine
+    update: typeof update
   }
 }

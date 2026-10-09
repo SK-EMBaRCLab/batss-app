@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppBanner } from '@/layouts/app-banner'
 import { AppHeader } from '@/layouts/app-header'
 import { AppSidebar } from '@/layouts/app-sidebar'
+import { UpdateBanner } from '@/layouts/update-banner'
 
 export function AppLayout({ children }: { children: React.ReactNode }): ReactElement {
   return (
@@ -16,6 +17,7 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
         <AppHeader />
 
         <AppBanner />
+        <UpdateBanner />
 
         <main className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
           <TooltipProvider>{children}</TooltipProvider>

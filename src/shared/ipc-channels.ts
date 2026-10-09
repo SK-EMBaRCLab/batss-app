@@ -48,5 +48,11 @@ export const IPC = {
   engine: {
     get: 'engine:get',
     state: 'engine:state'
+  },
+  update: {
+    check: 'update:check',
+    install: 'update:install',
+    get: 'update:get',
+    status: 'update:status'
   }
 } as const
