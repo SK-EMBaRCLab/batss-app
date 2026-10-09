@@ -2,18 +2,16 @@
 
 ## [4.6.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.5.0...v4.6.0) (2026-10-09)
 
-
 ### Features
 
-* **branding:** replace stock Electron placeholders with an Albatross mark ([bd55279](https://github.com/SK-EMBaRCLab/batss-app/commit/bd5527992288b7616a328f287bbb99b98da5dbd9))
-* **runtime:** redesign the first-run setup screen for non-technical users ([28ba2aa](https://github.com/SK-EMBaRCLab/batss-app/commit/28ba2aaf03668684bf34e09861ba2751ec714863))
-* **simulation:** make the decision rule chart interactive and fix a disappearing-preview bug ([d73ae8a](https://github.com/SK-EMBaRCLab/batss-app/commit/d73ae8acea60bb8e35389da44102100108764982))
-* **updates:** replace launch-time auto-update with a user-triggered check ([886822a](https://github.com/SK-EMBaRCLab/batss-app/commit/886822a99b3e8f15510689976079674b92b5487a))
-
+- **branding:** replace stock Electron placeholders with an Albatross mark ([bd55279](https://github.com/SK-EMBaRCLab/batss-app/commit/bd5527992288b7616a328f287bbb99b98da5dbd9))
+- **runtime:** redesign the first-run setup screen for non-technical users ([28ba2aa](https://github.com/SK-EMBaRCLab/batss-app/commit/28ba2aaf03668684bf34e09861ba2751ec714863))
+- **simulation:** make the decision rule chart interactive and fix a disappearing-preview bug ([d73ae8a](https://github.com/SK-EMBaRCLab/batss-app/commit/d73ae8acea60bb8e35389da44102100108764982))
+- **updates:** replace launch-time auto-update with a user-triggered check ([886822a](https://github.com/SK-EMBaRCLab/batss-app/commit/886822a99b3e8f15510689976079674b92b5487a))
 
 ### Bug Fixes
 
-* **dashboard:** remove Batts version from dashboard ([96c744a](https://github.com/SK-EMBaRCLab/batss-app/commit/96c744a5fd6adfb8655bf6357e3cad0340460dc2))
+- **dashboard:** remove Batts version from dashboard ([96c744a](https://github.com/SK-EMBaRCLab/batss-app/commit/96c744a5fd6adfb8655bf6357e3cad0340460dc2))
 
 ## [4.5.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.4.4...v4.5.0) (2026-10-08)
 
