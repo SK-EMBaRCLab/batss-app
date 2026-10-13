@@ -1,17 +1,30 @@
+# Must happen before `library(INLA)` — these are read by Intel MKL
+# (and OpenMP/OpenBLAS, depending on the installed INLA binary variant)
+# at load/first-use time, not re-read later. `inla.setOption(num.threads
+# = "1:1")` below only constrains GMRFLib's own thread pool; it does
+# NOT stop MKL's BLAS/LAPACK routines from spawning their own internal
+# threads for dense linear algebra, which they do by default (typically
+# one per logical core). Confirmed via `ps`: with only num.threads set,
+# individual `inla.mkl` worker processes were observed using 150-460%
+# CPU each, despite `-t1:1` being passed on their command line — i.e.
+# every "single-threaded" BATSS worker was quietly multithreading
+# anyway. With `mc.cores` workers already saturating the machine at the
+# outer level, that's severe oversubscription on top of oversubscription.
+Sys.setenv(
+  MKL_NUM_THREADS = "1",
+  OMP_NUM_THREADS = "1",
+  OPENBLAS_NUM_THREADS = "1"
+)
+
 library(BATSS)
 library(INLA)
 
 Sys.setenv(R_LIBS_USER = Sys.getenv("R_LIBS_USER"))
 
-# BATSS already parallelises across simulated trials below (one
-# process per replicate, via `mc.cores`), so each individual INLA fit
-# only ever needs to run single-threaded. Letting INLA also multithread
-# internally would oversubscribe the machine on top of that outer
-# parallelism, and INLA's own thread auto-detection is unreliable in
-# constrained/containerised environments (cgroup CPU limits vs.
-# /proc/cpuinfo) — one of the most common causes of "the inla-program
-# exited with an error" with no further detail. Forcing it here side-
-# steps that whole class of failure on every platform, not just Docker.
+# Belt-and-suspenders alongside the env vars above: constrains
+# GMRFLib's own outer/inner thread pool (see the main project
+# discussion for what these control) to 1 thread per worker process, on
+# top of the BLAS-level limits already set.
 inla.setOption(num.threads = "1:1")
 
 # logit is a helper function
