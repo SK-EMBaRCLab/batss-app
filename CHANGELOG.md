@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.7.0...v4.8.0) (2026-10-13)
+
+
+### Features
+
+* **update:** auto-check for updates on launch ([84d7f75](https://github.com/SK-EMBaRCLab/batss-app/commit/84d7f751a87b0be979b50b6bd657bb846ee9bd85))
+
 ## [4.7.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.6.0...v4.7.0) (2026-10-09)
 
 ### Features
