@@ -24,16 +24,48 @@ import { simulationService } from './services/simulation.service'
 let mainWindow: BrowserWindow | null = null
 let forceClose = false
 
-if (process.platform === 'linux') {
-  app.commandLine.appendSwitch('ozone-platform', 'x11')
-}
-
 // These software-rendering switches exist for the headless Docker dev
 // environment (see docker-compose.yml: DISPLAY/ELECTRON_DISABLE_GPU/
 // LIBGL_ALWAYS_SOFTWARE), where no real GPU is available. They should
 // NOT be applied on native installs — forcing swiftshader there just
 // disables hardware acceleration for no reason.
 const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1'
+
+// Electron 38+ defaults to Wayland on Linux, and the
+// ELECTRON_OZONE_PLATFORM_HINT env var that used to force X11 was
+// removed in that same release. Forcing X11 via
+// app.commandLine.appendSwitch() alone isn't reliably honored by the
+// GPU process on every Wayland setup — what actually works is a real
+// `--ozone-platform=x11` process argument, the same as launching with
+// `./Albatross.AppImage --ozone-platform=x11` by hand. That matters
+// here because electron-updater's AppImage restart
+// (AppImageUpdater.doInstall, in electron-updater) always relaunches
+// with an empty argv, silently dropping that flag and breaking
+// "Restart & Install" on Linux. Rather than requiring users to pass
+// the flag manually (or patching electron-updater), self-relaunch
+// once with it baked into real argv whenever it's missing — this
+// covers a plain launch and the post-update restart the same way.
+const OZONE_X11_FLAG = '--ozone-platform=x11'
+
+if (
+  process.platform === 'linux' &&
+  !isHeadlessContainer &&
+  !process.argv.includes(OZONE_X11_FLAG)
+) {
+  // Prefer the .AppImage entrypoint (the same file electron-updater
+  // itself execs) over process.execPath, which inside an AppImage
+  // points into a FUSE mount this process shouldn't be relied on to
+  // outlive.
+  const execPath = process.env.APPIMAGE
+
+  app.relaunch({
+    args: [...process.argv.slice(1), OZONE_X11_FLAG],
+    ...(execPath ? { execPath } : {})
+  })
+  app.exit(0)
+} else if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('ozone-platform', 'x11')
+}
 
 if (isHeadlessContainer) {
   app.disableHardwareAcceleration()

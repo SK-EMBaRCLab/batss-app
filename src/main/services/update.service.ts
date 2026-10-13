@@ -29,7 +29,12 @@ type Listener = (state: UpdateState) => void
  *    electron-builder.yml) are managed by the OS package
  *    manager/snapd instead; checkForUpdates() will error out for
  *    those, which — again — just surfaces as a normal error state with
- *    the GitHub releases fallback.
+ *    the GitHub releases fallback. The AppImage restart itself always
+ *    relaunches with an empty argv (see AppImageUpdater.doInstall in
+ *    electron-updater), which drops the `--ozone-platform=x11` flag
+ *    some Wayland setups need — see the self-relaunch guard in
+ *    src/main/index.ts, which re-adds it on every launch including
+ *    this one.
  */
 class UpdateService {
   private state: UpdateState = { status: 'idle', message: '' }
