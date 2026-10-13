@@ -4,6 +4,16 @@ type SimulationRunCommon = {
   m: number
   R: number
   decisionRules: DecisionRule[]
+
+  /**
+   * Percentage of the machine's detected CPU cores to use for BATSS's
+   * replicate-level parallelism (`mc.cores`). Resolved to an actual
+   * core count in the main process (see simulation.service.ts), since
+   * only Node knows `os.cpus().length` — R never needs to detect it
+   * itself. Optional for backward compatibility with designs saved
+   * before this setting existed.
+   */
+  corePercent?: 25 | 50 | 75 | 100
 }
 
 type BinarySimulationRunInput = {
@@ -93,6 +103,8 @@ export type DesignInput = {
   m: number
   R: number
   decisionRules: DecisionRule[]
+
+  corePercent?: 25 | 50 | 75 | 100
 }
 
 /**

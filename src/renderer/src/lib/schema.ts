@@ -59,7 +59,9 @@ const commonDesignFields = {
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
     v.minLength(1, 'Add at least one decision rule.')
-  )
+  ),
+
+  corePercent: v.optional(v.picklist([25, 50, 75, 100], 'Select a core usage percentage.'))
 }
 
 const binaryDesignSchema = v.object({
@@ -154,7 +156,9 @@ const runnableCommonSchema = {
 
   R: positiveInteger('Number of simulations'),
 
-  decisionRules: v.array(decisionRuleSchema)
+  decisionRules: v.array(decisionRuleSchema),
+
+  corePercent: v.optional(v.picklist([25, 50, 75, 100]))
 }
 
 const runnableBinarySchema = v.object({
@@ -221,5 +225,7 @@ export const initialDesignInput: DesignInput = {
 
   R: 10,
 
-  decisionRules: [defaultDecisionRule]
+  decisionRules: [defaultDecisionRule],
+
+  corePercent: 75
 }

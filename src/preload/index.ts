@@ -17,7 +17,8 @@ const app = {
   version: () => ipcRenderer.invoke(IPC.app.version),
   reload: () => ipcRenderer.invoke(IPC.app.reload),
   quit: () => ipcRenderer.invoke(IPC.app.quit),
-  setDocumentEdited: (edited: boolean) => ipcRenderer.send(IPC.app.setDocumentEdited, edited)
+  setDocumentEdited: (edited: boolean) => ipcRenderer.send(IPC.app.setDocumentEdited, edited),
+  cpuCount: (): Promise<number> => ipcRenderer.invoke(IPC.app.cpuCount)
 }
 
 const runtime = {

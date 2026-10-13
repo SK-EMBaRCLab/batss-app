@@ -1,10 +1,18 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
+import os from 'os'
 
 import { IPC } from '../../shared/ipc-channels'
 
 export function registerAppIPC(): void {
   ipcMain.handle(IPC.app.version, () => {
     return app.getVersion()
+  })
+
+  // Lets the renderer show real core counts next to the "% of cores"
+  // advanced-settings slider (e.g. "75% — 6 of 8 cores") instead of an
+  // abstract percentage. os.cpus() is Node-only, hence the round trip.
+  ipcMain.handle(IPC.app.cpuCount, () => {
+    return os.cpus().length
   })
 
   ipcMain.handle(IPC.app.reload, () => {

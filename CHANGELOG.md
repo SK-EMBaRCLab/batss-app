@@ -2,10 +2,9 @@
 
 ## [4.8.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.8.0...v4.8.1) (2026-10-13)
 
-
 ### Bug Fixes
 
-* **linux:** self-relaunch with --ozone-platform=x11 so it isn't needed manually ([545013e](https://github.com/SK-EMBaRCLab/batss-app/commit/545013e45a8ef98400ca30db99419b49609bdd71))
+- **linux:** self-relaunch with --ozone-platform=x11 so it isn't needed manually ([545013e](https://github.com/SK-EMBaRCLab/batss-app/commit/545013e45a8ef98400ca30db99419b49609bdd71))
 
 ## [4.8.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.7.0...v4.8.0) (2026-10-13)
 

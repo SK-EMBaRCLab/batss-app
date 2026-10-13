@@ -18,6 +18,26 @@ const BATSS_OUTPUT_ENV = 'ALBATROSS_BATSS_OUTPUT'
 // restarting the app.
 const SIMULATION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
 
+// Used when a design was saved before the "% of cores" advanced
+// setting existed, so `input.corePercent` is undefined.
+const DEFAULT_CORE_PERCENT = 75
+
+// Resolves the "% of cores" advanced setting to an actual worker count
+// for BATSS's `mc.cores`. Only Node knows the real core count
+// (os.cpus()), so this happens here rather than in R — see
+// batss-simulation.R, which forces INLA's own internal threading to
+// "1:1" and relies entirely on this value for parallelism, to avoid
+// oversubscribing the machine with two independent layers of threads.
+function resolveCores(corePercent: number | undefined, replicates: number): number {
+  const totalCores = os.cpus().length
+  const percent = corePercent ?? DEFAULT_CORE_PERCENT
+  const requested = Math.round((totalCores * percent) / 100)
+
+  // Never spawn more workers than there are Monte Carlo replicates —
+  // anything beyond `R` would just sit idle.
+  return Math.max(1, Math.min(requested, replicates))
+}
+
 // resources/** is asarUnpack'd (see electron-builder.yml), so in a
 // packaged build the real, directly-openable file lives next to
 // app.asar (under app.asar.unpacked), not inside it. Rscript is an
@@ -139,12 +159,20 @@ export class SimulationService {
 
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
     const outputPath = path.join(tmpDir, 'result.json')
+    const cores = resolveCores(input.corePercent, input.R)
 
     try {
       await this.r.executeFile(
         getSimulationScriptPath(),
         {
-          [BATSS_INPUT_ENV]: JSON.stringify({ ...input, alternative, family, link, varY }),
+          [BATSS_INPUT_ENV]: JSON.stringify({
+            ...input,
+            alternative,
+            family,
+            link,
+            varY,
+            cores
+          }),
           [BATSS_OUTPUT_ENV]: outputPath
         },
         onOutput,

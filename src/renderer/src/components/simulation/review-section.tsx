@@ -1,9 +1,14 @@
 import { useField } from '@formisch/react'
-import { Fragment, type ReactElement } from 'react'
+import { ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { Fragment, type ReactElement, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { decisionRuleSummary, type DesignSnapshot, fieldsFor } from '@/lib/design-fields'
 import type { SimulationFormStore } from '@/types/form-types'
+
+import { CoreUsageField } from './core-usage-field'
 
 type ReviewItem = [label: string, value: string | number | undefined]
 
@@ -23,6 +28,7 @@ function ReviewList({ items }: { items: ReviewItem[] }): ReactElement {
 }
 
 export function ReviewSection({ form }: { form: SimulationFormStore }): ReactElement {
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const outcomeType = useField(form, { path: ['outcomeType'] })
   const probability = useField(form, { path: ['probability'] })
   const treatmentEffectType = useField(form, { path: ['treatmentEffectType'] })
@@ -95,6 +101,34 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
             <div className="font-mono">{decisionRuleSummary(snapshot)}</div>
           </div>
         </CardContent>
+      </Card>
+
+      <Card>
+        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              Advanced Settings
+            </CardTitle>
+
+            <CollapsibleTrigger
+              render={
+                <Button variant="ghost" size="icon">
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
+                  />
+                  <span className="sr-only">Toggle advanced settings</span>
+                </Button>
+              }
+            ></CollapsibleTrigger>
+          </CardHeader>
+
+          <CollapsibleContent>
+            <CardContent>
+              <CoreUsageField form={form} />
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
     </div>
   )

@@ -8,7 +8,8 @@ export const IPC = {
     version: 'app:version',
     reload: 'app:reload',
     quit: 'app:quit',
-    setDocumentEdited: 'app:set-document-edited'
+    setDocumentEdited: 'app:set-document-edited',
+    cpuCount: 'app:cpu-count'
   },
   runtime: {
     check: 'runtime:check',

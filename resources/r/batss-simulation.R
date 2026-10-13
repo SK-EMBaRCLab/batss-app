@@ -3,16 +3,16 @@ library(INLA)
 
 Sys.setenv(R_LIBS_USER = Sys.getenv("R_LIBS_USER"))
 
-# Fix: INLA's automatic thread-count detection frequently
-# misreads what's actually available inside a container (cgroup
-# CPU limits vs. /proc/cpuinfo), which is one of the most common
-# causes of "the inla-program exited with an error" with no
-# further detail. Forcing a single thread sidesteps that whole
-# class of failure.
-# Docker only
-if (file.exists("/.dockerenv")) {
-  inla.setOption(num.threads = "1:1")
-}
+# BATSS already parallelises across simulated trials below (one
+# process per replicate, via `mc.cores`), so each individual INLA fit
+# only ever needs to run single-threaded. Letting INLA also multithread
+# internally would oversubscribe the machine on top of that outer
+# parallelism, and INLA's own thread auto-detection is unreliable in
+# constrained/containerised environments (cgroup CPU limits vs.
+# /proc/cpuinfo) — one of the most common causes of "the inla-program
+# exited with an error" with no further detail. Forcing it here side-
+# steps that whole class of failure on every platform, not just Docker.
+inla.setOption(num.threads = "1:1")
 
 # logit is a helper function
 logit <- function(p) {
@@ -77,7 +77,12 @@ trials <- batss.glm(
   ),
   R = input$R,
   extended = 2,
-  computation = "parallel"
+  computation = "parallel",
+  # Resolved from the "% of cores" advanced setting in the Electron
+  # main process (which is the only side that knows the real core
+  # count); 3 mirrors BATSS's own built-in default as a fallback for
+  # older callers that don't send it.
+  mc.cores = if (!is.null(input$cores)) input$cores else 3
 )
 
 summary1 <- summary(trials)
