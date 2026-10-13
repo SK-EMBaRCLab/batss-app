@@ -1,4 +1,5 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { spawn } from 'child_process'
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron'
 import { join } from 'path'
 
@@ -47,21 +48,43 @@ const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1'
 // covers a plain launch and the post-update restart the same way.
 const OZONE_X11_FLAG = '--ozone-platform=x11'
 
+// Guards the real startup further down (app.whenReady()/app.on(...))
+// so this process does nothing but bridge to the relaunched one.
+let isRelaunching = false
+
 if (
   process.platform === 'linux' &&
   !isHeadlessContainer &&
   !process.argv.includes(OZONE_X11_FLAG)
 ) {
+  isRelaunching = true
+
   // Deliberately relaunch process.execPath (the binary already
   // running out of this session's FUSE mount) rather than re-exec'ing
   // process.env.APPIMAGE — launching the .AppImage file again forces
   // a brand new FUSE mount, which fails outright on systems where
   // mounting is restricted outside of a normal interactive launch
   // (e.g. AppArmor's unprivileged-userns restrictions on newer
-  // Ubuntu). Reusing the existing mount means there's nothing new to
-  // mount at all.
-  app.relaunch({ args: [...process.argv.slice(1), OZONE_X11_FLAG] })
-  app.exit(0)
+  // Ubuntu).
+  //
+  // Spawning it ourselves (rather than app.relaunch(), which is
+  // fire-and-forget) and delaying app.exit() a moment matters for the
+  // same FUSE mount: an AppImage's mount isn't guaranteed to outlive
+  // the process that first launched it, so exiting immediately (as
+  // app.relaunch() + app.exit(0) does) risked killing this process —
+  // and whatever owns the mount along with it — before the new
+  // process had even finished loading its native modules and reading
+  // resources out of the mounted app bundle. That race is what caused
+  // the self-relaunch to silently produce no window at all instead of
+  // an error. Giving it a couple of seconds to get going first trades
+  // a slightly slower launch for an actually-reliable one.
+  const relaunched = spawn(process.execPath, [...process.argv.slice(1), OZONE_X11_FLAG], {
+    detached: true,
+    stdio: 'ignore'
+  })
+  relaunched.unref()
+
+  setTimeout(() => app.exit(0), 2000)
 } else if (process.platform === 'linux') {
   app.commandLine.appendSwitch('ozone-platform', 'x11')
 }
@@ -188,60 +211,67 @@ function createWindow(): void {
   })
 }
 
-app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.albatross.app')
+// Skipped entirely while isRelaunching: this process is just a brief
+// bridge keeping the AppImage's FUSE mount alive for the relaunched
+// instance above (see the ozone-platform block) — it should never
+// open its own window or register IPC handlers that'd fight with the
+// real instance for the same resources.
+if (!isRelaunching) {
+  app.whenReady().then(() => {
+    electronApp.setAppUserModelId('com.albatross.app')
 
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
+    app.on('browser-window-created', (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+    })
+
+    registerAppIPC()
+
+    registerRuntimeIPC()
+
+    registerSettingsIPC()
+
+    registerAlbatrossFilesIPC()
+
+    registerBatchIPC()
+
+    registerEngineIPC()
+
+    registerSimulationIPC()
+
+    registerThemeIPC()
+
+    registerUpdateIPC()
+
+    ipcMain.on(IPC.design.closeConfirmed, () => {
+      clearUnsavedDesignChanges()
+
+      forceClose = true
+
+      mainWindow?.close()
+    })
+
+    app.setName('albatross')
+
+    createWindow()
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow()
+      }
+    })
   })
 
-  registerAppIPC()
-
-  registerRuntimeIPC()
-
-  registerSettingsIPC()
-
-  registerAlbatrossFilesIPC()
-
-  registerBatchIPC()
-
-  registerEngineIPC()
-
-  registerSimulationIPC()
-
-  registerThemeIPC()
-
-  registerUpdateIPC()
-
-  ipcMain.on(IPC.design.closeConfirmed, () => {
-    clearUnsavedDesignChanges()
-
-    forceClose = true
-
-    mainWindow?.close()
-  })
-
-  app.setName('albatross')
-
-  createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
     }
   })
-})
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-// Kill any in-flight R work before the process exits. Rscript now runs
-// detached in its own process group (see RManager.runProcess), so without
-// this a running simulation would outlive the app.
-app.on('before-quit', () => {
-  batchService.cancel()
-  simulationService.cancel()
-})
+  // Kill any in-flight R work before the process exits. Rscript now runs
+  // detached in its own process group (see RManager.runProcess), so without
+  // this a running simulation would outlive the app.
+  app.on('before-quit', () => {
+    batchService.cancel()
+    simulationService.cancel()
+  })
+}
