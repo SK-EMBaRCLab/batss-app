@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.9.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.0...v4.9.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **simulation:** force MKL/OpenMP to single-threaded in INLA workers ([b2f2fdd](https://github.com/SK-EMBaRCLab/batss-app/commit/b2f2fdd93aa38adcd7f4717b0fefc8c0269f474f))
+* **simulation:** force MKL/OpenMP to single-threaded in INLA workers ([ec3da76](https://github.com/SK-EMBaRCLab/batss-app/commit/ec3da7693b3210bd7f273cfc3b77c493f8df28e1))
+
 ## [4.9.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.8.1...v4.9.0) (2026-10-13)
 
 
