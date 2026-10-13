@@ -14,17 +14,20 @@ export function UpdateBanner(): ReactElement | null {
   const message = useUpdate((state) => state.message)
   const version = useUpdate((state) => state.version)
   const error = useUpdate((state) => state.error)
+  const silent = useUpdate((state) => state.silent)
   const install = useUpdate((state) => state.install)
 
   const [dismissedKey, setDismissedKey] = useState<string | null>(null)
 
   // "You're up to date" is a one-off confirmation, not something that
-  // needs to sit around as a persistent banner.
+  // needs to sit around as a persistent banner. Suppressed for the
+  // automatic launch check — only a user-triggered check should hear
+  // "nothing to do here".
   useEffect(() => {
-    if (status === 'not-available') {
+    if (status === 'not-available' && !silent) {
       toast.add({ type: 'success', description: message || "You're up to date." })
     }
-  }, [status, message])
+  }, [status, message, silent])
 
   if (status === 'available' || status === 'downloading') {
     return (
@@ -57,6 +60,11 @@ export function UpdateBanner(): ReactElement | null {
   }
 
   if (status === 'error') {
+    // The automatic launch check fails on its own on platforms that
+    // can't self-update (see update.service.ts) — don't greet users
+    // with an error banner every time they open the app for that.
+    if (silent) return null
+
     const key = `error:${error}`
     if (dismissedKey === key) return null
 

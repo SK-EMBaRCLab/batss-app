@@ -159,8 +159,9 @@ const engine = {
 const update = {
   get: (): Promise<UpdateState> => ipcRenderer.invoke(IPC.update.get),
 
-  // User-initiated only — nothing calls this automatically on launch.
-  check: (): Promise<void> => ipcRenderer.invoke(IPC.update.check),
+  // `silent` distinguishes the automatic launch check (no "up to
+  // date"/error feedback) from a user clicking "Check for Updates".
+  check: (silent?: boolean): Promise<void> => ipcRenderer.invoke(IPC.update.check, silent),
 
   install: (): Promise<void> => ipcRenderer.invoke(IPC.update.install),
 

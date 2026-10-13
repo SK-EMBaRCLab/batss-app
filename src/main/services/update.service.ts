@@ -5,8 +5,14 @@ import type { UpdateState } from '../../shared/update-types'
 type Listener = (state: UpdateState) => void
 
 /**
- * Wraps electron-updater so update checks are something the user
- * triggers (a button), not something that happens silently on launch.
+ * Wraps electron-updater. A silent check runs once automatically on
+ * launch (see check(true) in the renderer's update store) so users
+ * learn about new releases without visiting Settings — if it finds
+ * one, the normal banner/download/"Restart & Install" flow takes over.
+ * Launch checks stay quiet when there's nothing to report (no "up to
+ * date" toast, no error banner); only an explicit, user-triggered
+ * check surfaces those. Installing always requires the user to click
+ * "Restart & Install".
  *
  * Platform notes (see also the README's packaging section):
  *  - Windows (NSIS): fully supported — differential download + silent
@@ -30,6 +36,12 @@ class UpdateService {
   private readonly listeners = new Set<Listener>()
   private initialized = false
 
+  // Tracks whether the in-flight check was the automatic launch check
+  // or a user clicking a "Check for Updates" button, so every event it
+  // produces (checking → available/not-available → ... ) can carry the
+  // same silent flag through to the renderer.
+  private silentCheck = false
+
   init(): void {
     if (this.initialized) return
     this.initialized = true
@@ -41,7 +53,11 @@ class UpdateService {
     autoUpdater.autoInstallOnAppQuit = false
 
     autoUpdater.on('checking-for-update', () => {
-      this.set({ status: 'checking', message: 'Checking for updates…' })
+      this.set({
+        status: 'checking',
+        message: 'Checking for updates…',
+        silent: this.silentCheck
+      })
     })
 
     autoUpdater.on('update-available', (info) => {
@@ -49,12 +65,17 @@ class UpdateService {
         status: 'available',
         message: `Update ${info.version} found — downloading…`,
         version: info.version,
-        progress: 0
+        progress: 0,
+        silent: this.silentCheck
       })
     })
 
     autoUpdater.on('update-not-available', () => {
-      this.set({ status: 'not-available', message: "You're up to date." })
+      this.set({
+        status: 'not-available',
+        message: "You're up to date.",
+        silent: this.silentCheck
+      })
     })
 
     autoUpdater.on('download-progress', (progress) => {
@@ -62,7 +83,8 @@ class UpdateService {
         status: 'downloading',
         message: `Downloading update… ${Math.round(progress.percent)}%`,
         version: this.state.version,
-        progress: progress.percent
+        progress: progress.percent,
+        silent: this.silentCheck
       })
     })
 
@@ -71,7 +93,8 @@ class UpdateService {
         status: 'downloaded',
         message: `Update ${info.version} ready to install`,
         version: info.version,
-        progress: 100
+        progress: 100,
+        silent: this.silentCheck
       })
     })
 
@@ -79,7 +102,8 @@ class UpdateService {
       this.set({
         status: 'error',
         message: 'Update check failed',
-        error: err instanceof Error ? err.message : String(err)
+        error: err instanceof Error ? err.message : String(err),
+        silent: this.silentCheck
       })
     })
   }
@@ -88,7 +112,9 @@ class UpdateService {
     return this.state
   }
 
-  async check(): Promise<void> {
+  async check(silent = false): Promise<void> {
+    this.silentCheck = silent
+
     try {
       await autoUpdater.checkForUpdates()
     } catch (error) {
@@ -98,7 +124,8 @@ class UpdateService {
       this.set({
         status: 'error',
         message: 'Update check failed',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
+        silent
       })
     }
   }

@@ -8,7 +8,7 @@ export function registerUpdateIPC(): void {
 
   ipcMain.handle(IPC.update.get, () => updateService.get())
 
-  ipcMain.handle(IPC.update.check, () => updateService.check())
+  ipcMain.handle(IPC.update.check, (_event, silent?: boolean) => updateService.check(silent))
 
   ipcMain.handle(IPC.update.install, () => updateService.install())
 
