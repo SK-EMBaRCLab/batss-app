@@ -76,11 +76,20 @@ const simulationRunResultFileSchema = v.union([
     sampleSize: v.object({
       H0: sampleSizeScenarioFileSchema,
       H1: sampleSizeScenarioFileSchema
-    })
+    }),
+    durationMs: v.optional(v.number())
   }),
   v.object({
     status: v.literal('error'),
-    message: v.string()
+    message: v.string(),
+    durationMs: v.optional(v.number())
+  }),
+  // Was missing until now — a saved design with a cancelled run would
+  // fail to load at all, since nothing in the union matched it.
+  v.object({
+    status: v.literal('cancelled'),
+    message: v.string(),
+    durationMs: v.optional(v.number())
   })
 ])
 

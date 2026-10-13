@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { outcomeTypes } from '@/lib/design-options'
-import { cn } from '@/lib/utils'
+import { cn, formatDurationLabel } from '@/lib/utils'
 import { useDesign, useSelectedEntry } from '@/stores/design'
 
 export function RunsHistory(): ReactElement | null {
@@ -64,6 +64,8 @@ export function RunsHistory(): ReactElement | null {
                           : entry.result.status === 'cancelled'
                             ? 'Cancelled'
                             : 'Error'}
+                        {entry.result.durationMs != null &&
+                          ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions>{Icon ? <Icon /> : null}</ItemActions>

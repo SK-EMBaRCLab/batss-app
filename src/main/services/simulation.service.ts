@@ -127,6 +127,7 @@ export class SimulationService {
   ): Promise<SimulationRunResult> {
     const controller = new AbortController()
     this.activeRun = { controller }
+    const startedAt = Date.now()
 
     const alternative = input.decisionRules[0]?.direction ?? 'greater'
 
@@ -178,15 +179,24 @@ export class SimulationService {
         onOutput,
         { signal: controller.signal, timeoutMs: SIMULATION_TIMEOUT_MS }
       )
-      return JSON.parse(await readFile(outputPath, 'utf8')) as SimulationRunResult
+      // batss-simulation.R has no concept of durationMs — it's ours to
+      // attach, measured around the whole Rscript invocation above.
+      // (Not `Omit<SimulationRunResult, 'durationMs'>` here: Omit over
+      // a discriminated union collapses it down to the keys common to
+      // every branch, losing the status-based narrowing.)
+      const parsed = JSON.parse(await readFile(outputPath, 'utf8')) as SimulationRunResult
+      return { ...parsed, durationMs: Date.now() - startedAt }
     } catch (error) {
+      const durationMs = Date.now() - startedAt
+
       if (isUserCancelled(error)) {
-        return { status: 'cancelled', message: error.message }
+        return { status: 'cancelled', message: error.message, durationMs }
       }
 
       return {
         status: 'error',
-        message: error instanceof Error ? error.message : 'Simulation run failed'
+        message: error instanceof Error ? error.message : 'Simulation run failed',
+        durationMs
       }
     } finally {
       this.activeRun = null

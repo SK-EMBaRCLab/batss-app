@@ -12,6 +12,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { formatDurationLabel } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 
@@ -73,6 +74,8 @@ export function DashboardRecentRuns({
                   {entry.result.status === 'success'
                     ? `BATSS v${entry.result.package}`
                     : entry.result.message}
+                  {entry.result.durationMs != null &&
+                    ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
                 </ItemDescription>
               </ItemContent>
               <ItemActions>

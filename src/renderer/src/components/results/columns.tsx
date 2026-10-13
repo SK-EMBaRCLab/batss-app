@@ -4,6 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import { fieldsFor } from '@/lib/design-fields'
+import { formatDurationLabel } from '@/lib/utils'
 
 import { EmptyCell } from '../table/empty-cell'
 import { renderCellValue } from '../table/render-cell-value'
@@ -76,6 +77,23 @@ export const columns = columnHelper.columns([
         dateStyle: 'medium',
         timeStyle: 'short'
       })
+    }
+  }),
+  columnHelper.accessor('result.durationMs', {
+    id: 'duration',
+    meta: {
+      label: 'Duration'
+    },
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Duration" />
+    },
+    cell: ({ getValue }) => {
+      const durationMs = getValue()
+      return durationMs == null ? (
+        <EmptyCell state="not-applicable" />
+      ) : (
+        formatDurationLabel(durationMs / 1000)
+      )
     }
   }),
   columnHelper.accessor('input.outcomeType', {

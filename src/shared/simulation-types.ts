@@ -62,7 +62,7 @@ export interface SimulationChartRow {
   Proportion: number
 }
 
-export type SimulationRunResult =
+export type SimulationRunResult = (
   | {
       status: 'success'
       package: string
@@ -78,6 +78,15 @@ export type SimulationRunResult =
       status: 'cancelled'
       message: string
     }
+) & {
+  /**
+   * Wall-clock time the run took, in milliseconds — set in
+   * simulation.service.ts's execute() around the Rscript invocation.
+   * Optional so results saved by older app versions (before this
+   * field existed) still load.
+   */
+  durationMs?: number
+}
 
 /** A single simulation run recorded against a StudyDesign. */
 export interface SimulationResultEntry {

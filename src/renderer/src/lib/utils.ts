@@ -7,6 +7,10 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
+// Stopwatch-style M:SS/H:MM:SS, for a live, ticking "Elapsed" counter
+// next to a label that already says what it is. As a bare value (e.g.
+// a table cell with nothing else around it), 0:39 reads ambiguously —
+// use formatDurationLabel below for those spots instead.
 export function formatDuration(seconds: number): string {
   const totalSeconds = Math.floor(seconds)
 
@@ -21,6 +25,27 @@ export function formatDuration(seconds: number): string {
   }
 
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
+
+// Unambiguous, unit-labeled duration for a run that already finished
+// (table cells, history lists) — "39s", "3m 45s", "1h 5m 12s" — so it
+// reads correctly with no surrounding context needed.
+export function formatDurationLabel(seconds: number): string {
+  const totalSeconds = Math.max(0, Math.round(seconds))
+
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const remainingSeconds = totalSeconds % 60
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${remainingSeconds}s`
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m ${remainingSeconds}s`
+  }
+
+  return `${remainingSeconds}s`
 }
 
 export function formatShortcut(binding: string): string {

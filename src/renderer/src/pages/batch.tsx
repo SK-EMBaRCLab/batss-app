@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table'
 import { buildBatchValidations, buildTemplateCsv } from '@/lib/batch-mapper'
 import { downloadCsv, parseCsvFile } from '@/lib/csv'
+import { formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
@@ -211,6 +212,7 @@ export default function Batch(): ReactElement {
                 <TableRow>
                   <TableHead>Row</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Duration</TableHead>
                   <TableHead>Detail</TableHead>
                 </TableRow>
               </TableHeader>
@@ -242,6 +244,11 @@ export default function Batch(): ReactElement {
                           : entry.result.status === 'cancelled'
                             ? 'Cancelled'
                             : 'Error'}
+                      </TableCell>
+                      <TableCell>
+                        {entry.result.durationMs != null
+                          ? formatDurationLabel(entry.result.durationMs / 1000)
+                          : '—'}
                       </TableCell>
                       <TableCell>
                         {entry.result.status === 'success'
