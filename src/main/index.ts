@@ -52,16 +52,15 @@ if (
   !isHeadlessContainer &&
   !process.argv.includes(OZONE_X11_FLAG)
 ) {
-  // Prefer the .AppImage entrypoint (the same file electron-updater
-  // itself execs) over process.execPath, which inside an AppImage
-  // points into a FUSE mount this process shouldn't be relied on to
-  // outlive.
-  const execPath = process.env.APPIMAGE
-
-  app.relaunch({
-    args: [...process.argv.slice(1), OZONE_X11_FLAG],
-    ...(execPath ? { execPath } : {})
-  })
+  // Deliberately relaunch process.execPath (the binary already
+  // running out of this session's FUSE mount) rather than re-exec'ing
+  // process.env.APPIMAGE — launching the .AppImage file again forces
+  // a brand new FUSE mount, which fails outright on systems where
+  // mounting is restricted outside of a normal interactive launch
+  // (e.g. AppArmor's unprivileged-userns restrictions on newer
+  // Ubuntu). Reusing the existing mount means there's nothing new to
+  // mount at all.
+  app.relaunch({ args: [...process.argv.slice(1), OZONE_X11_FLAG] })
   app.exit(0)
 } else if (process.platform === 'linux') {
   app.commandLine.appendSwitch('ozone-platform', 'x11')
