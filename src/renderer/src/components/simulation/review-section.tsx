@@ -1,11 +1,13 @@
 import { useField } from '@formisch/react'
-import { ChevronDown, SlidersHorizontal } from 'lucide-react'
-import { Fragment, type ReactElement, useState } from 'react'
+import { ChevronDown, Clock, SlidersHorizontal } from 'lucide-react'
+import { Fragment, type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { decisionRuleSummary, type DesignSnapshot, fieldsFor } from '@/lib/design-fields'
+import { estimateSimulationDuration, formatEstimatedDurationRange } from '@/lib/duration-estimate'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { CoreUsageField } from './core-usage-field'
@@ -40,9 +42,24 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
   const m0 = useField(form, { path: ['m0'] })
   const m = useField(form, { path: ['m'] })
   const R = useField(form, { path: ['R'] })
+  const corePercent = useField(form, { path: ['corePercent'] })
   const rules = useField(form, { path: ['decisionRules'] })
 
   const rule = rules.input[0]
+
+  const [cpuCount, setCpuCount] = useState<number | null>(null)
+  useEffect(() => {
+    window.app.cpuCount().then(setCpuCount)
+  }, [])
+
+  const estimate = estimateSimulationDuration({
+    N: N.input,
+    m0: m0.input,
+    m: m.input,
+    R: R.input,
+    corePercent: corePercent.input as number | undefined,
+    cpuCount
+  })
 
   const snapshot: DesignSnapshot = {
     outcomeType: outcomeType.input,
@@ -61,7 +78,26 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
 
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold">Review Simulation Design</h3>
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="font-semibold">Review Simulation Design</h3>
+
+        {estimate && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  Estimated run time:{' '}
+                  {formatEstimatedDurationRange(estimate.minSeconds, estimate.maxSeconds)}
+                </p>
+              }
+            />
+            <TooltipContent>
+              A rough guide based on your settings; actual time depends on your computer.
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
 
       <Card>
         <CardHeader>
