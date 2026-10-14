@@ -89,7 +89,7 @@ trials <- batss.glm(
     )
   ),
   R = input$R,
-  extended = 0,
+  extended = 1,
   computation = "parallel",
   # Resolved from the "% of cores" advanced setting in the Electron
   # main process (which is the only side that knows the real core
