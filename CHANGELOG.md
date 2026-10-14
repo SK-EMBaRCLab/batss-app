@@ -2,16 +2,14 @@
 
 ## [4.9.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.8.1...v4.9.0) (2026-10-13)
 
-
 ### Features
 
-* **results:** track and display each simulation run's duration ([b68c835](https://github.com/SK-EMBaRCLab/batss-app/commit/b68c8354243cd6fe25872a62cbd6137175140b9e))
-* **simulation:** control simulation parallelism via a CPU-usage slider ([77f760d](https://github.com/SK-EMBaRCLab/batss-app/commit/77f760d597ec9b9a50c9cbf484644ac46673bb26))
-
+- **results:** track and display each simulation run's duration ([b68c835](https://github.com/SK-EMBaRCLab/batss-app/commit/b68c8354243cd6fe25872a62cbd6137175140b9e))
+- **simulation:** control simulation parallelism via a CPU-usage slider ([77f760d](https://github.com/SK-EMBaRCLab/batss-app/commit/77f760d597ec9b9a50c9cbf484644ac46673bb26))
 
 ### Bug Fixes
 
-* **linux:** relaunch existing mount instead of re-execing the AppImage file ([698febf](https://github.com/SK-EMBaRCLab/batss-app/commit/698febfb29ada6c626a2e895bb7c58e1b5bc1073))
+- **linux:** relaunch existing mount instead of re-execing the AppImage file ([698febf](https://github.com/SK-EMBaRCLab/batss-app/commit/698febfb29ada6c626a2e895bb7c58e1b5bc1073))
 
 ## [4.8.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.8.0...v4.8.1) (2026-10-13)
 

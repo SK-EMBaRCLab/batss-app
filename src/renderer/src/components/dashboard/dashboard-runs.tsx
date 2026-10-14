@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleAlert } from 'lucide-react'
+import { CheckCircle2, CircleAlert, CircleOff } from 'lucide-react'
 import { type ReactElement, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -63,9 +63,11 @@ export function DashboardRecentRuns({
             >
               <ItemMedia>
                 {entry.result.status === 'success' ? (
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <CheckCircle2 className="text-green-700 dark:text-green-200 h-4 w-4" />
+                ) : entry.result.status === 'cancelled' ? (
+                  <CircleOff className="text-muted-foreground h-4 w-4" />
                 ) : (
-                  <CircleAlert className="h-4 w-4 text-destructive" />
+                  <CircleAlert className="text-destructive h-4 w-4" />
                 )}
               </ItemMedia>
               <ItemContent>

@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleAlert, Clock, SquareStack } from 'lucide-react'
+import { CheckCircle2, CircleAlert, CircleOff, Clock, SquareStack } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import {
@@ -35,14 +35,23 @@ export function DashboardStats(): ReactElement | null {
       <Item variant="outline" size="sm">
         <ItemMedia variant="icon">
           {latestRun?.result.status === 'success' ? (
-            <CheckCircle2 className="text-primary" />
+            <CheckCircle2 className="text-green-700 dark:text-green-200" />
+          ) : latestRun?.result.status === 'cancelled' ? (
+            <CircleOff className="text-muted-foreground" />
           ) : (
             <CircleAlert className="text-destructive" />
           )}
         </ItemMedia>
         <ItemContent>
           <ItemDescription>Latest Status</ItemDescription>
-          <ItemTitle>{latestRun?.result.status === 'success' ? 'Success' : 'Error'}</ItemTitle>
+          <ItemTitle>
+            {' '}
+            {latestRun?.result.status === 'success'
+              ? 'Success'
+              : latestRun?.result.status === 'cancelled'
+                ? 'Cancelled'
+                : 'Error'}
+          </ItemTitle>
         </ItemContent>
       </Item>
 
