@@ -60,7 +60,7 @@ export const useBatch = create<BatchState>((set) => ({
       })
     })
 
-    const teardownLog = subscribeLogs(window.runtime.onLog, (lines) =>
+    const teardownLog = subscribeLogs(window.batch.onLog, (lines) =>
       set((state) => ({ logs: appendLogs(state.logs, lines) }))
     )
 

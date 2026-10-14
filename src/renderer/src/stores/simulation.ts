@@ -42,7 +42,7 @@ export const useSimulation = create<SimulationState>((set) => ({
       ]
     })
 
-    const teardownLog = subscribeLogs(window.runtime.onLog, (lines) =>
+    const teardownLog = subscribeLogs(window.simulation.onLog, (lines) =>
       set((state) => ({ logs: appendLogs(state.logs, lines) }))
     )
 
