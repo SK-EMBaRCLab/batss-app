@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.10.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.10.0...v4.10.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **layout:** make settings and simulation-runs pages scrollable ([7ec6518](https://github.com/SK-EMBaRCLab/batss-app/commit/7ec65186d88a681b5cbb09da0d19859d5aaab831))
+
 ## [4.10.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.2...v4.10.0) (2026-10-14)
 
 
