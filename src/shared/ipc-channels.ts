@@ -37,7 +37,9 @@ export const IPC = {
   settings: {
     getOutputPath: 'settings:getOutputPath',
     setOutputPath: 'settings:setOutputPath',
-    selectOutputDirectory: 'settings:selectOutputDirectory'
+    selectOutputDirectory: 'settings:selectOutputDirectory',
+    getSimulationTimeoutMinutes: 'settings:getSimulationTimeoutMinutes',
+    setSimulationTimeoutMinutes: 'settings:setSimulationTimeoutMinutes'
   },
   batch: {
     run: 'batch:run',

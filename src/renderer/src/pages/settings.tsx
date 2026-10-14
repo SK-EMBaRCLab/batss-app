@@ -1,3 +1,7 @@
+import {
+  MAX_SIMULATION_TIMEOUT_MINUTES,
+  MIN_SIMULATION_TIMEOUT_MINUTES
+} from '@shared/settings-types'
 import { FolderOpen } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
@@ -39,6 +43,12 @@ export default function Settings(): ReactElement {
   const [isDirty, setIsDirty] = useState(false)
   const [pathError, setPathError] = useState<string | null>(null)
 
+  const [timeoutMinutes, setTimeoutMinutes] = useState('')
+  const [isTimeoutLoading, setIsTimeoutLoading] = useState(true)
+  const [isTimeoutSaving, setIsTimeoutSaving] = useState(false)
+  const [isTimeoutDirty, setIsTimeoutDirty] = useState(false)
+  const [timeoutError, setTimeoutError] = useState<string | null>(null)
+
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
 
@@ -64,6 +74,13 @@ export default function Settings(): ReactElement {
       if (!cancelled) {
         setOutputPath(path)
         setIsLoading(false)
+      }
+    })
+
+    window.settings.getSimulationTimeoutMinutes().then((minutes) => {
+      if (!cancelled) {
+        setTimeoutMinutes(String(minutes))
+        setIsTimeoutLoading(false)
       }
     })
 
@@ -108,6 +125,32 @@ export default function Settings(): ReactElement {
       })
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleSaveTimeout = async (): Promise<void> => {
+    setIsTimeoutSaving(true)
+    setTimeoutError(null)
+
+    try {
+      const parsed = Number(timeoutMinutes.trim())
+      const result = await window.settings.setSimulationTimeoutMinutes(parsed)
+
+      if (!result.saved) {
+        setTimeoutError(result.error ?? 'Could not save this value.')
+        return
+      }
+
+      setIsTimeoutDirty(false)
+      toast.add({ type: 'success', description: 'Simulation timeout updated.' })
+    } catch (error) {
+      toast.add({
+        type: 'error',
+        title: 'Could not save',
+        description: error instanceof Error ? error.message : 'Please try again.'
+      })
+    } finally {
+      setIsTimeoutSaving(false)
     }
   }
 
@@ -214,6 +257,58 @@ export default function Settings(): ReactElement {
 
             <Button onClick={handleSave} disabled={isLoading || isSaving || !isDirty}>
               {isSaving ? 'Saving…' : 'Save'}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Simulation Timeout</CardTitle>
+
+            <CardDescription>
+              A run is automatically cancelled if it hasn&apos;t finished within this many minutes.
+              Raise this for large designs (high R, many interim analyses) or slower machines.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <Field data-invalid={!!timeoutError} orientation="responsive">
+              <FieldContent>
+                <FieldLabel htmlFor="simulation-timeout">Timeout (minutes)</FieldLabel>
+
+                <Input
+                  id="simulation-timeout"
+                  type="number"
+                  min={MIN_SIMULATION_TIMEOUT_MINUTES}
+                  max={MAX_SIMULATION_TIMEOUT_MINUTES}
+                  step={1}
+                  value={timeoutMinutes}
+                  onChange={(event) => {
+                    setTimeoutMinutes(event.target.value)
+                    setIsTimeoutDirty(true)
+                    if (timeoutError) setTimeoutError(null)
+                  }}
+                  disabled={isTimeoutLoading}
+                  autoComplete="off"
+                  aria-invalid={!!timeoutError}
+                  className="max-w-40"
+                />
+
+                <FieldDescription>
+                  {isTimeoutDirty
+                    ? 'Unsaved changes.'
+                    : `Enter a value between ${MIN_SIMULATION_TIMEOUT_MINUTES} and ${MAX_SIMULATION_TIMEOUT_MINUTES} minutes.`}
+                </FieldDescription>
+
+                {timeoutError && <FieldError>{timeoutError}</FieldError>}
+              </FieldContent>
+            </Field>
+
+            <Button
+              onClick={handleSaveTimeout}
+              disabled={isTimeoutLoading || isTimeoutSaving || !isTimeoutDirty}
+            >
+              {isTimeoutSaving ? 'Saving…' : 'Save'}
             </Button>
           </CardContent>
         </Card>

@@ -5,7 +5,7 @@ import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/b
 import { EngineState } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
-import { SetOutputPathResult } from '../shared/settings-types'
+import { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
 import type {
   SimulationRunInput,
   SimulationRunResult,
@@ -108,7 +108,13 @@ const settings = {
     ipcRenderer.invoke(IPC.settings.setOutputPath, outputPath),
 
   selectOutputDirectory: (): Promise<string | null> =>
-    ipcRenderer.invoke(IPC.settings.selectOutputDirectory)
+    ipcRenderer.invoke(IPC.settings.selectOutputDirectory),
+
+  getSimulationTimeoutMinutes: (): Promise<number> =>
+    ipcRenderer.invoke(IPC.settings.getSimulationTimeoutMinutes),
+
+  setSimulationTimeoutMinutes: (minutes: number): Promise<SetSimulationTimeoutResult> =>
+    ipcRenderer.invoke(IPC.settings.setSimulationTimeoutMinutes, minutes)
 }
 
 const batch = {
