@@ -2,10 +2,9 @@
 
 ## [4.10.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.2...v4.10.0) (2026-10-14)
 
-
 ### Features
 
-* **settings:** make simulation timeout user-configurable ([00ef2d6](https://github.com/SK-EMBaRCLab/batss-app/commit/00ef2d6b8c4804e6cf8133aa2c9db3318d8ff600))
+- **settings:** make simulation timeout user-configurable ([00ef2d6](https://github.com/SK-EMBaRCLab/batss-app/commit/00ef2d6b8c4804e6cf8133aa2c9db3318d8ff600))
 
 ## [4.9.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.1...v4.9.2) (2026-10-14)
 
