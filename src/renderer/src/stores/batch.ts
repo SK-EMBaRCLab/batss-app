@@ -8,7 +8,9 @@ import { describeBusy } from '@shared/engine-types'
 import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
+import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
+import { detectRunStage, type RunStage } from '@/lib/run-progress'
 
 import { useDesign } from './design'
 import { useEngine } from './engine'
@@ -20,6 +22,12 @@ type BatchState = {
   total: number
   entries: BatchRunEntry[]
   logs: string[]
+  // Staged progress for whichever row is currently running — reset at
+  // the start of each row (see onUpdate below), same mechanism as the
+  // single-simulation progress bar in stores/simulation.ts.
+  stage: RunStage | null
+  stageStartedAt: number | null
+  rowEstimate: DurationEstimate | null
 
   start: (inputs: BatchPreparedInput[]) => Promise<void>
   cancel: () => Promise<void>
@@ -33,6 +41,9 @@ export const useBatch = create<BatchState>((set) => ({
   total: 0,
   entries: [],
   logs: [],
+  stage: null,
+  stageStartedAt: null,
+  rowEstimate: null,
 
   start: async (inputs) => {
     if (!useEngine.getState().tryAcquire('batch')) {
@@ -40,19 +51,59 @@ export const useBatch = create<BatchState>((set) => ({
       return
     }
 
-    set({ status: 'running', entries: [], logs: [], completed: 0, total: inputs.length })
+    const cpuCount = await window.app.cpuCount().catch(() => null)
+
+    set({
+      status: 'running',
+      entries: [],
+      logs: [],
+      completed: 0,
+      total: inputs.length,
+      stage: null,
+      stageStartedAt: null,
+      rowEstimate: null
+    })
 
     const unsubscribeUpdate = window.batch.onUpdate((update: BatchUpdate) => {
+      // BatchService emits this exact message right before executing
+      // each row (see batch.service.ts) — the one reliable "a new row
+      // is starting" signal, as opposed to the identical completed=0
+      // emitted once up front for "Starting batch of N run(s)".
+      const startingRow = update.status === 'running' && update.message.startsWith('Running row ')
+      const rowInput = startingRow ? inputs[update.completed]?.input : undefined
+
       set({
         status: update.status,
         message: update.message,
         completed: update.completed,
-        total: update.total
+        total: update.total,
+        ...(startingRow
+          ? {
+              stage: 'init' as RunStage,
+              stageStartedAt: Date.now(),
+              rowEstimate: rowInput
+                ? estimateSimulationDuration({
+                    N: rowInput.N,
+                    m0: rowInput.m0,
+                    m: rowInput.m,
+                    R: rowInput.R,
+                    corePercent: rowInput.corePercent,
+                    cpuCount
+                  })
+                : null
+            }
+          : {})
       })
     })
 
     const unsubscribeRow = window.batch.onRowDone((entry: BatchRunEntry) => {
-      set((state) => ({ entries: [...state.entries, entry] }))
+      set((state) => ({
+        entries: [...state.entries, entry],
+        // Brief gap until the next row's onUpdate re-arms this — avoids
+        // showing the just-finished row's stage frozen at ~99%.
+        stage: null,
+        stageStartedAt: null
+      }))
       useDesign.getState().appendResult({
         createdAt: entry.createdAt,
         input: entry.input,
@@ -61,7 +112,16 @@ export const useBatch = create<BatchState>((set) => ({
     })
 
     const teardownLog = subscribeLogs(window.batch.onLog, (lines) =>
-      set((state) => ({ logs: appendLogs(state.logs, lines) }))
+      set((state) => {
+        const stageLine = [...lines].reverse().find((line) => detectRunStage(line) !== null)
+        const stage = stageLine ? detectRunStage(stageLine) : state.stage
+
+        return {
+          logs: appendLogs(state.logs, lines),
+          stage,
+          stageStartedAt: stage !== state.stage ? Date.now() : state.stageStartedAt
+        }
+      })
     )
 
     try {
@@ -70,7 +130,9 @@ export const useBatch = create<BatchState>((set) => ({
         status: final.status,
         message: final.message,
         completed: final.completed,
-        total: final.total
+        total: final.total,
+        stage: null,
+        stageStartedAt: null
       })
 
       if (final.status === 'done') {
@@ -92,5 +154,16 @@ export const useBatch = create<BatchState>((set) => ({
     await window.batch.cancel()
   },
 
-  reset: () => set({ status: 'idle', message: '', completed: 0, total: 0, entries: [], logs: [] })
+  reset: () =>
+    set({
+      status: 'idle',
+      message: '',
+      completed: 0,
+      total: 0,
+      entries: [],
+      logs: [],
+      stage: null,
+      stageStartedAt: null,
+      rowEstimate: null
+    })
 }))

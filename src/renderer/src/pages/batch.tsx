@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table'
 import { buildBatchValidations, buildTemplateCsv } from '@/lib/batch-mapper'
 import { downloadCsv, parseCsvFile } from '@/lib/csv'
+import { STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
 import { formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
@@ -38,11 +39,21 @@ export default function Batch(): ReactElement {
   const message = useBatch((s) => s.message)
   const entries = useBatch((s) => s.entries)
   const logs = useBatch((s) => s.logs)
+  const stage = useBatch((s) => s.stage)
+  const stageStartedAt = useBatch((s) => s.stageStartedAt)
+  const rowEstimate = useBatch((s) => s.rowEstimate)
   const start = useBatch((s) => s.start)
   const cancel = useBatch((s) => s.cancel)
 
   const busy = useEngine((s) => s.busy)
   const isRunning = busy === 'batch'
+
+  const rowProgress = useRunProgress({
+    stage,
+    stageStartedAt,
+    estimate: rowEstimate,
+    done: !isRunning
+  })
 
   const invalidRows = useMemo(
     () =>
@@ -190,6 +201,13 @@ export default function Batch(): ReactElement {
                 </span>
               </div>
               <Progress value={total > 0 ? (completed / total) * 100 : 0} />
+
+              {isRunning && stage && (
+                <div className="space-y-1 pl-4">
+                  <div className="text-xs text-muted-foreground">{STAGE_LABEL[stage]}</div>
+                  <Progress value={rowProgress} className="h-1.5" />
+                </div>
+              )}
             </div>
           )}
 

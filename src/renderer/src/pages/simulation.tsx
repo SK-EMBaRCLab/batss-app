@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 
 import { SimulationForm } from '@/components/simulation/form'
-import { LogPanel } from '@/components/simulation/log-panel'
+import { SimulationStatus } from '@/components/simulation/simulation-status'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -20,6 +20,10 @@ export default function Simulation(): ReactElement {
   const logs = useSimulation((s) => s.logs)
   const startedAt = useSimulation((s) => s.startedAt)
   const endedAt = useSimulation((s) => s.endedAt)
+  const stage = useSimulation((s) => s.stage)
+  const stageStartedAt = useSimulation((s) => s.stageStartedAt)
+  const estimate = useSimulation((s) => s.estimate)
+  const lastResult = useSimulation((s) => s.lastResult)
   const run = useSimulation((s) => s.run)
 
   const [logsOpen, setLogsOpen] = useState(isRunning)
@@ -61,7 +65,7 @@ export default function Simulation(): ReactElement {
         <Card className="shrink-0">
           <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Simulation Log</CardTitle>
+              <CardTitle className="text-lg">Simulation Progress</CardTitle>
 
               <CollapsibleTrigger
                 render={
@@ -69,19 +73,22 @@ export default function Simulation(): ReactElement {
                     <ChevronDown
                       className={`h-4 w-4 transition-transform ${logsOpen ? 'rotate-180' : ''}`}
                     />
-                    <span className="sr-only">Toggle log panel</span>
+                    <span className="sr-only">Toggle simulation progress</span>
                   </Button>
                 }
               ></CollapsibleTrigger>
             </CardHeader>
 
             <CollapsibleContent>
-              <CardContent className="h-64 overflow-hidden">
-                <LogPanel
+              <CardContent>
+                <SimulationStatus
                   logs={logs}
-                  isRunning={isRunning}
                   startedAt={startedAt}
                   endedAt={endedAt}
+                  stage={stage}
+                  stageStartedAt={stageStartedAt}
+                  estimate={estimate}
+                  lastResult={lastResult}
                 />
               </CardContent>
             </CollapsibleContent>

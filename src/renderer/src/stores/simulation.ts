@@ -2,7 +2,9 @@ import { describeBusy } from '@shared/engine-types'
 import type { DesignInput, SimulationRunInput, SimulationRunResult } from '@shared/simulation-types'
 import { create } from 'zustand'
 
+import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
+import { detectRunStage, type RunStage } from '@/lib/run-progress'
 import { formatDuration, toError } from '@/lib/utils'
 
 import { useDesign } from './design'
@@ -12,6 +14,13 @@ type SimulationState = {
   logs: string[]
   startedAt: number | null
   endedAt: number | null
+  stage: RunStage | null
+  stageStartedAt: number | null
+  estimate: DurationEstimate | null
+  // The outcome of the most recently finished run, so the UI can tell
+  // a clean finish apart from an error/cancellation without scraping
+  // the raw log text.
+  lastResult: SimulationRunResult | null
 
   run: (input: SimulationRunInput, formInput: DesignInput) => Promise<SimulationRunResult>
   cancel: () => Promise<void>
@@ -21,6 +30,10 @@ export const useSimulation = create<SimulationState>((set) => ({
   logs: [],
   startedAt: null,
   endedAt: null,
+  stage: null,
+  stageStartedAt: null,
+  estimate: null,
+  lastResult: null,
 
   run: async (input, formInput) => {
     if (!useEngine.getState().tryAcquire('simulation')) {
@@ -28,10 +41,23 @@ export const useSimulation = create<SimulationState>((set) => ({
     }
 
     const startedAt = Date.now()
+    const cpuCount = await window.app.cpuCount().catch(() => null)
+    const estimate = estimateSimulationDuration({
+      N: input.N,
+      m0: input.m0,
+      m: input.m,
+      R: input.R,
+      corePercent: input.corePercent,
+      cpuCount
+    })
 
     set({
       startedAt,
       endedAt: null,
+      stage: 'init',
+      stageStartedAt: startedAt,
+      estimate,
+      lastResult: null,
       logs: [
         '> Starting BATSS simulation',
         `> Outcome: ${input.outcomeType}`,
@@ -43,7 +69,16 @@ export const useSimulation = create<SimulationState>((set) => ({
     })
 
     const teardownLog = subscribeLogs(window.simulation.onLog, (lines) =>
-      set((state) => ({ logs: appendLogs(state.logs, lines) }))
+      set((state) => {
+        const stageLine = [...lines].reverse().find((line) => detectRunStage(line) !== null)
+        const stage = stageLine ? detectRunStage(stageLine) : state.stage
+
+        return {
+          logs: appendLogs(state.logs, lines),
+          stage,
+          stageStartedAt: stage !== state.stage ? Date.now() : state.stageStartedAt
+        }
+      })
     )
 
     try {
@@ -62,6 +97,7 @@ export const useSimulation = create<SimulationState>((set) => ({
 
       set((state) => ({
         endedAt,
+        lastResult: result,
         logs: appendLogs(state.logs, [
           '',
           ...(result.status === 'error' ? [`> Error: ${result.message}`] : []),
