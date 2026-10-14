@@ -14,7 +14,7 @@ export default function Table(): ReactElement {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="h-full overflow-y-auto container mx-auto py-10">
       <DataTable
         title="Simulation Runs"
         description="The following table allows you to view all of the simulations you have performed

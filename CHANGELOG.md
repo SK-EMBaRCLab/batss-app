@@ -2,10 +2,9 @@
 
 ## [4.9.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.1...v4.9.2) (2026-10-14)
 
-
 ### Bug Fixes
 
-* **dashboard:** handle cancelled state correctly previously was showing as error ([bef85e0](https://github.com/SK-EMBaRCLab/batss-app/commit/bef85e058d5a60238f5c389149a6e2e757c220a5))
+- **dashboard:** handle cancelled state correctly previously was showing as error ([bef85e0](https://github.com/SK-EMBaRCLab/batss-app/commit/bef85e058d5a60238f5c389149a6e2e757c220a5))
 
 ## [4.9.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.0...v4.9.1) (2026-10-13)
 

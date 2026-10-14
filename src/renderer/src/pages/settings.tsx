@@ -155,7 +155,7 @@ export default function Settings(): ReactElement {
   }
 
   return (
-    <div className="p-6 lg:p-16">
+    <div className="h-full overflow-y-auto p-6 lg:p-16">
       <h1 className="text-xl font-semibold">Settings</h1>
 
       <p className="text-muted-foreground mt-2">
