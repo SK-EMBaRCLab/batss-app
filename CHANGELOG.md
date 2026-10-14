@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.11.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.0...v4.11.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **simulation:** restore scenario output by using extended = 1 ([9c4ae3c](https://github.com/SK-EMBaRCLab/batss-app/commit/9c4ae3c1b2d97c35a0438280c5215bcbd8f8d7eb))
+
 ## [4.11.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.10.1...v4.11.0) (2026-10-14)
 
 
