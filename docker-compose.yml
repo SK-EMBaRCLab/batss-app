@@ -8,6 +8,8 @@ services:
 
     user: '${UID}:${GID}'
 
+    ipc: host
+
     environment:
       - NODE_ENV=development
       - DISPLAY=${DISPLAY}
@@ -21,7 +23,6 @@ services:
       - .:/app
       - node_modules:/app/node_modules
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /dev/dri:/dev/dri:ro
 
     stdin_open: true
     tty: true
