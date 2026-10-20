@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.1...v5.0.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** upgrade Electron 39 to 44
+
+### Bug Fixes
+
+* **deps:** upgrade Electron 39 to 44 ([0a4f3fb](https://github.com/SK-EMBaRCLab/batss-app/commit/0a4f3fbde682df647b0cf6e9757c5e0db7ca280e))
+
 ## [4.11.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.0...v4.11.1) (2026-10-14)
 
 ### Bug Fixes
