@@ -106,6 +106,8 @@ export function registerAlbatrossFilesIPC(): void {
 
   ipcMain.handle(IPC.design.loadResult, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
+      // Electron 43+ defaults to Downloads; start where designs are saved.
+      defaultPath: settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
       filters: [
         {
           name: 'Albatross Study Design',

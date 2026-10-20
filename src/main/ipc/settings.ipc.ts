@@ -65,6 +65,8 @@ export function registerSettingsIPC(): void {
     const window = BrowserWindow.fromWebContents(event.sender)
 
     const options: Electron.OpenDialogOptions = {
+      // Electron 43+ defaults to Downloads; start at the current folder.
+      defaultPath: settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
       properties: ['openDirectory', 'createDirectory']
     }
 

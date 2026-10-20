@@ -2,35 +2,30 @@
 
 ## [4.11.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.0...v4.11.1) (2026-10-14)
 
-
 ### Bug Fixes
 
-* **simulation:** restore scenario output by using extended = 1 ([9c4ae3c](https://github.com/SK-EMBaRCLab/batss-app/commit/9c4ae3c1b2d97c35a0438280c5215bcbd8f8d7eb))
+- **simulation:** restore scenario output by using extended = 1 ([9c4ae3c](https://github.com/SK-EMBaRCLab/batss-app/commit/9c4ae3c1b2d97c35a0438280c5215bcbd8f8d7eb))
 
 ## [4.11.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.10.1...v4.11.0) (2026-10-14)
 
-
 ### Features
 
-* **simulation:** add staged progress tracking and a friendlier status UI ([798c33d](https://github.com/SK-EMBaRCLab/batss-app/commit/798c33db13d19c14c773bb14bda648c1285fc6e1))
-* **simulation:** estimate run time on the review step ([ace543f](https://github.com/SK-EMBaRCLab/batss-app/commit/ace543f694f1afbf8737c59293434a7fb8043063))
-
+- **simulation:** add staged progress tracking and a friendlier status UI ([798c33d](https://github.com/SK-EMBaRCLab/batss-app/commit/798c33db13d19c14c773bb14bda648c1285fc6e1))
+- **simulation:** estimate run time on the review step ([ace543f](https://github.com/SK-EMBaRCLab/batss-app/commit/ace543f694f1afbf8737c59293434a7fb8043063))
 
 ### Bug Fixes
 
-* **simulation:** subscribe to the correct IPC log channel ([2fcf5a3](https://github.com/SK-EMBaRCLab/batss-app/commit/2fcf5a3ef170a626ad3b35d84fdb2b78d451c822))
-
+- **simulation:** subscribe to the correct IPC log channel ([2fcf5a3](https://github.com/SK-EMBaRCLab/batss-app/commit/2fcf5a3ef170a626ad3b35d84fdb2b78d451c822))
 
 ### Performance Improvements
 
-* **simulation:** drop extended output level from BATSS runs ([f6467e5](https://github.com/SK-EMBaRCLab/batss-app/commit/f6467e51cd3500656f0928ebec1f58c5e66e3e88))
+- **simulation:** drop extended output level from BATSS runs ([f6467e5](https://github.com/SK-EMBaRCLab/batss-app/commit/f6467e51cd3500656f0928ebec1f58c5e66e3e88))
 
 ## [4.10.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.10.0...v4.10.1) (2026-10-14)
 
-
 ### Bug Fixes
 
-* **layout:** make settings and simulation-runs pages scrollable ([7ec6518](https://github.com/SK-EMBaRCLab/batss-app/commit/7ec65186d88a681b5cbb09da0d19859d5aaab831))
+- **layout:** make settings and simulation-runs pages scrollable ([7ec6518](https://github.com/SK-EMBaRCLab/batss-app/commit/7ec65186d88a681b5cbb09da0d19859d5aaab831))
 
 ## [4.10.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.9.2...v4.10.0) (2026-10-14)
 
