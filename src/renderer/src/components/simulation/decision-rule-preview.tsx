@@ -1,7 +1,8 @@
 import type { DecisionRule } from '@shared/simulation-types'
-import { cn } from 'cn'
 import { MoveHorizontal } from 'lucide-react'
 import { type ReactElement } from 'react'
+
+import { cn } from '@/lib/utils'
 
 import { DecisionChart } from './decision-rule-chart'
 
