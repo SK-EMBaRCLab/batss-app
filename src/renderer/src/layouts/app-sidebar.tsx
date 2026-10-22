@@ -37,7 +37,12 @@ export function AppSidebar(): ReactElement {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" tooltip="Albatross">
+            {/* Logo goes home, the usual pattern for an app's mark */}
+            <SidebarMenuButton
+              size="lg"
+              tooltip="Go to Dashboard"
+              onClick={() => navigate('dashboard')}
+            >
               <img
                 src={icon}
                 alt="Albatross"
@@ -81,7 +86,8 @@ export function AppSidebar(): ReactElement {
           {busy !== 'idle' && (
             <SidebarMenuItem>
               <SidebarMenuButton
-                tooltip={busy === 'batch' ? 'Batch running' : 'Simulation running'}
+                tooltip={busy === 'batch' ? 'Go to running batch' : 'Go to running simulation'}
+                onClick={() => navigate(busy === 'batch' ? 'batch' : 'simulation')}
               >
                 <Spinner />
                 <span>{busy === 'batch' ? 'Batch running' : 'Simulation running'}</span>
