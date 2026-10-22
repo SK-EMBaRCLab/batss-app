@@ -41,6 +41,14 @@ export class BatchService {
     this.cancelled = false
     const total = inputs.length
 
+    const cancelledAfter = (count: number): BatchUpdate =>
+      emit({
+        status: 'cancelled',
+        completed: count,
+        total,
+        message: `Batch cancelled after ${count}/${total} run(s)`
+      })
+
     try {
       onUpdate({
         status: 'running',
@@ -50,14 +58,8 @@ export class BatchService {
       })
 
       for (const [index, { input, rowIndex }] of inputs.entries()) {
-        if (this.cancelled) {
-          return emit({
-            status: 'cancelled',
-            completed: index,
-            total,
-            message: `Batch cancelled after ${index}/${total} run(s)`
-          })
-        }
+        // Cancelled between rows (no run was active to abort)
+        if (this.cancelled) return cancelledAfter(index)
 
         onUpdate({
           status: 'running',
@@ -74,6 +76,10 @@ export class BatchService {
           input,
           result
         })
+
+        // Cancelled during this row: the run was aborted, but without this
+        // check a cancel in the last row would fall through to "done"
+        if (this.cancelled) return cancelledAfter(index + 1)
       }
 
       return emit({ status: 'done', completed: total, total, message: 'Batch complete' })
