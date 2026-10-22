@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react'
 
+import { RunProgressPanel } from '@/components/common/run-progress-panel'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/toast'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -23,6 +24,7 @@ export function AppLayout({ children }: { children: React.ReactNode }): ReactEle
           <TooltipProvider>{children}</TooltipProvider>
         </main>
       </SidebarInset>
+      <RunProgressPanel />
       <Toaster />
     </SidebarProvider>
   )

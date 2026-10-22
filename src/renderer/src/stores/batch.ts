@@ -14,6 +14,7 @@ import { detectRunStage, type RunStage } from '@/lib/run-progress'
 
 import { useDesign } from './design'
 import { useEngine } from './engine'
+import { useNavigation } from './navigation'
 
 type BatchState = {
   status: BatchStatus
@@ -139,12 +140,16 @@ export const useBatch = create<BatchState>((set) => ({
         stageStartedAt: null
       })
 
-      if (final.status === 'done') {
-        toast.add({ type: 'success', title: 'Batch finished', description: final.message })
-      } else if (final.status === 'cancelled') {
-        toast.add({ type: 'info', title: 'Batch cancelled', description: final.message })
-      } else if (final.status === 'error') {
-        toast.add({ type: 'error', title: 'Batch failed', description: final.message })
+      // Off the Batch page, the floating run panel reports the outcome
+      // instead (see run-progress-panel.tsx), so don't stack a toast on it
+      if (useNavigation.getState().currentView === 'batch') {
+        if (final.status === 'done') {
+          toast.add({ type: 'success', title: 'Batch finished', description: final.message })
+        } else if (final.status === 'cancelled') {
+          toast.add({ type: 'info', title: 'Batch cancelled', description: final.message })
+        } else if (final.status === 'error') {
+          toast.add({ type: 'error', title: 'Batch failed', description: final.message })
+        }
       }
     } finally {
       unsubscribeUpdate()

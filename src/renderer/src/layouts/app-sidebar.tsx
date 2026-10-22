@@ -7,7 +7,6 @@ import albatrossLight from '@/assets/albatross-light.svg'
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -16,16 +15,13 @@ import {
   SidebarMenuItem,
   SidebarRail
 } from '@/components/ui/sidebar'
-import { Spinner } from '@/components/ui/spinner'
 import { navigationItems } from '@/config/navigation'
-import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
 import { useTheme } from '@/stores/theme'
 
 export function AppSidebar(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
-  const busy = useEngine((s) => s.busy)
   const isDark = useTheme((state) => state.isDark)
   const iconAppearance = useTheme((state) => state.iconAppearance)
   const icon = { brand: albatrossBrand, light: albatrossLight, dark: albatrossDark }[
@@ -81,21 +77,6 @@ export function AppSidebar(): ReactElement {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          {busy !== 'idle' && (
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                tooltip={busy === 'batch' ? 'Go to running batch' : 'Go to running simulation'}
-                onClick={() => navigate(busy === 'batch' ? 'batch' : 'simulation')}
-              >
-                <Spinner />
-                <span>{busy === 'batch' ? 'Batch running' : 'Simulation running'}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-        </SidebarMenu>
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

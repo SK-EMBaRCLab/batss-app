@@ -2,15 +2,13 @@ import { describeBusy } from '@shared/engine-types'
 import type { DesignInput, SimulationRunInput, SimulationRunResult } from '@shared/simulation-types'
 import { create } from 'zustand'
 
-import { toast } from '@/components/ui/toast'
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { detectRunStage, type RunStage } from '@/lib/run-progress'
-import { formatDuration, formatDurationLabel, toError } from '@/lib/utils'
+import { formatDuration, toError } from '@/lib/utils'
 
 import { useDesign } from './design'
 import { useEngine } from './engine'
-import { useNavigation } from './navigation'
 
 type SimulationState = {
   logs: string[]
@@ -116,31 +114,6 @@ export const useSimulation = create<SimulationState>((set) => ({
           `> Completed in ${formatDuration((endedAt - startedAt) / 1000)}`
         ])
       }))
-
-      // Off the Simulation page the user can't see its status (or its
-      // jump to Results), so say it finished. Batches always toast; see
-      // the batch store.
-      const { currentView, navigate } = useNavigation.getState()
-      if (currentView !== 'simulation') {
-        if (result.status === 'success') {
-          toast.add({
-            type: 'success',
-            title: 'Simulation complete',
-            description:
-              result.durationMs != null
-                ? `Took ${formatDurationLabel(result.durationMs / 1000)}.`
-                : undefined,
-            actionProps: { children: 'View results', onClick: () => navigate('results') }
-          })
-        } else if (result.status === 'error') {
-          toast.add({
-            type: 'error',
-            title: 'Simulation failed',
-            description: 'See the Simulation page for details.',
-            actionProps: { children: 'View details', onClick: () => navigate('simulation') }
-          })
-        }
-      }
 
       return result
     } finally {
