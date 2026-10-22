@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.2.0...v5.3.0) (2026-10-22)
+
+
+### Features
+
+* **branding:** add theme-aware Albatross app icons ([ff8647c](https://github.com/SK-EMBaRCLab/batss-app/commit/ff8647c45c935bd1ea56288eb487058d1b7cfaf4))
+* **branding:** add theme-aware Albatross app icons ([e67c8f3](https://github.com/SK-EMBaRCLab/batss-app/commit/e67c8f36281d781b5a61763b4001680c68d6bef8))
+* **simulation:** lock the form and allow free step navigation while running ([f81678c](https://github.com/SK-EMBaRCLab/batss-app/commit/f81678c8c397a509174c2ce1b15df4d38f44585d))
+
 ## [5.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.1.0...v5.2.0) (2026-10-22)
 
 ### Features
