@@ -1,3 +1,4 @@
+import type { IconAppearance } from '@shared/appearance-types'
 import {
   MAX_SIMULATION_TIMEOUT_MINUTES,
   MIN_SIMULATION_TIMEOUT_MINUTES
@@ -37,6 +38,13 @@ const items: { label: string; value: Theme }[] = [
   { label: 'System', value: 'system' }
 ]
 
+const iconItems: { label: string; value: IconAppearance }[] = [
+  { label: 'Follow theme', value: 'theme' },
+  { label: 'Teal', value: 'brand' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' }
+]
+
 export default function Settings(): ReactElement {
   const [outputPath, setOutputPath] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -54,6 +62,26 @@ export default function Settings(): ReactElement {
 
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
+
+  const iconAppearance = useTheme((state) => state.iconAppearance)
+  const setIconAppearance = useTheme((state) => state.setIconAppearance)
+  const [isIconSaving, setIsIconSaving] = useState(false)
+
+  const handleIconChange = async (choice: IconAppearance | null): Promise<void> => {
+    if (!choice) return
+    setIsIconSaving(true)
+    try {
+      await setIconAppearance(choice)
+    } catch (error) {
+      toast.add({
+        type: 'error',
+        title: 'Could not change app icon',
+        description: error instanceof Error ? error.message : 'Please try again.'
+      })
+    } finally {
+      setIsIconSaving(false)
+    }
+  }
 
   const appVersion = useRuntime((state) => state.appVersion)
   const loadAppVersion = useRuntime((state) => state.loadAppVersion)
@@ -185,6 +213,37 @@ export default function Settings(): ReactElement {
               <SelectContent>
                 <SelectGroup>
                   {items.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+          <ItemContent>
+            <ItemTitle>App Icon</ItemTitle>
+            <ItemDescription>
+              Follow the color scheme or choose a fixed icon for the sidebar and macOS Dock. The
+              Dock icon updates while Albatross is running.
+            </ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Select
+              items={iconItems}
+              value={iconAppearance}
+              onValueChange={handleIconChange}
+              disabled={isIconSaving}
+            >
+              <SelectTrigger className="w-45" aria-label="App icon appearance">
+                <SelectValue placeholder="App icon" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {iconItems.map((item) => (
                     <SelectItem key={item.value} value={item.value}>
                       {item.label}
                     </SelectItem>

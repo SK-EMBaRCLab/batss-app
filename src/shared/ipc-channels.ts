@@ -35,6 +35,7 @@ export const IPC = {
   theme: {
     get: 'theme:get',
     set: 'theme:set',
+    setIconAppearance: 'theme:set-icon-appearance',
     updated: 'theme:updated'
   },
   settings: {

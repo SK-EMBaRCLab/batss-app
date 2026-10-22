@@ -11,14 +11,22 @@ used by the existing electron-builder configuration. `resources/icon.png` is
 the same launcher design used by BrowserWindow.
 
 Renderer sources are `albatross-brand.svg`, `albatross-light.svg`, and
-`albatross-dark.svg` under `src/renderer/src/assets/`. The sidebar uses the
-existing `.dark` class, so Light, Dark, and System settings stay synchronized
-without a second theme listener. `albatross-mark.svg` remains a compatible
-alias of the default brand artwork.
+`albatross-dark.svg` under `src/renderer/src/assets/`.
 
-The launcher uses a fixed teal design legible on light and dark desktops.
-The in-app logo adapts to the app theme; installer and launcher icons do not
-change with it. Transparency is outside the rounded tile, with no baked shadow.
+Settings > App Icon defaults to Follow theme, which resolves Light, Dark,
+and System using Electron's effective native theme. Teal, Light, and Dark
+can also be selected as fixed icons independently of the color scheme.
+The selection applies to the sidebar and the running macOS Dock icon.
+Both the color scheme and icon preference persist across app restarts.
 
-To update artwork, edit the SVG sources and regenerate the matching PNG,
-ICO and ICNS exports. No additional application dependencies are required.
+`resources/icon-light.png` and `resources/icon-dark.png` are 1024px exports
+of the corresponding renderer SVGs. The default teal export is
+`resources/icon.png`.
+The main process imports all three as build assets and updates `app.dock`
+at startup, on theme changes, and when the icon preference changes.
+
+Finder, installers, and the Dock while the app is not running retain the
+packaged teal icon. Windows and Linux launcher icons also retain that icon.
+No application bundle or system icon cache is modified at runtime.
+
+To update artwork, edit the SVG sources and regenerate matching exports.
