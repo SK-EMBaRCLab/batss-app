@@ -260,6 +260,11 @@ export class RManager {
     const executable = await this.getRExecutable()
     const { signal: externalSignal, timeoutMs } = options
 
+    // Cancelled while the run was still being set up (temp dir, finding
+    // Rscript, building the env). An abort listener added below would
+    // never fire for a signal that's already aborted, so R would start.
+    if (externalSignal?.aborted) throw this.toAbortError(externalSignal)
+
     return new Promise((resolve, reject) => {
       // Own AbortController so spawn() only has to know about one
       // signal, regardless of whether the abort came from the caller
