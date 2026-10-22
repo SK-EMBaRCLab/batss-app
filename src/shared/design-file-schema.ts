@@ -46,6 +46,10 @@ const designInputFileSchema = v.object({
   m0: v.number(),
   m: v.number(),
   R: v.number(),
+  // Must be listed or v.object strips it, and every loaded design falls
+  // back to the default CPU share. An unexpected value is dropped (so the
+  // default applies) rather than rejecting the whole file.
+  corePercent: v.fallback(v.optional(v.picklist([25, 50, 75, 100])), undefined),
 
   decisionRules: v.array(decisionRuleFileSchema)
 })
