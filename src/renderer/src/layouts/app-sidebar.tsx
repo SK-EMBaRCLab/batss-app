@@ -62,6 +62,10 @@ export function AppSidebar(): ReactElement {
                     tooltip={item.title}
                     isActive={currentView === item.view}
                     onClick={() => navigate(item.view)}
+                    // The stock active style is the same faint grey as hover;
+                    // use a primary tint and primary text so the current
+                    // page stands out and doesn't look like a hover
+                    className="data-active:bg-sidebar-primary/12 data-active:font-semibold data-active:text-sidebar-primary"
                   >
                     <item.icon />
                     <span>{item.title}</span>
