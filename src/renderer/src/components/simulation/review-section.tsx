@@ -2,7 +2,6 @@ import { useField } from '@formisch/react'
 import { ChevronDown, Clock, SlidersHorizontal } from 'lucide-react'
 import { Fragment, type ReactElement, useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -30,7 +29,7 @@ function ReviewList({ items }: { items: ReviewItem[] }): ReactElement {
 }
 
 export function ReviewSection({ form }: { form: SimulationFormStore }): ReactElement {
-  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [performanceOpen, setPerformanceOpen] = useState(false)
   const outcomeType = useField(form, { path: ['outcomeType'] })
   const probability = useField(form, { path: ['probability'] })
   const treatmentEffectType = useField(form, { path: ['treatmentEffectType'] })
@@ -60,6 +59,12 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
     corePercent: corePercent.input as number | undefined,
     cpuCount
   })
+
+  // Same defaulting/rounding as CoreUsageField, so the collapsed summary matches the slider
+  const corePercentValue = (corePercent.input ?? 75) as number
+  const resolvedCores = cpuCount
+    ? Math.max(1, Math.round((cpuCount * corePercentValue) / 100))
+    : null
 
   const snapshot: DesignSnapshot = {
     outcomeType: outcomeType.input,
@@ -140,24 +145,32 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
       </Card>
 
       <Card>
-        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-              Advanced Settings
-            </CardTitle>
+        <Collapsible
+          open={performanceOpen}
+          onOpenChange={setPerformanceOpen}
+          className="flex flex-col gap-(--card-spacing)"
+        >
+          <CollapsibleTrigger
+            nativeButton={false}
+            render={
+              <CardHeader className="flex cursor-pointer flex-row items-center justify-between gap-4 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            }
+          >
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                Performance Settings
+              </CardTitle>
+              <p className="pl-6 text-xs text-muted-foreground">
+                Using {corePercentValue}% of CPU
+                {resolvedCores !== null && ` (${resolvedCores} of ${cpuCount} cores)`}
+              </p>
+            </div>
 
-            <CollapsibleTrigger
-              render={
-                <Button variant="ghost" size="icon">
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
-                  />
-                  <span className="sr-only">Toggle advanced settings</span>
-                </Button>
-              }
-            ></CollapsibleTrigger>
-          </CardHeader>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${performanceOpen ? 'rotate-180' : ''}`}
+            />
+          </CollapsibleTrigger>
 
           <CollapsibleContent>
             <CardContent>
