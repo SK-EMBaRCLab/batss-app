@@ -19,15 +19,22 @@ interface DataTableColumnHeaderProps<
 > extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<DataTableFeatures, TData, TValue>
   title: string
+  // Full name for headers shortened to fit, shown on hover
+  tooltip?: string
 }
 
 export function DataTableColumnHeader<TData extends RowData, TValue>({
   column,
   title,
+  tooltip,
   className
 }: DataTableColumnHeaderProps<TData, TValue>): ReactElement {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return (
+      <div className={cn(className)} title={tooltip}>
+        {title}
+      </div>
+    )
   }
 
   return (
@@ -35,7 +42,12 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-accent">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-ml-3 h-8 data-[state=open]:bg-accent"
+              title={tooltip}
+            >
               <span>{title}</span>
               {column.getIsSorted() === 'desc' ? (
                 <ArrowDown />

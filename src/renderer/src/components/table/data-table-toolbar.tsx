@@ -46,8 +46,10 @@ export function DataTableToolbar<TData extends DataTableRow>({
   }
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center gap-2">
+    // Wraps the action buttons onto their own line rather than squashing
+    // the search box when the window is narrow
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex grow items-center gap-2">
         <InputGroup className="max-w-xs">
           <DebouncedInput
             value={globalFilter}
@@ -60,9 +62,6 @@ export function DataTableToolbar<TData extends DataTableRow>({
           </InputGroupAddon>
           <InputGroupAddon align="inline-end">{resultCount} results</InputGroupAddon>
         </InputGroup>
-        <span className="hidden text-xs text-muted-foreground sm:inline">
-          Click a row to open it, or check rows to compare them.
-        </span>
         {table.getColumn('outcomeType') && (
           <DataTableFacetedFilter column={table.getColumn('outcomeType')} title="Outcome Type" />
         )}

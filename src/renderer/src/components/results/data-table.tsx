@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { cn } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 import { DataTableRow } from '@/types/data-table-types'
@@ -29,13 +30,38 @@ interface DataTableProps<TData extends DataTableRow> {
   description?: string
   columns: ColumnDef<DataTableFeatures, TData>[]
   data: TData[]
+  // Columns hidden until the user turns them on from the Columns menu
+  hiddenColumns?: string[]
+}
+
+// Keeps the checkbox and Created At columns in view while the rest of
+// the table scrolls sideways. Sticky cells need an opaque background,
+// so the row's translucent hover tint is mixed into it by hand, and a
+// border-collapse table drops cell borders on sticky cells, hence the
+// inset shadow for the divider.
+const STICKY_COLUMN_CLASSES: Record<string, string> = {
+  select: 'left-0 w-10 min-w-10 max-w-10',
+  createdAt: 'left-10 shadow-[inset_-1px_0_0_var(--border)]'
+}
+
+function stickyClassName(columnId: string): string | undefined {
+  const position = STICKY_COLUMN_CLASSES[columnId]
+  if (!position) return undefined
+
+  return cn(
+    'sticky z-10 bg-background',
+    'group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--background))]',
+    'group-data-[state=selected]:bg-muted',
+    position
+  )
 }
 
 export function DataTable<TData extends DataTableRow>({
   title,
   description,
   columns,
-  data
+  data,
+  hiddenColumns = []
 }: DataTableProps<TData>): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const selectResult = useDesign((state) => state.selectResult)
@@ -49,7 +75,11 @@ export function DataTable<TData extends DataTableRow>({
   ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({})
+  const [userColumnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({})
+  const columnVisibility: ColumnVisibilityState = {
+    ...Object.fromEntries(hiddenColumns.map((id) => [id, false])),
+    ...userColumnVisibility
+  }
 
   const table = useTable({
     features,
@@ -106,10 +136,10 @@ export function DataTable<TData extends DataTableRow>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="group">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className={stickyClassName(header.column.id)}>
                       {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                     </TableHead>
                   )
@@ -124,11 +154,12 @@ export function DataTable<TData extends DataTableRow>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => selectRow(row)}
-                  className="hover:cursor-pointer"
+                  className="group hover:cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
+                      className={stickyClassName(cell.column.id)}
                       onClick={(e) => {
                         if (cell.column.id === 'select') {
                           e.stopPropagation()

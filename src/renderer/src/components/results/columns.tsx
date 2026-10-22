@@ -21,18 +21,55 @@ const outcomeScopedColumnIds = [
   'sd'
 ] as const
 
-const outcomeScopedColumns = outcomeScopedColumnIds.map((key) => {
+type OutcomeScopedColumnId = (typeof outcomeScopedColumnIds)[number]
+
+// Shorter than the field labels (which stay as each header's tooltip)
+// so the table fits narrower windows.
+const outcomeScopedHeaders: Record<OutcomeScopedColumnId, string> = {
+  treatmentEffectType: 'Effect Type',
+  treatmentEffect: 'Effect Value',
+  meanOutcome: 'Control Mean',
+  sd: 'SD',
+  meanDiff: 'Mean Difference'
+}
+
+function outcomeScopedField(key: OutcomeScopedColumnId): {
+  field: ReturnType<typeof fieldsFor>[number]
+  outcomeType: 'binary' | 'continuous'
+} {
   const binaryField = fieldsFor('binary').find((f) => f.key === key)
   const continuousField = fieldsFor('continuous').find((f) => f.key === key)
-  const field = binaryField ?? continuousField!
+
+  return {
+    field: (binaryField ?? continuousField)!,
+    outcomeType: binaryField ? 'binary' : 'continuous'
+  }
+}
+
+/**
+ * Outcome-scoped columns whose outcome type no run in `entries` uses.
+ * Every cell in them would be "N/A", so the table hides them by default.
+ */
+export function inapplicableColumnIds(entries: SimulationResultEntry[]): string[] {
+  const outcomeTypes = new Set(entries.map((entry) => entry.input.outcomeType))
+  return outcomeScopedColumnIds.filter(
+    (key) => !outcomeTypes.has(outcomeScopedField(key).outcomeType)
+  )
+}
+
+const outcomeScopedColumns = outcomeScopedColumnIds.map((key) => {
+  const { field, outcomeType } = outcomeScopedField(key)
+  const title = outcomeScopedHeaders[key]
 
   return columnHelper.accessor(`input.${key}` as const, {
     id: key,
-    meta: { label: field.label },
-    header: ({ column }) => <DataTableColumnHeader column={column} title={field.label} />,
+    meta: { label: title },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={title} tooltip={field.label} />
+    ),
     cell: ({ row, getValue }) => {
-      const matches = row.original.input.outcomeType === (binaryField ? 'binary' : 'continuous')
-      if (!matches) return <EmptyCell state="not-applicable" />
+      if (row.original.input.outcomeType !== outcomeType)
+        return <EmptyCell state="not-applicable" />
       return renderCellValue(field.value(row.original.input) ?? getValue())
     }
   })
@@ -113,7 +150,13 @@ export const columns = columnHelper.columns([
       label: 'Max Sample Size'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Maximum Sample Size" />
+      return (
+        <DataTableColumnHeader
+          column={column}
+          title="Max Sample Size"
+          tooltip="Maximum sample size"
+        />
+      )
     }
   }),
   columnHelper.accessor('input.m0', {
@@ -131,16 +174,28 @@ export const columns = columnHelper.columns([
       label: 'Patients Between'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Patients Between" />
+      return (
+        <DataTableColumnHeader
+          column={column}
+          title="Patients Between"
+          tooltip="Patients between interim analyses"
+        />
+      )
     }
   }),
   columnHelper.accessor('input.R', {
     id: 'numOfSimulatedTrials',
     meta: {
-      label: 'Number of simulated Trials'
+      label: 'Simulated Trials'
     },
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Number of simulated Trials" />
+      return (
+        <DataTableColumnHeader
+          column={column}
+          title="Simulated Trials"
+          tooltip="Number of simulated trials"
+        />
+      )
     }
   })
 ])
