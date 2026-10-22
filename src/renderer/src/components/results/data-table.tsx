@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
-import { useNavigation } from '@/stores/navigation'
 import { DataTableRow } from '@/types/data-table-types'
 
 import { type DataTableFeatures, features } from './data-table-features'
@@ -63,9 +62,7 @@ export function DataTable<TData extends DataTableRow>({
   data,
   hiddenColumns = []
 }: DataTableProps<TData>): ReactElement {
-  const navigate = useNavigation((state) => state.navigate)
-  const selectResult = useDesign((state) => state.selectResult)
-  const selectResults = useDesign((state) => state.selectResults)
+  const openResults = useDesign((state) => state.openResults)
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -114,9 +111,7 @@ export function DataTable<TData extends DataTableRow>({
       return
     }
 
-    selectResult(row.original.id)
-    selectResults([row.original.id])
-    navigate('results')
+    openResults([row.original.id])
   }
 
   return (

@@ -44,6 +44,8 @@ interface DesignState {
   updateInput: (input: DesignInput) => void
   selectResult: (id: string) => void
   selectResults: (ids: string[]) => void
+  // Show these runs on the Results page, focused on the last one
+  openResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
   saveDesignAs: () => Promise<boolean>
   loadDesign: () => Promise<boolean>
@@ -54,6 +56,33 @@ export const useDesign = create<DesignState>((set, get) => {
   const setDirty = (dirty: boolean): void => {
     set({ isDirty: dirty })
     window.design.setDirty(dirty)
+  }
+
+  // Saves to `knownPath`, or through the save dialog when it's omitted.
+  // Returns false if the user cancelled the dialog or the save failed.
+  const save = async (knownPath?: string): Promise<boolean> => {
+    const { design } = get()
+    if (!design) return true
+
+    try {
+      const result = await window.design.saveResult(design, knownPath)
+      if (!result.saved) return false
+
+      set({ filePath: result.filePath ?? null })
+      setDirty(false)
+      toast.add({ type: 'success', description: `Design saved: ${design.name}` })
+
+      return true
+    } catch (error) {
+      // Details go to the console; the toast stays generic
+      console.error('Saving the design failed:', error)
+      toast.add({
+        type: 'error',
+        title: 'Save failed',
+        description: 'Could not save the design file.'
+      })
+      return false
+    }
   }
 
   // The unsaved-changes prompt: false if the user cancelled, or chose
@@ -128,56 +157,18 @@ export const useDesign = create<DesignState>((set, get) => {
     selectResult: (id) => set({ selectedResultId: id }),
     selectResults: (ids) => set({ selectedResults: ids }),
 
-    saveDesign: async () => {
-      const { design, filePath } = get()
-      if (!design) return true
+    openResults: (ids) => {
+      const lastId = ids.at(-1)
+      if (!lastId) return
 
-      try {
-        const result = await window.design.saveResult(design, filePath ?? undefined)
-
-        if (!result.saved) {
-          return false
-        }
-
-        set({ filePath: result.filePath ?? null })
-        setDirty(false)
-        toast.add({ type: 'success', description: `Design saved: ${design.name}` })
-
-        return true
-      } catch (error) {
-        toast.add({
-          type: 'error',
-          title: 'Save failed',
-          description: error instanceof Error ? error.message : 'Could not save the design file.'
-        })
-        return false
-      }
+      set({ selectedResults: ids, selectedResultId: lastId })
+      useNavigation.getState().navigate('results')
     },
+
+    saveDesign: () => save(get().filePath ?? undefined),
 
     // Always shows the picker, regardless of a remembered path.
-    saveDesignAs: async () => {
-      const { design } = get()
-      if (!design) return true
-
-      try {
-        const result = await window.design.saveResult(design)
-
-        if (!result.saved) return false
-
-        set({ filePath: result.filePath ?? null })
-        setDirty(false)
-        toast.add({ type: 'success', description: `Design saved: ${design.name}` })
-
-        return true
-      } catch (error) {
-        toast.add({
-          type: 'error',
-          title: 'Save failed',
-          description: error instanceof Error ? error.message : 'Could not save the design file.'
-        })
-        return false
-      }
-    },
+    saveDesignAs: () => save(),
 
     loadDesign: async () => {
       if (!(await confirmLeave())) return false

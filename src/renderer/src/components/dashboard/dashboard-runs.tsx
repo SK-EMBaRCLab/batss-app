@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/item'
 import { formatDurationLabel } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
-import { useNavigation } from '@/stores/navigation'
 
 type DashboardRecentRunsProps = {
   viewAllResults: () => void
@@ -24,9 +23,7 @@ export function DashboardRecentRuns({
   viewAllResults
 }: DashboardRecentRunsProps): ReactElement | null {
   const design = useDesign((s) => s.design)
-  const selectResult = useDesign((s) => s.selectResult)
-  const selectResults = useDesign((s) => s.selectResults)
-  const navigate = useNavigation((s) => s.navigate)
+  const openResults = useDesign((s) => s.openResults)
 
   const recentRuns = useMemo(() => [...(design?.results ?? [])].reverse().slice(0, 5), [design])
 
@@ -34,11 +31,7 @@ export function DashboardRecentRuns({
     return null
   }
 
-  const openResult = (id: string): void => {
-    selectResult(id)
-    selectResults([id])
-    navigate('results')
-  }
+  const openResult = (id: string): void => openResults([id])
 
   return (
     <Card>

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { useDesign } from '@/stores/design'
-import { useNavigation } from '@/stores/navigation'
 import { DataTableRow } from '@/types/data-table-types'
 
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
@@ -25,9 +24,7 @@ export function DataTableToolbar<TData extends DataTableRow>({
   globalFilter,
   setGlobalFilter
 }: DataTableToolbarProps<TData>): ReactElement {
-  const navigate = useNavigation((state) => state.navigate)
-  const selectResults = useDesign((state) => state.selectResults)
-  const selectResult = useDesign((state) => state.selectResult)
+  const openResults = useDesign((state) => state.openResults)
   const isFiltered = table.state.columnFilters.length > 0
   const selected = table.getSelectedRowModel().rows
   const resultCount = table.getFilteredRowModel().rows.length
@@ -35,14 +32,7 @@ export function DataTableToolbar<TData extends DataTableRow>({
   function viewResults(): void {
     if (selected.length === 0) return
 
-    const ids = selected.map((row) => row.original.id)
-    const lastId = ids.at(-1)
-
-    if (!lastId) return
-
-    selectResults(ids)
-    selectResult(lastId)
-    navigate('results')
+    openResults(selected.map((row) => row.original.id))
   }
 
   return (

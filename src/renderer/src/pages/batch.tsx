@@ -21,13 +21,10 @@ import { formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
-import { useNavigation } from '@/stores/navigation'
 
 export default function Batch(): ReactElement {
   const design = useDesign((s) => s.design)
-  const selectResult = useDesign((s) => s.selectResult)
-  const selectResults = useDesign((s) => s.selectResults)
-  const navigate = useNavigation((s) => s.navigate)
+  const openResults = useDesign((s) => s.openResults)
 
   const [fileName, setFileName] = useState<string | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
@@ -248,10 +245,7 @@ export default function Batch(): ReactElement {
                     <TableRow
                       key={entry.rowIndex}
                       onClick={() => {
-                        if (!match) return
-                        selectResult(match.id)
-                        selectResults([match.id])
-                        navigate('results')
+                        if (match) openResults([match.id])
                       }}
                       className={match ? 'cursor-pointer hover:bg-muted/50' : undefined}
                     >
