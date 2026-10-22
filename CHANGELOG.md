@@ -1,5 +1,21 @@
 # Changelog
 
+## [5.5.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.4.1...v5.5.0) (2026-10-22)
+
+
+### Features
+
+* **layout:** make the sidebar logo and running indicator navigate ([1bb7724](https://github.com/SK-EMBaRCLab/batss-app/commit/1bb7724958db25c618418ee9bd56885fd1e2cc5d))
+* **settings:** group settings into General and Simulation columns ([8313fe6](https://github.com/SK-EMBaRCLab/batss-app/commit/8313fe65ad8d61edbacc809b290f87396c2267e1))
+* **simulation:** move step help into its own card beside the form ([76adac9](https://github.com/SK-EMBaRCLab/batss-app/commit/76adac9f46adaadba5bee91c355c7949e3a6f658))
+
+
+### Bug Fixes
+
+* **layout:** cap Dashboard and Batch to the same width as Run Simulation ([bf5b9f5](https://github.com/SK-EMBaRCLab/batss-app/commit/bf5b9f566bd9afaf00e51413b0a3a17947f25fdb))
+* **layout:** make the current page stand out in the sidebar ([6bc62c4](https://github.com/SK-EMBaRCLab/batss-app/commit/6bc62c42b9a32813ad07a6832187858ff887f402))
+* **ui:** tone down the header badges and the Dashboard Save button ([f676dd7](https://github.com/SK-EMBaRCLab/batss-app/commit/f676dd7c410c6a62f2f7c37df6e29544dd472d52))
+
 ## [5.4.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.4.0...v5.4.1) (2026-10-22)
 
 
