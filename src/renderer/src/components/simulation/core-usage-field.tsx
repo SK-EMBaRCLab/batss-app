@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { useFormLocked } from './form-locked'
+
 const CORE_PERCENT_STEPS = [25, 50, 75, 100] as const
 
 /**
@@ -16,6 +18,7 @@ const CORE_PERCENT_STEPS = [25, 50, 75, 100] as const
  * resolves to on this machine.
  */
 export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactElement {
+  const locked = useFormLocked()
   const [cpuCount, setCpuCount] = useState<number | null>(null)
 
   useEffect(() => {
@@ -51,6 +54,7 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
 
             <Slider
               id="slider-core-usage"
+              disabled={locked}
               value={percent}
               onValueChange={(value) =>
                 field.onChange(value as (typeof CORE_PERCENT_STEPS)[number])

@@ -12,9 +12,11 @@ import {
 import { treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { useFormLocked } from './form-locked'
 import { NumericField } from './numeric-field'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
+  const locked = useFormLocked()
   return (
     <div className="space-y-6">
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
@@ -43,6 +45,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                 </FieldDescription>
 
                 <Select
+                  disabled={locked}
                   value={field.input ?? ''}
                   onValueChange={(value) => {
                     if (

@@ -18,6 +18,7 @@ import { useSimulation } from '@/stores/simulation'
 import { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleHelp } from './decision-rule-help'
+import { FormLockedContext } from './form-locked'
 import { OutcomeParametersHelp } from './outcome-parameters-help'
 import { OutcomeParametersSection } from './outcome-parameters-section'
 import { OutcomeTypeHelp } from './outcome-type-help'
@@ -168,6 +169,11 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       onKeyDown={(event) => {
         if (event.key !== 'Enter') return
 
+        // Nothing to advance or submit while a run is in progress. Leave
+        // the default alone so Enter still activates a focused button
+        // (e.g. Cancel); every input is disabled, so it can't submit.
+        if (isRunning) return
+
         // Let Enter insert newlines in multi-line fields normally.
         if ((event.target as HTMLElement).tagName === 'TEXTAREA') return
 
@@ -180,7 +186,13 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
       className="flex h-full min-h-0 flex-col"
     >
       <div className="shrink-0 pb-6">
-        <Stepper steps={steps} currentStep={step} onStepClick={setStep} className="shrink-0 pb-4" />
+        <Stepper
+          steps={steps}
+          currentStep={step}
+          onStepClick={setStep}
+          allowAnyStep={isRunning}
+          className="shrink-0 pb-4"
+        />
       </div>
       <Separator className="h-px" />
       <div
@@ -188,7 +200,13 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
           step === 4 ? 'lg:grid-cols-[minmax(0,1fr)_0fr]' : 'lg:grid-cols-[minmax(0,1fr)_22rem]'
         }`}
       >
-        <div className="min-h-0 overflow-y-auto p-6">{steps[step].render(form)}</div>
+        <div className="min-h-0 overflow-y-auto p-6">
+          {/* Read-only while running, so the form keeps matching the run in
+              progress. See form-locked.ts for the Base UI controls. */}
+          <fieldset disabled={isRunning} className="min-w-0">
+            <FormLockedContext value={isRunning}>{steps[step].render(form)}</FormLockedContext>
+          </fieldset>
+        </div>
 
         <aside
           className={`hidden min-h-0 min-w-0 border-l lg:block transition-opacity duration-300 ${
@@ -223,6 +241,12 @@ export function SimulationForm({ onRun, initialInput }: SimulationFormProps): Re
         <Button type="button" variant="outline" disabled={step === 0} onClick={handleBack}>
           Back
         </Button>
+
+        {isRunning && (
+          <p className="self-center text-xs text-muted-foreground">
+            Editing is paused while the simulation runs.
+          </p>
+        )}
 
         {runButton()}
       </div>

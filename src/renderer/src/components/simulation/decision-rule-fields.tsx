@@ -11,6 +11,8 @@ import {
   SelectValue
 } from '@/components/ui/select'
 
+import { useFormLocked } from './form-locked'
+
 type DecisionRuleFieldsProps = {
   type: DecisionRule['type'] | undefined
   direction: DecisionRule['direction'] | undefined
@@ -38,12 +40,14 @@ export function DecisionRuleFields({
   marginErrors,
   thresholdErrors
 }: DecisionRuleFieldsProps): ReactElement {
+  const locked = useFormLocked()
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <Field>
         <FieldLabel className="">Decision rule type</FieldLabel>
 
         <Select
+          disabled={locked}
           value={type ?? ''}
           onValueChange={(value) => {
             if (value === 'superiority' || value === 'futility') {
@@ -68,6 +72,7 @@ export function DecisionRuleFields({
         <FieldLabel className="">Direction</FieldLabel>
 
         <Select
+          disabled={locked}
           value={direction ?? ''}
           onValueChange={(value) => {
             if (value === 'greater' || value === 'less') {

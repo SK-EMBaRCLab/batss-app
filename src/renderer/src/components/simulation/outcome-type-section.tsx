@@ -17,9 +17,12 @@ import {
 import { outcomeTypes } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { useFormLocked } from './form-locked'
+
 type OutcomeType = (typeof outcomeTypes)[number]['value']
 
 export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): ReactElement {
+  const locked = useFormLocked()
   return (
     <FormischField of={form} path={['outcomeType']}>
       {(field) => {
@@ -32,6 +35,7 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
               </FieldDescription>
 
               <Select
+                disabled={locked}
                 value={field.input ?? ''}
                 onValueChange={(value) => {
                   if (outcomeTypes.some((type) => type.value === value)) {

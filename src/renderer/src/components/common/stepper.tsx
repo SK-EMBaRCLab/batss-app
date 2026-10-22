@@ -16,6 +16,9 @@ type StepperProps = {
   steps: Step[]
   currentStep: number
   onStepClick?: (index: number) => void
+  // Lets every step be clicked, not just ones already reached (e.g.
+  // while a run is in progress and the form is read-only)
+  allowAnyStep?: boolean
   className?: string
 }
 
@@ -23,6 +26,7 @@ export function Stepper({
   steps,
   currentStep,
   onStepClick,
+  allowAnyStep = false,
   className
 }: StepperProps): ReactElement {
   const progress = ((currentStep + 1) / steps.length) * 100
@@ -34,7 +38,7 @@ export function Stepper({
         {steps.map((step, index) => {
           const completed = index < currentStep
           const active = index === currentStep
-          const clickable = index <= currentStep
+          const clickable = allowAnyStep || index <= currentStep
 
           return (
             <div key={step.id} className="flex items-start">
@@ -53,13 +57,14 @@ export function Stepper({
                     'flex h-8 w-8 items-center justify-center rounded-full border text-sm font-medium transition-colors',
                     active &&
                       'border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2',
+                    // Dotted outline (rings can't be dotted) marks a step as clickable
                     completed &&
-                      'border-primary bg-primary text-primary-foreground group-hover:bg-primary/90',
+                      'border-primary bg-primary text-primary-foreground group-hover:bg-primary/90 group-hover:outline-2 group-hover:outline-offset-2 group-hover:outline-primary group-hover:outline-dotted',
                     !active && !completed && 'border-muted text-muted-foreground',
                     clickable &&
                       !active &&
                       !completed &&
-                      'group-hover:border-primary group-hover:bg-primary/5'
+                      'group-hover:border-primary group-hover:bg-primary/5 group-hover:outline-2 group-hover:outline-offset-2 group-hover:outline-primary group-hover:outline-dotted'
                   )}
                 >
                   {completed ? <Check className="h-4 w-4" /> : index + 1}
