@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.4.0...v5.4.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **branding:** ship Linux icons in standard sizes so the Dock shows them ([d69287c](https://github.com/SK-EMBaRCLab/batss-app/commit/d69287c003435eff74a0ae1f3b1f242a2fa3cfab))
+
 ## [5.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.3.0...v5.4.0) (2026-10-22)
 
 ### Features
