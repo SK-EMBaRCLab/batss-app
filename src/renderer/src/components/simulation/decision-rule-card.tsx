@@ -124,8 +124,10 @@ export function DecisionRuleCard({ form }: { form: SimulationFormStore }): React
           Define the conditions that determine whether the trial adapts
         </p>
       </div>
-      <div className="p-6">
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+      {/* Sized by the card's own width (container queries), not the window's:
+          the help panel and padding leave it much narrower than the screen */}
+      <div className="@container p-6">
+        <div className="grid gap-8 @3xl:grid-cols-[1.4fr_1fr]">
           {preview && (
             <DecisionRulePreview
               rule={preview.rule}

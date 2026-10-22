@@ -42,80 +42,84 @@ export function DecisionRuleFields({
 }: DecisionRuleFieldsProps): ReactElement {
   const locked = useFormLocked()
   return (
-    <div className="grid gap-5 sm:grid-cols-2">
-      <Field>
-        <FieldLabel className="">Decision rule type</FieldLabel>
+    <div className="@container">
+      <div className="grid gap-5 @md:grid-cols-2">
+        <Field>
+          <FieldLabel className="">Decision rule type</FieldLabel>
 
-        <Select
-          disabled={locked}
-          value={type ?? ''}
-          onValueChange={(value) => {
-            if (value === 'superiority' || value === 'futility') {
-              onTypeChange(value)
-            }
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select rule type" />
-          </SelectTrigger>
+          <Select
+            disabled={locked}
+            value={type ?? ''}
+            onValueChange={(value) => {
+              if (value === 'superiority' || value === 'futility') {
+                onTypeChange(value)
+              }
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select rule type" />
+            </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value="superiority">Superiority</SelectItem>
-            <SelectItem value="futility" disabled>
-              Futility (under development)
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </Field>
+            <SelectContent>
+              <SelectItem value="superiority">Superiority</SelectItem>
+              <SelectItem value="futility" disabled>
+                Futility (under development)
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
 
-      <Field>
-        <FieldLabel className="">Direction</FieldLabel>
+        <Field>
+          <FieldLabel className="">Direction</FieldLabel>
 
-        <Select
-          disabled={locked}
-          value={direction ?? ''}
-          onValueChange={(value) => {
-            if (value === 'greater' || value === 'less') {
-              onDirectionChange(value)
-            }
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select direction" />
-          </SelectTrigger>
+          <Select
+            disabled={locked}
+            value={direction ?? ''}
+            onValueChange={(value) => {
+              if (value === 'greater' || value === 'less') {
+                onDirectionChange(value)
+              }
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select direction" />
+            </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value="greater">Greater than</SelectItem>
-            <SelectItem value="less">Less than</SelectItem>
-          </SelectContent>
-        </Select>
-      </Field>
+            <SelectContent>
+              <SelectItem value="greater">Greater than</SelectItem>
+              <SelectItem value="less">Less than</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
 
-      <Field data-invalid={marginErrors !== undefined}>
-        <FieldLabel className="">Superiority margin (SM)</FieldLabel>
+        <Field data-invalid={marginErrors !== undefined}>
+          <FieldLabel className="">Superiority margin (SM)</FieldLabel>
 
-        <Input
-          type="number"
-          step="0.01"
-          value={margin ?? ''}
-          onChange={(event) => onMarginChange(event.target.value)}
-        />
+          <Input
+            type="number"
+            step="0.01"
+            value={margin ?? ''}
+            onChange={(event) => onMarginChange(event.target.value)}
+          />
 
-        {marginErrors && <FieldError errors={marginErrors.map((message) => ({ message }))} />}
-      </Field>
+          {marginErrors && <FieldError errors={marginErrors.map((message) => ({ message }))} />}
+        </Field>
 
-      <Field data-invalid={thresholdErrors !== undefined}>
-        <FieldLabel className="">Decision threshold (DT)</FieldLabel>
+        <Field data-invalid={thresholdErrors !== undefined}>
+          <FieldLabel className="">Decision threshold (DT)</FieldLabel>
 
-        <Input
-          type="number"
-          step="0.01"
-          value={threshold ?? ''}
-          onChange={(event) => onThresholdChange(event.target.value)}
-        />
+          <Input
+            type="number"
+            step="0.01"
+            value={threshold ?? ''}
+            onChange={(event) => onThresholdChange(event.target.value)}
+          />
 
-        {thresholdErrors && <FieldError errors={thresholdErrors.map((message) => ({ message }))} />}
-      </Field>
+          {thresholdErrors && (
+            <FieldError errors={thresholdErrors.map((message) => ({ message }))} />
+          )}
+        </Field>
+      </div>
     </div>
   )
 }

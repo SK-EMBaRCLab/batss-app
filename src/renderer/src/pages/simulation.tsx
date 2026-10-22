@@ -51,24 +51,23 @@ export default function Simulation(): ReactElement {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-6">
-      <Card className="flex min-h-0 flex-1 flex-col">
-        <CardHeader className="shrink-0">
-          <div className="flex items-center justify-between">
-            <CardTitle>
-              {design?.name ?? 'BATSS Simulation Design'}
-              {design && design.results.length > 0 && (
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
-                </span>
-              )}
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="min-h-0 flex-1 overflow-hidden">
-          <SimulationForm onRun={handleRun} initialInput={design?.input} />
-        </CardContent>
-      </Card>
+    // Wider than the other capped pages: the form card plus the help card
+    // beside it fill the space a single centred form would leave empty
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-352 flex-col gap-4 p-6">
+      <SimulationForm
+        onRun={handleRun}
+        initialInput={design?.input}
+        header={
+          <CardTitle>
+            {design?.name ?? 'BATSS Simulation Design'}
+            {design && design.results.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far
+              </span>
+            )}
+          </CardTitle>
+        }
+      />
       {showProgress && (
         <Card className="shrink-0">
           <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
