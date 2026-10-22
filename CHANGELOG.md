@@ -2,40 +2,35 @@
 
 ## [5.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.1.0...v5.2.0) (2026-10-22)
 
-
 ### Features
 
-* **table:** fit the Simulation Runs table to the window ([cc72986](https://github.com/SK-EMBaRCLab/batss-app/commit/cc72986fff206a18b2c8ba2bbb34b651ca3c9086))
-
+- **table:** fit the Simulation Runs table to the window ([cc72986](https://github.com/SK-EMBaRCLab/batss-app/commit/cc72986fff206a18b2c8ba2bbb34b651ca3c9086))
 
 ### Bug Fixes
 
-* **window:** set a minimum window size of 960×600 ([04f32b6](https://github.com/SK-EMBaRCLab/batss-app/commit/04f32b6018e7884867fc5b7e97960f666692c7cb))
+- **window:** set a minimum window size of 960×600 ([04f32b6](https://github.com/SK-EMBaRCLab/batss-app/commit/04f32b6018e7884867fc5b7e97960f666692c7cb))
 
 ## [5.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.0.0...v5.1.0) (2026-10-22)
 
-
 ### Features
 
-* **simulation:** clarify performance settings on the review step ([b738213](https://github.com/SK-EMBaRCLab/batss-app/commit/b7382131b69e12389d12348f21f960e8b567b45a))
-* **simulation:** show run progress on the taskbar and dock icon ([6fe18b0](https://github.com/SK-EMBaRCLab/batss-app/commit/6fe18b0435100f9118e4316b57c31958b60eb31b))
-
+- **simulation:** clarify performance settings on the review step ([b738213](https://github.com/SK-EMBaRCLab/batss-app/commit/b7382131b69e12389d12348f21f960e8b567b45a))
+- **simulation:** show run progress on the taskbar and dock icon ([6fe18b0](https://github.com/SK-EMBaRCLab/batss-app/commit/6fe18b0435100f9118e4316b57c31958b60eb31b))
 
 ### Bug Fixes
 
-* **simulation:** hide stale progress after a run finishes ([0ea7e84](https://github.com/SK-EMBaRCLab/batss-app/commit/0ea7e846018f2ec481201a83d131aef72534945a))
-* **simulation:** prevent results from being saved to the wrong design ([f1c5238](https://github.com/SK-EMBaRCLab/batss-app/commit/f1c52385ad080c05488d90bbf1fa73bd5805e09f))
+- **simulation:** hide stale progress after a run finishes ([0ea7e84](https://github.com/SK-EMBaRCLab/batss-app/commit/0ea7e846018f2ec481201a83d131aef72534945a))
+- **simulation:** prevent results from being saved to the wrong design ([f1c5238](https://github.com/SK-EMBaRCLab/batss-app/commit/f1c52385ad080c05488d90bbf1fa73bd5805e09f))
 
 ## [5.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.1...v5.0.0) (2026-10-20)
 
-
 ### ⚠ BREAKING CHANGES
 
-* **deps:** upgrade Electron 39 to 44
+- **deps:** upgrade Electron 39 to 44
 
 ### Bug Fixes
 
-* **deps:** upgrade Electron 39 to 44 ([0a4f3fb](https://github.com/SK-EMBaRCLab/batss-app/commit/0a4f3fbde682df647b0cf6e9757c5e0db7ca280e))
+- **deps:** upgrade Electron 39 to 44 ([0a4f3fb](https://github.com/SK-EMBaRCLab/batss-app/commit/0a4f3fbde682df647b0cf6e9757c5e0db7ca280e))
 
 ## [4.11.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v4.11.0...v4.11.1) (2026-10-14)
 

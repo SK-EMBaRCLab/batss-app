@@ -1,6 +1,7 @@
 # Albatross app icons
 
 Palette follows `src/renderer/src/assets/globals.css` (OKLCH converted to sRGB):
+
 - Light primary: #02677f; accent: #03a2bc; gold: #ffb500.
 - Dark card: #060e11; accent: #084150; gold: #eaaa2c.
 

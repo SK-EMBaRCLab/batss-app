@@ -10,7 +10,11 @@ import {
 } from '../../shared/settings-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
-import { OUTPUT_PATH_KEY, SIMULATION_TIMEOUT_MINUTES_KEY } from '../settings.constants'
+import {
+  NOTIFY_ON_RUN_FINISH_KEY,
+  OUTPUT_PATH_KEY,
+  SIMULATION_TIMEOUT_MINUTES_KEY
+} from '../settings.constants'
 
 export function registerSettingsIPC(): void {
   ipcMain.handle(IPC.settings.getOutputPath, () => {
@@ -60,6 +64,14 @@ export function registerSettingsIPC(): void {
       return { saved: true }
     }
   )
+
+  ipcMain.handle(IPC.settings.getNotifyOnRunFinish, () => {
+    return settingsService.get(NOTIFY_ON_RUN_FINISH_KEY, true)
+  })
+
+  ipcMain.handle(IPC.settings.setNotifyOnRunFinish, (_event, enabled: boolean) => {
+    settingsService.set(NOTIFY_ON_RUN_FINISH_KEY, enabled === true)
+  })
 
   ipcMain.handle(IPC.settings.selectOutputDirectory, async (event) => {
     const window = BrowserWindow.fromWebContents(event.sender)

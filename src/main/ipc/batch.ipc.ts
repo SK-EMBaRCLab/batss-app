@@ -1,9 +1,10 @@
 // src/main/ipc/batch.ipc.ts
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../../shared/batch-types'
 import { IPC } from '../../shared/ipc-channels'
 import { batchService } from '../services/batch.service'
+import { alertBatchFinished } from '../services/run-alerts'
 import { safeSend } from './safe-send'
 
 export function registerBatchIPC(): void {
@@ -14,7 +15,11 @@ export function registerBatchIPC(): void {
 
     const sendLog = (line: string): void => send(IPC.batch.log, line)
 
-    return await batchService.runBatch(inputs, sendUpdate, sendRowDone, sendLog)
+    const startedAt = Date.now()
+    const final = await batchService.runBatch(inputs, sendUpdate, sendRowDone, sendLog)
+
+    alertBatchFinished(BrowserWindow.fromWebContents(event.sender), final, Date.now() - startedAt)
+    return final
   })
 
   ipcMain.handle(IPC.batch.cancel, () => {

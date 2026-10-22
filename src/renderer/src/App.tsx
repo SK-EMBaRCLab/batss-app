@@ -49,6 +49,17 @@ export default function App(): ReactElement {
     return cleanup
   }, [])
 
+  // A clicked "run finished" notification (see run-alerts.ts in main)
+  // opens the run's results, or the page showing its error.
+  useEffect(() => {
+    return window.app.onOpenRunResult(({ kind, outcome }) => {
+      const { navigate } = useNavigation.getState()
+
+      if (outcome === 'error') navigate(kind)
+      else navigate(kind === 'batch' ? 'table' : 'results')
+    })
+  }, [])
+
   if (!bootstrapped) {
     return <RuntimeScreen />
   }

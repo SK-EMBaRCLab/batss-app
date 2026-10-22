@@ -19,3 +19,10 @@ export function describeBusy(state: EngineState): string {
 // Taskbar/dock progress styles for a running engine; a subset of
 // Electron's ProgressBarOptions['mode'].
 export type TaskbarProgressMode = 'normal' | 'indeterminate' | 'error'
+
+// Sent when the user clicks a "run finished" notification, so the
+// renderer can open the matching page
+export type RunFinishedSummary = {
+  kind: Exclude<EngineBusy, 'idle'>
+  outcome: 'success' | 'error'
+}

@@ -7,6 +7,7 @@ import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Field,
   FieldContent,
@@ -49,6 +50,8 @@ export default function Settings(): ReactElement {
   const [isTimeoutDirty, setIsTimeoutDirty] = useState(false)
   const [timeoutError, setTimeoutError] = useState<string | null>(null)
 
+  const [notifyOnRunFinish, setNotifyOnRunFinish] = useState<boolean | null>(null)
+
   const theme = useTheme((state) => state.theme)
   const setTheme = useTheme((state) => state.setTheme)
 
@@ -75,6 +78,10 @@ export default function Settings(): ReactElement {
         setOutputPath(path)
         setIsLoading(false)
       }
+    })
+
+    window.settings.getNotifyOnRunFinish().then((enabled) => {
+      if (!cancelled) setNotifyOnRunFinish(enabled)
     })
 
     window.settings.getSimulationTimeoutMinutes().then((minutes) => {
@@ -185,6 +192,27 @@ export default function Settings(): ReactElement {
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+          <ItemContent>
+            <ItemTitle>Notify me when a run finishes</ItemTitle>
+            <ItemDescription>
+              Shows a system notification, with your system&apos;s notification sound, when a
+              simulation or batch finishes while Albatross is in the background.
+            </ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Checkbox
+              aria-label="Notify me when a run finishes"
+              checked={notifyOnRunFinish ?? false}
+              disabled={notifyOnRunFinish === null}
+              onCheckedChange={(checked) => {
+                setNotifyOnRunFinish(checked)
+                void window.settings.setNotifyOnRunFinish(checked)
+              }}
+            />
           </ItemActions>
         </Item>
 

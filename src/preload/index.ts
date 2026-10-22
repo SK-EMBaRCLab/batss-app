@@ -2,7 +2,12 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 import { SaveResultResponse } from '../main/ipc/albatross-files.ipc'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
-import { EngineBusy, EngineState, TaskbarProgressMode } from '../shared/engine-types'
+import {
+  EngineBusy,
+  EngineState,
+  RunFinishedSummary,
+  TaskbarProgressMode
+} from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
 import { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
@@ -21,7 +26,15 @@ const app = {
   cpuCount: (): Promise<number> => ipcRenderer.invoke(IPC.app.cpuCount),
   setProgress: (value: number, mode: TaskbarProgressMode) =>
     ipcRenderer.send(IPC.app.setProgress, value, mode),
-  requestAttention: () => ipcRenderer.send(IPC.app.requestAttention)
+
+  onOpenRunResult: (callback: (summary: RunFinishedSummary) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, summary: RunFinishedSummary): void =>
+      callback(summary)
+    ipcRenderer.on(IPC.app.openRunResult, listener)
+    return (): void => {
+      ipcRenderer.removeListener(IPC.app.openRunResult, listener)
+    }
+  }
 }
 
 const runtime = {
@@ -120,7 +133,13 @@ const settings = {
     ipcRenderer.invoke(IPC.settings.getSimulationTimeoutMinutes),
 
   setSimulationTimeoutMinutes: (minutes: number): Promise<SetSimulationTimeoutResult> =>
-    ipcRenderer.invoke(IPC.settings.setSimulationTimeoutMinutes, minutes)
+    ipcRenderer.invoke(IPC.settings.setSimulationTimeoutMinutes, minutes),
+
+  getNotifyOnRunFinish: (): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.settings.getNotifyOnRunFinish),
+
+  setNotifyOnRunFinish: (enabled: boolean): Promise<void> =>
+    ipcRenderer.invoke(IPC.settings.setNotifyOnRunFinish, enabled)
 }
 
 const batch = {

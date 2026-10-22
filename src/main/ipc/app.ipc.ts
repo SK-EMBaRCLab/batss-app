@@ -45,14 +45,4 @@ export function registerAppIPC(): void {
   ipcMain.on(IPC.app.setProgress, (event, value: number, mode: TaskbarProgressMode) => {
     BrowserWindow.fromWebContents(event.sender)?.setProgressBar(value, { mode })
   })
-
-  // Flashes the taskbar button / bounces the dock icon when a run
-  // finishes while the window is in the background, until it's focused.
-  ipcMain.on(IPC.app.requestAttention, (event) => {
-    const window = BrowserWindow.fromWebContents(event.sender)
-    if (!window || window.isFocused()) return
-
-    window.flashFrame(true)
-    window.once('focus', () => window.flashFrame(false))
-  })
 }

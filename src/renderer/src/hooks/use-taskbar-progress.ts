@@ -13,8 +13,9 @@ function batchOutcome(status: BatchStatus): RunOutcome {
   return status === 'cancelled' ? 'cancelled' : 'error'
 }
 
-// Mirrors the running simulation/batch onto the taskbar/dock icon and
-// asks for attention when it finishes. Lives in App rather than on the
+// Mirrors the running simulation/batch onto the taskbar/dock icon
+// (flashing and notifications on finish come from run-alerts.ts in
+// main). Lives in App rather than on the
 // Simulation/Batch pages so it keeps going while the user is elsewhere.
 //  - Simulation: the same stage-based estimate as the in-page bar.
 //  - Batch: finished rows plus the current row's estimate, so it moves
@@ -59,7 +60,6 @@ export function useTaskbarProgress(): void {
 
   useEffect(() => {
     const finish = (outcome: RunOutcome): void => {
-      if (outcome !== 'cancelled') window.app.requestAttention()
       setShowError(outcome === 'error' && !document.hasFocus())
     }
 

@@ -11,7 +11,7 @@ export const IPC = {
     setDocumentEdited: 'app:set-document-edited',
     cpuCount: 'app:cpu-count',
     setProgress: 'app:set-progress',
-    requestAttention: 'app:request-attention'
+    openRunResult: 'app:open-run-result'
   },
   runtime: {
     check: 'runtime:check',
@@ -42,7 +42,9 @@ export const IPC = {
     setOutputPath: 'settings:setOutputPath',
     selectOutputDirectory: 'settings:selectOutputDirectory',
     getSimulationTimeoutMinutes: 'settings:getSimulationTimeoutMinutes',
-    setSimulationTimeoutMinutes: 'settings:setSimulationTimeoutMinutes'
+    setSimulationTimeoutMinutes: 'settings:setSimulationTimeoutMinutes',
+    getNotifyOnRunFinish: 'settings:getNotifyOnRunFinish',
+    setNotifyOnRunFinish: 'settings:setNotifyOnRunFinish'
   },
   batch: {
     run: 'batch:run',
