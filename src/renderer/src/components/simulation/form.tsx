@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
 import { designSchema, initialDesignInput } from '@/lib/schema'
 import { toSimulationInput } from '@/lib/simulation-mapper'
 import { cn } from '@/lib/utils'
@@ -33,24 +34,8 @@ import { SampleSizeSection } from './sample-size-section'
 import { hasAnyFieldError } from './utils'
 
 // Whether the help card beside the form is expanded, remembered across
-// sessions. Same fail-open localStorage handling as app-banner.tsx.
+// sessions
 const HELP_OPEN_KEY = 'albatross:simulation-help-open'
-
-function readHelpOpen(): boolean {
-  try {
-    return window.localStorage.getItem(HELP_OPEN_KEY) !== 'false'
-  } catch {
-    return true
-  }
-}
-
-function writeHelpOpen(open: boolean): void {
-  try {
-    window.localStorage.setItem(HELP_OPEN_KEY, String(open))
-  } catch {
-    // Ignore; the card just won't remember its state.
-  }
-}
 
 /**
  * Natural height of the tallest of `count` elements, kept up to date as
@@ -149,11 +134,7 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   const isRunning = busy === 'simulation'
   const [step, setStep] = useState(0)
   const stepHeights = useTallestHeight(steps.length)
-  const [helpOpen, setHelpOpenState] = useState(readHelpOpen)
-  const setHelpOpen = (open: boolean): void => {
-    setHelpOpenState(open)
-    writeHelpOpen(open)
-  }
+  const [helpOpen, setHelpOpen] = usePersistentBoolean(HELP_OPEN_KEY, true)
   const form = useForm({
     schema: designSchema,
     validate: 'blur',

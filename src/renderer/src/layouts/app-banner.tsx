@@ -2,30 +2,15 @@ import { type ReactElement, useState } from 'react'
 
 import { Banner } from '@/components/common/banner'
 import { Button } from '@/components/ui/button'
+import { readStorage, writeStorage } from '@/lib/storage'
 import { useRuntime } from '@/stores/runtime'
 
 const DISMISSED_BANNER_KEY = 'albatross:dismissed-banner'
 
-function readDismissedKey(): string | null {
-  try {
-    return window.localStorage.getItem(DISMISSED_BANNER_KEY)
-  } catch {
-    // localStorage can throw in some sandboxed contexts — fail open
-    // (banner just won't remember dismissal) rather than crash.
-    return null
-  }
-}
-
-function writeDismissedKey(key: string): void {
-  try {
-    window.localStorage.setItem(DISMISSED_BANNER_KEY, key)
-  } catch {
-    // Ignore — see readDismissedKey.
-  }
-}
-
 export function AppBanner(): ReactElement | null {
-  const [dismissedKey, setDismissedKey] = useState<string | null>(() => readDismissedKey())
+  const [dismissedKey, setDismissedKey] = useState<string | null>(() =>
+    readStorage(DISMISSED_BANNER_KEY)
+  )
 
   const status = useRuntime((state) => state.status)
   const message = useRuntime((state) => state.message)
@@ -42,7 +27,7 @@ export function AppBanner(): ReactElement | null {
 
   const dismiss = (key: string): void => {
     setDismissedKey(key)
-    writeDismissedKey(key)
+    writeStorage(DISMISSED_BANNER_KEY, key)
   }
 
   if (status === 'installing') {

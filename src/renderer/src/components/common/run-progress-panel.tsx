@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { batchOutcome, type RunOutcome, useActiveRunPercent } from '@/hooks/use-active-run-progress'
+import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
 import { STAGE_LABEL } from '@/lib/run-progress'
 import { cn, formatDuration, formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
@@ -24,25 +25,9 @@ type PanelRun = {
 // Failures stay until closed.
 const SUCCESS_HIDE_MS = 10_000
 
-// Whether the panel is collapsed to its header, remembered across runs and
-// sessions. Same fail-open localStorage handling as app-banner.tsx.
+// Whether the panel is collapsed to its header, remembered across runs
+// and sessions
 const COLLAPSED_KEY = 'albatross:run-panel-collapsed'
-
-function readCollapsed(): boolean {
-  try {
-    return window.localStorage.getItem(COLLAPSED_KEY) === 'true'
-  } catch {
-    return false
-  }
-}
-
-function writeCollapsed(collapsed: boolean): void {
-  try {
-    window.localStorage.setItem(COLLAPSED_KEY, String(collapsed))
-  } catch {
-    // Ignore; it just won't remember.
-  }
-}
 
 function pageFor(kind: RunKind): 'simulation' | 'batch' {
   return kind === 'batch' ? 'batch' : 'simulation'
@@ -77,13 +62,8 @@ export function RunProgressPanel(): ReactElement | null {
 
   const [run, setRun] = useState<PanelRun | null>(runFromEngine)
   const [closed, setClosed] = useState(false)
-  const [collapsed, setCollapsedState] = useState(readCollapsed)
+  const [collapsed, setCollapsed] = usePersistentBoolean(COLLAPSED_KEY, false)
   const [now, setNow] = useState(() => Date.now())
-
-  const setCollapsed = (value: boolean): void => {
-    setCollapsedState(value)
-    writeCollapsed(value)
-  }
 
   // Track run start/end from the engine. A run that finishes while the
   // user is on its own page has already been shown there, so the panel
