@@ -36,8 +36,10 @@ export default function Dashboard(): ReactElement {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="flex flex-col gap-6">
+    // Same max width as the Simulation and Batch pages, so moving between
+    // them doesn't shift the content sideways
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto flex max-w-[88rem] flex-col gap-6 p-6">
         <DashboardHeader />
 
         {/* Empty state: design exists but has never been run */}
