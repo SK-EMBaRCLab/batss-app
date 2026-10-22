@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.3.0...v5.4.0) (2026-10-22)
+
+
+### Features
+
+* **app:** customize icons and improve completion notifications ([bbd744b](https://github.com/SK-EMBaRCLab/batss-app/commit/bbd744bb71c8638cfc737b785d6861aa9c4d997b))
+* **branding:** add configurable app and Dock icon appearance ([b764c9e](https://github.com/SK-EMBaRCLab/batss-app/commit/b764c9eddee9d03c54858cfba00ec9fd63dae520))
+* **simulation:** notify when a run finishes in the background ([30f6791](https://github.com/SK-EMBaRCLab/batss-app/commit/30f679192e6a6808b2b14b08dcdf4a8e25a67338))
+
+
+### Bug Fixes
+
+* **branding:** normalize Dock and launcher icon padding ([b75fe81](https://github.com/SK-EMBaRCLab/batss-app/commit/b75fe81d3b3c3641e47528f182e879416dce959b))
+* **notifications:** notify when runs finish while the app is focused ([bd09037](https://github.com/SK-EMBaRCLab/batss-app/commit/bd09037280353c9c3b8fb6fc88facca7a8b68b52))
+
 ## [5.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.2.0...v5.3.0) (2026-10-22)
 
 
