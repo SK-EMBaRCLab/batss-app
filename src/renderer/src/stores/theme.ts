@@ -1,53 +1,43 @@
-// stores/theme.ts
+import type { AppearanceState, IconAppearance, ThemeSource } from '@shared/appearance-types'
 import { create } from 'zustand'
 
-export type Theme = 'system' | 'light' | 'dark'
+export type Theme = ThemeSource
 
 type ThemeState = {
   theme: Theme
   isDark: boolean
+  iconAppearance: IconAppearance
   initialized: boolean
   initialize: () => Promise<void>
   setTheme: (theme: Theme) => Promise<void>
+  setIconAppearance: (choice: IconAppearance) => Promise<void>
 }
 
-export const useTheme = create<ThemeState>((set, get) => ({
-  theme: 'system',
-  isDark: false,
-  initialized: false,
-
-  initialize: async () => {
-    if (get().initialized) return
-    set({ initialized: true })
-    const { source, dark } = await window.theme.get()
-
-    set({
-      theme: source,
-      isDark: dark
-    })
-
-    document.documentElement.classList.toggle('dark', dark)
-
-    window.theme.onUpdated(({ source, dark }) => {
-      set({
-        theme: source,
-        isDark: dark
-      })
-
-      document.documentElement.classList.toggle('dark', dark)
-    })
-  },
-
-  setTheme: async (theme) => {
-    await window.theme.set(theme)
-
-    const { dark } = await window.theme.get()
-
-    set({
-      theme,
-      isDark: dark
-    })
-
+export const useTheme = create<ThemeState>((set, get) => {
+  const applyAppearance = ({ source, dark, iconAppearance }: AppearanceState): void => {
+    set({ theme: source, isDark: dark, iconAppearance })
     document.documentElement.classList.toggle('dark', dark)
   }
-}))
+
+  return {
+    theme: 'system',
+    isDark: false,
+    iconAppearance: 'theme',
+    initialized: false,
+
+    initialize: async () => {
+      if (get().initialized) return
+      set({ initialized: true })
+      window.theme.onUpdated(applyAppearance)
+      applyAppearance(await window.theme.get())
+    },
+
+    setTheme: async (theme) => {
+      applyAppearance(await window.theme.set(theme))
+    },
+
+    setIconAppearance: async (choice) => {
+      applyAppearance(await window.theme.setIconAppearance(choice))
+    }
+  }
+})

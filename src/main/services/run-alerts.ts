@@ -14,15 +14,10 @@ import { settingsService } from './settings.service'
 let current: Notification | null = null
 
 /**
- * Lets the user know a run finished while albatross was in the
- * background: flashes the taskbar button / bounces the dock icon, and
- * (unless turned off in Settings) shows a native notification, which
- * plays the OS's own notification sound. Clicking it brings the window
- * back and tells the renderer which page to open. Does nothing while
- * the window is focused, since the in-app status is already visible.
- *
- * Fired from main rather than the renderer so it still works if the
- * renderer reloads mid-run.
+ * Shows a native notification when a run finishes, unless disabled in
+ * Settings. Background windows also flash/bounce for attention.
+ * Clicking the notification opens the results or error page.
+ * Runs in main so renderer reloads do not interrupt completion alerts.
  */
 function alertRunFinished(
   window: BrowserWindow,
@@ -30,18 +25,23 @@ function alertRunFinished(
   title: string,
   body: string
 ): void {
-  if (window.isDestroyed() || window.isFocused()) return
+  if (window.isDestroyed()) return
 
-  window.flashFrame(true)
-  window.once('focus', () => window.flashFrame(false))
+  if (!window.isFocused()) {
+    window.flashFrame(true)
+    window.once('focus', () => window.flashFrame(false))
+  }
 
-  if (!settingsService.get(NOTIFY_ON_RUN_FINISH_KEY, true) || !Notification.isSupported()) {
+  if (!settingsService.get(NOTIFY_ON_RUN_FINISH_KEY, true)) return
+
+  if (!Notification.isSupported()) {
+    console.warn('[run-alerts] Native notifications are not supported in this environment.')
     return
   }
 
   current?.close()
 
-  const notification = new Notification({ title, body, icon })
+  const notification = new Notification({ title, body, icon, silent: false })
 
   notification.on('click', () => {
     if (window.isDestroyed()) return
@@ -52,8 +52,19 @@ function alertRunFinished(
     window.webContents.send(IPC.app.openRunResult, summary)
   })
 
-  notification.show()
+  notification.on('failed', (_event, error) => {
+    console.warn(
+      '[run-alerts] Could not deliver the completion notification. Check macOS notification permissions and app signing.',
+      error
+    )
+  })
+
+  notification.on('close', () => {
+    if (current === notification) current = null
+  })
+
   current = notification
+  notification.show()
 }
 
 export function alertSimulationFinished(

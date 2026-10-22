@@ -1,5 +1,7 @@
+import { resolveIconVariant } from '@shared/appearance-types'
 import { type ReactElement } from 'react'
 
+import albatrossBrand from '@/assets/albatross-brand.svg'
 import albatrossDark from '@/assets/albatross-dark.svg'
 import albatrossLight from '@/assets/albatross-light.svg'
 import {
@@ -18,11 +20,17 @@ import { Spinner } from '@/components/ui/spinner'
 import { navigationItems } from '@/config/navigation'
 import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
+import { useTheme } from '@/stores/theme'
 
 export function AppSidebar(): ReactElement {
   const currentView = useNavigation((state) => state.currentView)
   const navigate = useNavigation((state) => state.navigate)
   const busy = useEngine((s) => s.busy)
+  const isDark = useTheme((state) => state.isDark)
+  const iconAppearance = useTheme((state) => state.iconAppearance)
+  const icon = { brand: albatrossBrand, light: albatrossLight, dark: albatrossDark }[
+    resolveIconVariant(iconAppearance, isDark)
+  ]
 
   return (
     <Sidebar collapsible="icon" variant="floating">
@@ -31,15 +39,9 @@ export function AppSidebar(): ReactElement {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Albatross">
               <img
-                src={albatrossLight}
+                src={icon}
                 alt="Albatross"
-                className="size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8 dark:hidden"
-              />
-
-              <img
-                src={albatrossDark}
-                alt="Albatross"
-                className="hidden size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8 dark:block"
+                className="size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8"
               />
 
               <div className="grid flex-1 text-left text-sm leading-tight">

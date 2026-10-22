@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 import { SaveResultResponse } from '../main/ipc/albatross-files.ipc'
+import type { AppearanceState, IconAppearance } from '../shared/appearance-types'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
 import {
   EngineBusy,
@@ -103,15 +104,16 @@ const simulation = {
 }
 
 const theme = {
-  get: () => ipcRenderer.invoke(IPC.theme.get),
+  get: (): Promise<AppearanceState> => ipcRenderer.invoke(IPC.theme.get),
 
-  set: (theme: 'system' | 'light' | 'dark') => ipcRenderer.invoke(IPC.theme.set, theme),
+  set: (theme: 'system' | 'light' | 'dark'): Promise<AppearanceState> =>
+    ipcRenderer.invoke(IPC.theme.set, theme),
 
-  onUpdated: (
-    callback: (theme: { source: 'system' | 'light' | 'dark'; dark: boolean }) => void
-  ) => {
-    type ThemePayload = { source: 'system' | 'light' | 'dark'; dark: boolean }
-    const listener = (_: Electron.IpcRendererEvent, payload: ThemePayload): void =>
+  setIconAppearance: (choice: IconAppearance): Promise<AppearanceState> =>
+    ipcRenderer.invoke(IPC.theme.setIconAppearance, choice),
+
+  onUpdated: (callback: (theme: AppearanceState) => void) => {
+    const listener = (_: Electron.IpcRendererEvent, payload: AppearanceState): void =>
       callback(payload)
     ipcRenderer.on(IPC.theme.updated, listener)
     return (): void => {
