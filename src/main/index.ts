@@ -113,6 +113,10 @@ function createWindow(): void {
   })
   mainWindow = new BrowserWindow({
     ...state.bounds,
+    // Below this the sidebar plus the wider pages (e.g. Simulation Runs)
+    // stop fitting comfortably
+    minWidth: 960,
+    minHeight: 600,
     show: false,
     autoHideMenuBar: true,
     icon,
