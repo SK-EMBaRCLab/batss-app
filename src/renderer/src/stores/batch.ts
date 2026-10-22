@@ -10,7 +10,7 @@ import { create } from 'zustand'
 import { toast } from '@/components/ui/toast'
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
-import { detectRunStage, type RunStage } from '@/lib/run-progress'
+import { type RunStage, withLogLines } from '@/lib/run-progress'
 import { toError } from '@/lib/utils'
 
 import { useDesign } from './design'
@@ -67,7 +67,15 @@ export const useBatch = create<BatchState>((set) => ({
       rowEstimate: null
     })
 
+    const teardownLog = subscribeLogs(window.batch.onLog, (lines) =>
+      set((state) => withLogLines(state, lines))
+    )
+
     const unsubscribeUpdate = window.batch.onUpdate((update: BatchUpdate) => {
+      // Apply the previous row's last log lines first, so a late stage
+      // marker can't override the new row's 'init' below
+      teardownLog.flush()
+
       // BatchService emits this exact message right before executing
       // each row (see batch.service.ts) — the one reliable "a new row
       // is starting" signal, as opposed to the identical completed=0
@@ -84,22 +92,17 @@ export const useBatch = create<BatchState>((set) => ({
           ? {
               stage: 'init' as RunStage,
               stageStartedAt: Date.now(),
-              rowEstimate: rowInput
-                ? estimateSimulationDuration({
-                    N: rowInput.N,
-                    m0: rowInput.m0,
-                    m: rowInput.m,
-                    R: rowInput.R,
-                    corePercent: rowInput.corePercent,
-                    cpuCount
-                  })
-                : null
+              rowEstimate: rowInput ? estimateSimulationDuration({ ...rowInput, cpuCount }) : null
             }
           : {})
       })
     })
 
     const unsubscribeRow = window.batch.onRowDone((entry: BatchRunEntry) => {
+      // Same for the row that just finished: its last lines (e.g. the
+      // "Results" marker) must land before the stage is cleared below
+      teardownLog.flush()
+
       set((state) => ({
         entries: [...state.entries, entry],
         // Brief gap until the next row's onUpdate re-arms this — avoids
@@ -116,19 +119,6 @@ export const useBatch = create<BatchState>((set) => ({
         result: entry.result
       })
     })
-
-    const teardownLog = subscribeLogs(window.batch.onLog, (lines) =>
-      set((state) => {
-        const stageLine = [...lines].reverse().find((line) => detectRunStage(line) !== null)
-        const stage = stageLine ? detectRunStage(stageLine) : state.stage
-
-        return {
-          logs: appendLogs(state.logs, lines),
-          stage,
-          stageStartedAt: stage !== state.stage ? Date.now() : state.stageStartedAt
-        }
-      })
-    )
 
     try {
       // An IPC failure would otherwise leave the batch "running" for good

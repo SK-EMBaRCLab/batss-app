@@ -4,7 +4,7 @@ import { create } from 'zustand'
 
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
-import { detectRunStage, type RunStage } from '@/lib/run-progress'
+import { type RunStage, withLogLines } from '@/lib/run-progress'
 import { formatDuration, toError } from '@/lib/utils'
 
 import { useDesign } from './design'
@@ -44,17 +44,15 @@ export const useSimulation = create<SimulationState>((set) => ({
       return { status: 'error', message: describeBusy(useEngine.getState()) }
     }
 
+    // Clear the last run's stage now: the engine reads as busy from here,
+    // and progress (taskbar, run panel) would otherwise show the old
+    // run's ~99% while the core count below is fetched
+    set({ stage: null, stageStartedAt: null })
+
     const startedAt = Date.now()
     const designId = useDesign.getState().design?.id ?? null
     const cpuCount = await window.app.cpuCount().catch(() => null)
-    const estimate = estimateSimulationDuration({
-      N: input.N,
-      m0: input.m0,
-      m: input.m,
-      R: input.R,
-      corePercent: input.corePercent,
-      cpuCount
-    })
+    const estimate = estimateSimulationDuration({ ...input, cpuCount })
 
     set({
       startedAt,
@@ -75,16 +73,7 @@ export const useSimulation = create<SimulationState>((set) => ({
     })
 
     const teardownLog = subscribeLogs(window.simulation.onLog, (lines) =>
-      set((state) => {
-        const stageLine = [...lines].reverse().find((line) => detectRunStage(line) !== null)
-        const stage = stageLine ? detectRunStage(stageLine) : state.stage
-
-        return {
-          logs: appendLogs(state.logs, lines),
-          stage,
-          stageStartedAt: stage !== state.stage ? Date.now() : state.stageStartedAt
-        }
-      })
+      set((state) => withLogLines(state, lines))
     )
 
     try {

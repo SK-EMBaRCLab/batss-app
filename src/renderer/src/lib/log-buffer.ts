@@ -45,16 +45,21 @@ export function createLogBatcher(onFlush: (lines: string[]) => void, waitMs = 50
  * returns a single teardown function (unsubscribe + final flush).
  * Used by every store that streams R output (runtime, simulation,
  * batch) so the subscribe/unsubscribe/flush dance lives in one place.
+ * `.flush()` applies any lines still waiting in the batch, for callers
+ * that must see them before handling another event (e.g. a batch row
+ * finishing, so its late lines can't land after the row is reset).
  */
 export function subscribeLogs(
   onLog: (callback: (line: string) => void) => () => void,
   appendTo: (lines: string[]) => void
-): () => void {
+): (() => void) & { flush: () => void } {
   const batcher = createLogBatcher(appendTo)
   const unsubscribe = onLog(batcher.push)
 
-  return () => {
+  const teardown = (): void => {
     unsubscribe()
     batcher.flush()
   }
+
+  return Object.assign(teardown, { flush: batcher.flush })
 }

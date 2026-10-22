@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import type { DurationEstimate } from './duration-estimate'
+import { appendLogs } from './log-buffer'
 
 // The only progress signal a BATSS run actually gives us: batss.glm()
 // prints these 4 fixed stage markers via message() (which R sends to
@@ -27,6 +28,28 @@ export const STAGE_LABEL: Record<RunStage, string> = {
 /** Matches a raw line of R output against BATSS's known stage markers. */
 export function detectRunStage(line: string): RunStage | null {
   return STAGE_MARKERS[line.trim()] ?? null
+}
+
+type StagedLogState = {
+  logs: string[]
+  stage: RunStage | null
+  stageStartedAt: number | null
+}
+
+/**
+ * Store update for newly flushed R output: appends the lines and moves
+ * to the latest stage marker among them, if any. Shared by the
+ * simulation and batch stores.
+ */
+export function withLogLines(state: StagedLogState, lines: string[]): StagedLogState {
+  const stageLine = [...lines].reverse().find((line) => detectRunStage(line) !== null)
+  const stage = stageLine ? detectRunStage(stageLine) : state.stage
+
+  return {
+    logs: appendLogs(state.logs, lines),
+    stage,
+    stageStartedAt: stage !== state.stage ? Date.now() : state.stageStartedAt
+  }
 }
 
 // Progress value the bar jumps to the instant each stage marker is
