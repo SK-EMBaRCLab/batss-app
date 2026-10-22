@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast'
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { detectRunStage, type RunStage } from '@/lib/run-progress'
+import { toError } from '@/lib/utils'
 
 import { useDesign } from './design'
 import { useEngine } from './engine'
@@ -130,7 +131,18 @@ export const useBatch = create<BatchState>((set) => ({
     )
 
     try {
-      const final = await window.batch.run(inputs)
+      // An IPC failure would otherwise leave the batch "running" for good
+      // (same idea as the simulation store). Keep the message generic and
+      // put the details in the batch log.
+      const final = await window.batch.run(inputs).catch((error): BatchUpdate => {
+        set((state) => ({ logs: appendLogs(state.logs, [`> Error: ${toError(error).message}`]) }))
+        return {
+          status: 'error',
+          completed: useBatch.getState().completed,
+          total: inputs.length,
+          message: 'The batch stopped unexpectedly. See the log for details.'
+        }
+      })
       set({
         status: final.status,
         message: final.message,
