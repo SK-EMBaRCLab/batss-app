@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.1.0...v5.2.0) (2026-10-22)
+
+
+### Features
+
+* **table:** fit the Simulation Runs table to the window ([cc72986](https://github.com/SK-EMBaRCLab/batss-app/commit/cc72986fff206a18b2c8ba2bbb34b651ca3c9086))
+
+
+### Bug Fixes
+
+* **window:** set a minimum window size of 960×600 ([04f32b6](https://github.com/SK-EMBaRCLab/batss-app/commit/04f32b6018e7884867fc5b7e97960f666692c7cb))
+
 ## [5.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.0.0...v5.1.0) (2026-10-22)
 
 
