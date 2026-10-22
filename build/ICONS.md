@@ -7,7 +7,18 @@ Palette follows `src/renderer/src/assets/globals.css` (OKLCH converted to sRGB):
 
 `icon.svg` is the editable launcher source. `icon.png` (1024px), `icon.ico`
 (16–256px), and `icon.icns` (16–1024px with Retina sizes) are matching exports
-used by the existing electron-builder configuration. `resources/icon.png` is
+used by the existing electron-builder configuration.
+
+Linux uses `icons/` (16–512px, one PNG per size). The desktop icon theme only
+searches the sizes it defines, which stop at 512×512, so a single 1024px PNG
+is never found and the Dock falls back to a generic icon. Regenerate them from
+`icon.png` whenever it changes:
+
+```sh
+for s in 16 24 32 48 64 128 256 512; do
+  magick build/icon.png -filter Lanczos -resize ${s}x${s} -strip PNG32:build/icons/${s}x${s}.png
+done
+``` `resources/icon.png` is
 the same launcher design used by BrowserWindow.
 
 Renderer sources are `albatross-brand.svg`, `albatross-light.svg`, and

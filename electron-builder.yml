@@ -35,7 +35,9 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
-  icon: build/icon.png
+  # One PNG per size: the hicolor icon theme only looks in the sizes it
+  # defines (up to 512x512), so a lone 1024px PNG never shows up
+  icon: build/icons
   target:
     - AppImage
     - snap
