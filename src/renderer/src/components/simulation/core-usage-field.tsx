@@ -1,4 +1,5 @@
-import { Field as FormischField } from '@formisch/react'
+import { Field as FormischField, useField } from '@formisch/react'
+import { DEFAULT_CORE_PERCENT, resolveCoreCount } from '@shared/cores'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Label } from '@/components/ui/label'
@@ -12,13 +13,14 @@ const CORE_PERCENT_STEPS = [25, 50, 75, 100] as const
 /**
  * How many CPU cores BATSS will use to parallelise across simulated
  * trials (`mc.cores`), as a percentage of the machine's total cores.
- * Resolved to an actual worker count in the main process — see
- * resolveCores() in simulation.service.ts — this slider only ever
- * stores/displays the percentage plus a live preview of what it
- * resolves to on this machine.
+ * Resolved to an actual worker count in the main process; this slider
+ * only stores the percentage, plus a live preview of what it resolves
+ * to on this machine using the same resolveCoreCount() (shared/cores.ts),
+ * including the cap at R.
  */
 export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
+  const replicates = useField(form, { path: ['R'] })
   const [cpuCount, setCpuCount] = useState<number | null>(null)
 
   useEffect(() => {
@@ -28,8 +30,10 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
   return (
     <FormischField of={form} path={['corePercent']}>
       {(field) => {
-        const percent = (field.input ?? 75) as number
-        const resolvedCores = cpuCount ? Math.max(1, Math.round((cpuCount * percent) / 100)) : null
+        const percent = (field.input ?? DEFAULT_CORE_PERCENT) as number
+        const resolvedCores = cpuCount
+          ? resolveCoreCount(cpuCount, percent, Number(replicates.input) || undefined)
+          : null
 
         return (
           <div className="max-w-md space-y-3">

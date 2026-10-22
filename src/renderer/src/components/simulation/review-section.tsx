@@ -1,4 +1,5 @@
 import { useField } from '@formisch/react'
+import { DEFAULT_CORE_PERCENT, resolveCoreCount } from '@shared/cores'
 import { ChevronDown, Clock, SlidersHorizontal } from 'lucide-react'
 import { Fragment, type ReactElement, useEffect, useState } from 'react'
 
@@ -60,10 +61,9 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
     cpuCount
   })
 
-  // Same defaulting/rounding as CoreUsageField, so the collapsed summary matches the slider
-  const corePercentValue = (corePercent.input ?? 75) as number
+  const corePercentValue = (corePercent.input ?? DEFAULT_CORE_PERCENT) as number
   const resolvedCores = cpuCount
-    ? Math.max(1, Math.round((cpuCount * corePercentValue) / 100))
+    ? resolveCoreCount(cpuCount, corePercentValue, Number(R.input) || undefined)
     : null
 
   const snapshot: DesignSnapshot = {

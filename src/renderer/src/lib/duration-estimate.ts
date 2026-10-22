@@ -1,3 +1,5 @@
+import { resolveCoreCount } from '@shared/cores'
+
 // A rough, pre-run "how long will this take" estimate for the Review
 // step of the simulation wizard. This is a heuristic, not a
 // measurement: there's no stored history of past run durations behind
@@ -13,8 +15,6 @@
 const SECONDS_PER_UNIT_LOW = 0.5
 const SECONDS_PER_UNIT_HIGH = 2.5
 
-const DEFAULT_CORE_PERCENT = 75
-
 export type DurationEstimate = {
   minSeconds: number
   maxSeconds: number
@@ -27,9 +27,9 @@ function toPositiveNumber(value: string | number | undefined): number | null {
 
 /**
  * Estimates a [min, max] second range for a simulation run, from the
- * same inputs visible on the Review step. Mirrors resolveCores() in
- * simulation.service.ts so the "cores" half of the estimate matches
- * what the main process will actually use, but cpuCount has to be
+ * same inputs visible on the Review step. Uses the same
+ * resolveCoreCount() as the main process so the "cores" half of the
+ * estimate matches what it will actually use, but cpuCount has to be
  * passed in (via window.app.cpuCount()) since only the main process
  * can see the real core count.
  *
@@ -54,9 +54,7 @@ export function estimateSimulationDuration(input: {
 
   const interims = Math.max(1, Math.ceil((N - m0) / m))
 
-  const totalCores = input.cpuCount ?? 4
-  const percent = input.corePercent ?? DEFAULT_CORE_PERCENT
-  const cores = Math.max(1, Math.min(Math.round((totalCores * percent) / 100), R))
+  const cores = resolveCoreCount(input.cpuCount ?? 4, input.corePercent, R)
 
   const workUnits = (R * interims) / cores
 

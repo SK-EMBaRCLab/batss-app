@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm } from 'fs/promises'
 import os from 'os'
 import path from 'path'
 
+import { resolveCoreCount } from '../../shared/cores'
 import { describeBusy } from '../../shared/engine-types'
 import { DEFAULT_SIMULATION_TIMEOUT_MINUTES } from '../../shared/settings-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
@@ -31,10 +32,6 @@ function getSimulationTimeoutMs(): number {
   return minutes * 60 * 1000
 }
 
-// Used when a design was saved before the "% of cores" advanced
-// setting existed, so `input.corePercent` is undefined.
-const DEFAULT_CORE_PERCENT = 75
-
 // Resolves the "% of cores" advanced setting to an actual worker count
 // for BATSS's `mc.cores`. Only Node knows the real core count
 // (os.cpus()), so this happens here rather than in R — see
@@ -42,13 +39,7 @@ const DEFAULT_CORE_PERCENT = 75
 // "1:1" and relies entirely on this value for parallelism, to avoid
 // oversubscribing the machine with two independent layers of threads.
 function resolveCores(corePercent: number | undefined, replicates: number): number {
-  const totalCores = os.cpus().length
-  const percent = corePercent ?? DEFAULT_CORE_PERCENT
-  const requested = Math.round((totalCores * percent) / 100)
-
-  // Never spawn more workers than there are Monte Carlo replicates —
-  // anything beyond `R` would just sit idle.
-  return Math.max(1, Math.min(requested, replicates))
+  return resolveCoreCount(os.cpus().length, corePercent, replicates)
 }
 
 // resources/** is asarUnpack'd (see electron-builder.yml), so in a
