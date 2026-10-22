@@ -14,9 +14,11 @@ function makeId(): string {
 }
 
 // Runs write their results into the design that started them, so
-// switching designs mid-run would orphan (or misfile) them. Ask the
-// user to stop the run first. Cancels via window.* directly rather than
-// the simulation/batch stores, which import this one.
+// switching designs mid-run would orphan (or misfile) them. Asked last,
+// once the user has committed to switching (past the unsaved-changes
+// prompt and any file picker), so backing out of those never stops a
+// run. Cancels via window.* directly rather than the simulation/batch
+// stores, which import this one.
 async function confirmStopActiveRun(): Promise<boolean> {
   const { busy } = useEngine.getState()
   if (busy === 'idle') return true
@@ -54,6 +56,14 @@ export const useDesign = create<DesignState>((set, get) => {
     window.design.setDirty(dirty)
   }
 
+  // The unsaved-changes prompt: false if the user cancelled, or chose
+  // Save and the save didn't go through.
+  const confirmLeave = async (): Promise<boolean> => {
+    const result = await window.design.canLeave()
+    if (result === 'save') return get().saveDesign()
+    return result
+  }
+
   return {
     design: null,
     filePath: null,
@@ -62,21 +72,8 @@ export const useDesign = create<DesignState>((set, get) => {
     isDirty: false,
 
     newDesign: async (input, name = 'Untitled Design') => {
+      if (!(await confirmLeave())) return
       if (!(await confirmStopActiveRun())) return
-
-      const result = await window.design.canLeave()
-
-      if (result === false) {
-        return
-      }
-
-      if (result === 'save') {
-        const saved = await get().saveDesign()
-
-        if (!saved) {
-          return
-        }
-      }
 
       get().startNewDesign(input, name)
     },
@@ -183,19 +180,19 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     loadDesign: async () => {
-      if (!(await confirmStopActiveRun())) return false
-
-      const allowed = await window.design.canLeave()
-
-      if (!allowed) return false
+      if (!(await confirmLeave())) return false
 
       const loaded = await window.design.loadResult()
       if (!loaded) return false
 
+      if (!(await confirmStopActiveRun())) return false
+
       set({
         design: loaded.design,
         filePath: loaded.filePath,
-        selectedResultId: loaded.design.results.at(-1)?.id ?? null
+        selectedResultId: loaded.design.results.at(-1)?.id ?? null,
+        // The previous design's run ids mean nothing here
+        selectedResults: null
       })
 
       setDirty(false)
