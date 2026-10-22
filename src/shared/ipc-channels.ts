@@ -22,7 +22,8 @@ export const IPC = {
     loadResult: 'design:loadResult',
     saveRequested: 'design:save-requested',
     closeConfirmed: 'design:close-confirmed',
-    canLeave: 'design:can-leave'
+    canLeave: 'design:can-leave',
+    confirmStopRun: 'design:confirm-stop-run'
   },
   simulation: {
     run: 'simulation:run',

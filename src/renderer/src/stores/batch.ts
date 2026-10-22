@@ -51,6 +51,7 @@ export const useBatch = create<BatchState>((set) => ({
       return
     }
 
+    const designId = useDesign.getState().design?.id ?? null
     const cpuCount = await window.app.cpuCount().catch(() => null)
 
     set({
@@ -104,6 +105,9 @@ export const useBatch = create<BatchState>((set) => ({
         stage: null,
         stageStartedAt: null
       }))
+      // Rows finishing after another design was opened belong to the old one.
+      if (useDesign.getState().design?.id !== designId) return
+
       useDesign.getState().appendResult({
         createdAt: entry.createdAt,
         input: entry.input,

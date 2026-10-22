@@ -4,12 +4,28 @@ import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
 
+import { useEngine } from './engine'
 import { useNavigation } from './navigation'
 
 function makeId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+// Runs write their results into the design that started them, so
+// switching designs mid-run would orphan (or misfile) them. Ask the
+// user to stop the run first. Cancels via window.* directly rather than
+// the simulation/batch stores, which import this one.
+async function confirmStopActiveRun(): Promise<boolean> {
+  const { busy } = useEngine.getState()
+  if (busy === 'idle') return true
+
+  const stop = await window.design.confirmStopRun(busy)
+  if (!stop) return false
+
+  await (busy === 'batch' ? window.batch.cancel() : window.simulation.cancelSimulation())
+  return true
 }
 
 interface DesignState {
@@ -46,6 +62,8 @@ export const useDesign = create<DesignState>((set, get) => {
     isDirty: false,
 
     newDesign: async (input, name = 'Untitled Design') => {
+      if (!(await confirmStopActiveRun())) return
+
       const result = await window.design.canLeave()
 
       if (result === false) {
@@ -165,6 +183,8 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     loadDesign: async () => {
+      if (!(await confirmStopActiveRun())) return false
+
       const allowed = await window.design.canLeave()
 
       if (!allowed) return false

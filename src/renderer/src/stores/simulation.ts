@@ -45,6 +45,7 @@ export const useSimulation = create<SimulationState>((set) => ({
     }
 
     const startedAt = Date.now()
+    const designId = useDesign.getState().design?.id ?? null
     const cpuCount = await window.app.cpuCount().catch(() => null)
     const estimate = estimateSimulationDuration({
       N: input.N,
@@ -62,7 +63,7 @@ export const useSimulation = create<SimulationState>((set) => ({
       stageStartedAt: startedAt,
       estimate,
       lastResult: null,
-      designId: useDesign.getState().design?.id ?? null,
+      designId,
       logs: [
         '> Starting BATSS simulation',
         `> Outcome: ${input.outcomeType}`,
@@ -94,9 +95,13 @@ export const useSimulation = create<SimulationState>((set) => ({
           message: toError(error).message
         }))
 
+      // Skip if another design was opened mid-run (the run was stopped
+      // to allow that), so the result isn't filed under the wrong one.
       const design = useDesign.getState()
-      design.updateInput(formInput)
-      design.appendResult({ createdAt: new Date().toISOString(), input, result })
+      if (design.design?.id === designId) {
+        design.updateInput(formInput)
+        design.appendResult({ createdAt: new Date().toISOString(), input, result })
+      }
 
       const endedAt = Date.now()
 

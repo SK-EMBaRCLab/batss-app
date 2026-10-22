@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 import { parseStudyDesignFile } from '../../shared/design-file-schema'
+import type { EngineBusy } from '../../shared/engine-types'
 import { IPC } from '../../shared/ipc-channels'
 import { StudyDesign } from '../../shared/simulation-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
@@ -84,6 +85,23 @@ export function registerAlbatrossFilesIPC(): void {
       default:
         return false
     }
+  })
+
+  ipcMain.handle(IPC.design.confirmStopRun, async (_, kind: Exclude<EngineBusy, 'idle'>) => {
+    const result = await dialog.showMessageBox({
+      type: 'warning',
+      title: kind === 'batch' ? 'Batch Running' : 'Simulation Running',
+      message: `A ${kind} is still running.`,
+      detail:
+        kind === 'batch'
+          ? 'Stop it to continue? Rows that have already finished stay in the current design.'
+          : 'Stop it to continue? The run will be discarded.',
+      buttons: [kind === 'batch' ? 'Stop Batch' : 'Stop Simulation', 'Keep Running'],
+      defaultId: 1,
+      cancelId: 1
+    })
+
+    return result.response === 0
   })
 
   ipcMain.handle(
