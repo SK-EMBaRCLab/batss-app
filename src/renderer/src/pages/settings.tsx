@@ -196,7 +196,7 @@ export default function Settings(): ReactElement {
           columns side by side once this content area is 64rem wide (a
           container query, so the sidebar is accounted for), stacked in the
           same order below that. */}
-      <div className="@container mx-auto max-w-[88rem] p-6">
+      <div className="@container mx-auto max-w-352 p-6">
         <h1 className="text-xl font-semibold">Settings</h1>
 
         <p className="text-muted-foreground mt-2">

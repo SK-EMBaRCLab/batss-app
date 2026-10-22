@@ -24,10 +24,10 @@ export function DashboardHeader(): ReactElement | null {
       </div>
 
       <div className="flex items-center gap-2">
-        <Badge variant="secondary">
+        <Badge variant="ghost">
           {design.results.length} run{design.results.length === 1 ? '' : 's'}
         </Badge>
-        <Button size="sm" onClick={saveDesign} disabled={!isDirty}>
+        <Button size="sm" onClick={saveDesign} disabled={!isDirty} variant="secondary">
           <Save className="mr-1.5 h-4 w-4" />
           Save
         </Button>

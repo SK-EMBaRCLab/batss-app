@@ -16,7 +16,7 @@ export function RunHeader(): ReactElement {
       </div>
 
       {result?.status === 'success' && (
-        <Badge variant="secondary">{result.package ? `BATSS v${result.package}` : 'BATSS'}</Badge>
+        <Badge variant="ghost">{result.package ? `BATSS v${result.package}` : 'BATSS'}</Badge>
       )}
     </header>
   )
