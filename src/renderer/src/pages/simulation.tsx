@@ -24,9 +24,17 @@ export default function Simulation(): ReactElement {
   const stageStartedAt = useSimulation((s) => s.stageStartedAt)
   const estimate = useSimulation((s) => s.estimate)
   const lastResult = useSimulation((s) => s.lastResult)
+  const runDesignId = useSimulation((s) => s.designId)
   const run = useSimulation((s) => s.run)
 
   const [logsOpen, setLogsOpen] = useState(isRunning)
+
+  // Always show a run in progress. Once it's finished, keep failures and
+  // cancellations around for this design only; a success already lives
+  // on the Results page.
+  const showProgress =
+    logs.length > 0 &&
+    (isRunning || (runDesignId === design?.id && lastResult?.status !== 'success'))
 
   const handleRun = async (input: SimulationRunInput, formInput: DesignInput): Promise<void> => {
     setLogsOpen(true)
@@ -61,7 +69,7 @@ export default function Simulation(): ReactElement {
           <SimulationForm onRun={handleRun} initialInput={design?.input} />
         </CardContent>
       </Card>
-      {logs.length > 0 && (
+      {showProgress && (
         <Card className="shrink-0">
           <Collapsible open={logsOpen} onOpenChange={setLogsOpen}>
             <CardHeader className="flex flex-row items-center justify-between">

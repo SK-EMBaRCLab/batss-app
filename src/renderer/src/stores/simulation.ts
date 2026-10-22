@@ -21,6 +21,9 @@ type SimulationState = {
   // a clean finish apart from an error/cancellation without scraping
   // the raw log text.
   lastResult: SimulationRunResult | null
+  // The design this run belongs to, so the progress card isn't shown
+  // against a different design opened afterwards.
+  designId: string | null
 
   run: (input: SimulationRunInput, formInput: DesignInput) => Promise<SimulationRunResult>
   cancel: () => Promise<void>
@@ -34,6 +37,7 @@ export const useSimulation = create<SimulationState>((set) => ({
   stageStartedAt: null,
   estimate: null,
   lastResult: null,
+  designId: null,
 
   run: async (input, formInput) => {
     if (!useEngine.getState().tryAcquire('simulation')) {
@@ -58,6 +62,7 @@ export const useSimulation = create<SimulationState>((set) => ({
       stageStartedAt: startedAt,
       estimate,
       lastResult: null,
+      designId: useDesign.getState().design?.id ?? null,
       logs: [
         '> Starting BATSS simulation',
         `> Outcome: ${input.outcomeType}`,
