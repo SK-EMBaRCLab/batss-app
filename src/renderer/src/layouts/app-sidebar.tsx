@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react'
 
-import albatrossMark from '@/assets/albatross-mark.svg'
+import albatrossDark from '@/assets/albatross-dark.svg'
+import albatrossLight from '@/assets/albatross-light.svg'
 import {
   Sidebar,
   SidebarContent,
@@ -30,9 +31,15 @@ export function AppSidebar(): ReactElement {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Albatross">
               <img
-                src={albatrossMark}
+                src={albatrossLight}
                 alt="Albatross"
-                className="size-12 rounded-lg object-contain"
+                className="size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8 dark:hidden"
+              />
+
+              <img
+                src={albatrossDark}
+                alt="Albatross"
+                className="hidden size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8 dark:block"
               />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
