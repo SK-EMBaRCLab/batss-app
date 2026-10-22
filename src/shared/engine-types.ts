@@ -15,3 +15,7 @@ export function describeBusy(state: EngineState): string {
       return 'The simulation engine is busy.'
   }
 }
+
+// Taskbar/dock progress styles for a running engine; a subset of
+// Electron's ProgressBarOptions['mode'].
+export type TaskbarProgressMode = 'normal' | 'indeterminate' | 'error'

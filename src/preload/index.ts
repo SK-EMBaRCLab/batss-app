@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 import { SaveResultResponse } from '../main/ipc/albatross-files.ipc'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
-import { EngineBusy, EngineState } from '../shared/engine-types'
+import { EngineBusy, EngineState, TaskbarProgressMode } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
 import { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
@@ -18,7 +18,10 @@ const app = {
   reload: () => ipcRenderer.invoke(IPC.app.reload),
   quit: () => ipcRenderer.invoke(IPC.app.quit),
   setDocumentEdited: (edited: boolean) => ipcRenderer.send(IPC.app.setDocumentEdited, edited),
-  cpuCount: (): Promise<number> => ipcRenderer.invoke(IPC.app.cpuCount)
+  cpuCount: (): Promise<number> => ipcRenderer.invoke(IPC.app.cpuCount),
+  setProgress: (value: number, mode: TaskbarProgressMode) =>
+    ipcRenderer.send(IPC.app.setProgress, value, mode),
+  requestAttention: () => ipcRenderer.send(IPC.app.requestAttention)
 }
 
 const runtime = {

@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import os from 'os'
 
+import type { TaskbarProgressMode } from '../../shared/engine-types'
 import { IPC } from '../../shared/ipc-channels'
 
 export function registerAppIPC(): void {
@@ -34,5 +35,24 @@ export function registerAppIPC(): void {
   // equivalent there.
   ipcMain.on(IPC.app.setDocumentEdited, (event, edited: boolean) => {
     BrowserWindow.fromWebContents(event.sender)?.setDocumentEdited(edited)
+  })
+
+  // Taskbar (Windows) / dock (macOS) progress for a running simulation
+  // or batch. The renderer computes the value (see useTaskbarProgress),
+  // since it owns the stage-based estimate. On Linux this only shows on
+  // docks with Unity launcher support, and only with an installed
+  // .desktop file, so not for the AppImage.
+  ipcMain.on(IPC.app.setProgress, (event, value: number, mode: TaskbarProgressMode) => {
+    BrowserWindow.fromWebContents(event.sender)?.setProgressBar(value, { mode })
+  })
+
+  // Flashes the taskbar button / bounces the dock icon when a run
+  // finishes while the window is in the background, until it's focused.
+  ipcMain.on(IPC.app.requestAttention, (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window || window.isFocused()) return
+
+    window.flashFrame(true)
+    window.once('focus', () => window.flashFrame(false))
   })
 }

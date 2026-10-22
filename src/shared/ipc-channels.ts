@@ -9,7 +9,9 @@ export const IPC = {
     reload: 'app:reload',
     quit: 'app:quit',
     setDocumentEdited: 'app:set-document-edited',
-    cpuCount: 'app:cpu-count'
+    cpuCount: 'app:cpu-count',
+    setProgress: 'app:set-progress',
+    requestAttention: 'app:request-attention'
   },
   runtime: {
     check: 'runtime:check',

@@ -8,6 +8,7 @@ import { WelcomeScreen } from '@/components/common/welcome-screen'
 import { views } from '@/config/views'
 import { useCommandShortcuts } from '@/hooks/use-command-shortcuts'
 import { useDocumentTitle } from '@/hooks/use-document-title'
+import { useTaskbarProgress } from '@/hooks/use-taskbar-progress'
 import { AppLayout } from '@/layouts/app-layout'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
@@ -27,6 +28,7 @@ export default function App(): ReactElement {
 
   useCommandShortcuts()
   useDocumentTitle()
+  useTaskbarProgress()
 
   useEffect(() => {
     initialize()
