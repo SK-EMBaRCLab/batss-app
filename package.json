@@ -19,7 +19,8 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win --publish never",
     "build:mac": "electron-vite build && electron-builder --mac --publish never",
-    "build:linux": "electron-vite build && electron-builder --linux --publish never"
+    "build:linux": "electron-vite build && electron-builder --linux --publish never",
+    "test:appearance": "node --test scripts/appearance.test.cjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
