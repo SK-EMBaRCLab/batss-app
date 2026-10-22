@@ -55,6 +55,9 @@ export default function Simulation(): ReactElement {
     // beside it fill the space a single centred form would leave empty
     <div className="mx-auto flex h-full min-h-0 w-full max-w-352 flex-col gap-4 p-6">
       <SimulationForm
+        // The form only reads initialInput when it mounts; remount for a new
+        // or loaded design so it doesn't keep the previous design's values
+        key={design?.id}
         onRun={handleRun}
         initialInput={design?.input}
         header={
