@@ -259,7 +259,7 @@ export default function Settings(): ReactElement {
             <ItemTitle>Notify me when a run finishes</ItemTitle>
             <ItemDescription>
               Shows a system notification, with your system&apos;s notification sound, when a
-              simulation or batch finishes while Albatross is in the background.
+              simulation or batch finishes, even while Albatross is open.
             </ItemDescription>
           </ItemContent>
           <ItemActions>
