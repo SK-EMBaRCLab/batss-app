@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.6.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.5.0...v5.6.0) (2026-10-22)
+
+
+### Features
+
+* **simulation:** show a floating run progress panel on other pages ([9315101](https://github.com/SK-EMBaRCLab/batss-app/commit/9315101c20fad7b338b563c087ca59290239601d))
+
 ## [5.5.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.4.1...v5.5.0) (2026-10-22)
 
 ### Features
