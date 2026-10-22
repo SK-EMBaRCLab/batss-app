@@ -21,6 +21,9 @@ type SimulationState = {
   // a clean finish apart from an error/cancellation without scraping
   // the raw log text.
   lastResult: SimulationRunResult | null
+  // The design this run belongs to, so the progress card isn't shown
+  // against a different design opened afterwards.
+  designId: string | null
 
   run: (input: SimulationRunInput, formInput: DesignInput) => Promise<SimulationRunResult>
   cancel: () => Promise<void>
@@ -34,6 +37,7 @@ export const useSimulation = create<SimulationState>((set) => ({
   stageStartedAt: null,
   estimate: null,
   lastResult: null,
+  designId: null,
 
   run: async (input, formInput) => {
     if (!useEngine.getState().tryAcquire('simulation')) {
@@ -41,6 +45,7 @@ export const useSimulation = create<SimulationState>((set) => ({
     }
 
     const startedAt = Date.now()
+    const designId = useDesign.getState().design?.id ?? null
     const cpuCount = await window.app.cpuCount().catch(() => null)
     const estimate = estimateSimulationDuration({
       N: input.N,
@@ -58,6 +63,7 @@ export const useSimulation = create<SimulationState>((set) => ({
       stageStartedAt: startedAt,
       estimate,
       lastResult: null,
+      designId,
       logs: [
         '> Starting BATSS simulation',
         `> Outcome: ${input.outcomeType}`,
@@ -89,9 +95,13 @@ export const useSimulation = create<SimulationState>((set) => ({
           message: toError(error).message
         }))
 
+      // Skip if another design was opened mid-run (the run was stopped
+      // to allow that), so the result isn't filed under the wrong one.
       const design = useDesign.getState()
-      design.updateInput(formInput)
-      design.appendResult({ createdAt: new Date().toISOString(), input, result })
+      if (design.design?.id === designId) {
+        design.updateInput(formInput)
+        design.appendResult({ createdAt: new Date().toISOString(), input, result })
+      }
 
       const endedAt = Date.now()
 
