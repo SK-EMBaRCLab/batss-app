@@ -8,11 +8,14 @@ import { cn } from '@/lib/utils'
 export function EditableInPlaceInput({
   name,
   title,
+  hint,
   onRename,
   className
 }: {
   name: string
   title: string
+  // Extra line under the tooltip's title, e.g. where the design is saved
+  hint?: string
   onRename: (name: string) => void
   className?: string
 }): ReactElement {
@@ -75,7 +78,10 @@ export function EditableInPlaceInput({
           </button>
         }
       />
-      <TooltipContent>{title}</TooltipContent>
+      <TooltipContent>
+        <div>{title}</div>
+        {hint && <div className="max-w-80 text-xs break-all opacity-80">{hint}</div>}
+      </TooltipContent>
     </Tooltip>
   )
 }

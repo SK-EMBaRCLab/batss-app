@@ -1,4 +1,4 @@
-import { dialog, ipcMain } from 'electron'
+import { dialog, ipcMain, shell } from 'electron'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -132,6 +132,25 @@ export function registerAlbatrossFilesIPC(): void {
       }
     }
   )
+
+  // Opens the file manager with the design file selected. Only for paths
+  // the user chose in a dialog (see userChosenPaths). False if the file is
+  // gone, so the renderer can say so.
+  ipcMain.handle(IPC.design.showInFolder, async (_, filePath: unknown): Promise<boolean> => {
+    if (typeof filePath !== 'string') return false
+
+    const resolved = path.resolve(filePath)
+    if (!userChosenPaths.has(resolved)) return false
+
+    try {
+      await fs.access(resolved)
+    } catch {
+      return false
+    }
+
+    shell.showItemInFolder(resolved)
+    return true
+  })
 
   ipcMain.handle(IPC.design.loadResult, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({

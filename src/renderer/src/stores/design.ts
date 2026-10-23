@@ -44,6 +44,8 @@ interface DesignState {
   updateInput: (input: DesignInput) => void
   selectResult: (id: string) => void
   selectResults: (ids: string[]) => void
+  // Opens the file manager at the saved design file
+  showInFolder: () => Promise<void>
   // Show these runs on the Results page, focused on the last one
   openResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
@@ -156,6 +158,21 @@ export const useDesign = create<DesignState>((set, get) => {
 
     selectResult: (id) => set({ selectedResultId: id }),
     selectResults: (ids) => set({ selectedResults: ids }),
+
+    showInFolder: async () => {
+      const { filePath } = get()
+      if (!filePath) return
+
+      const shown = await window.design.showInFolder(filePath)
+      if (!shown) {
+        toast.add({
+          type: 'error',
+          title: "Can't show the file",
+          description:
+            'It may have been moved or deleted. Save the design again to choose a location.'
+        })
+      }
+    },
 
     openResults: (ids) => {
       const lastId = ids.at(-1)

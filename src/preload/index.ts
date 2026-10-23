@@ -85,7 +85,10 @@ const design = {
   canLeave: (): Promise<boolean | 'save'> => ipcRenderer.invoke(IPC.design.canLeave),
 
   confirmStopRun: (kind: Exclude<EngineBusy, 'idle'>): Promise<boolean> =>
-    ipcRenderer.invoke(IPC.design.confirmStopRun, kind)
+    ipcRenderer.invoke(IPC.design.confirmStopRun, kind),
+
+  showInFolder: (filePath: string): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.design.showInFolder, filePath)
 }
 
 const simulation = {

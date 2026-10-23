@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, MoreHorizontal, Save } from 'lucide-react'
+import { FilePlus2, FolderOpen, FolderSearch, MoreHorizontal, Save } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -13,12 +13,16 @@ export function HeaderOverflowMenu({
   onNew,
   onLoad,
   onSave,
-  canSave
+  canSave,
+  onShowInFolder,
+  canShowInFolder
 }: {
   onNew: () => void
   onLoad: () => void
   onSave: () => void
   canSave: boolean
+  onShowInFolder: () => void
+  canShowInFolder: boolean
 }): ReactElement {
   return (
     <DropdownMenu>
@@ -31,19 +35,25 @@ export function HeaderOverflowMenu({
         }
       />
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={onNew}>
+        {/* New, Open and Save are header buttons from lg up; only listed here below that */}
+        <DropdownMenuItem onClick={onNew} className="lg:hidden">
           <FilePlus2 />
           New Design
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onLoad}>
+        <DropdownMenuItem onClick={onLoad} className="lg:hidden">
           <FolderOpen />
           Open Design
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!canSave} onClick={onSave}>
+        <DropdownMenuItem disabled={!canSave} onClick={onSave} className="lg:hidden">
           <Save />
           Save
+        </DropdownMenuItem>
+
+        <DropdownMenuItem disabled={!canShowInFolder} onClick={onShowInFolder}>
+          <FolderSearch />
+          Show in Folder
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

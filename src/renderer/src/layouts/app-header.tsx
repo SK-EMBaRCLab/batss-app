@@ -19,6 +19,8 @@ export function AppHeader(): ReactElement {
   const saveDesign = useDesign((s) => s.saveDesign)
   const loadDesign = useDesign((s) => s.loadDesign)
   const isDirty = useDesign((state) => state.isDirty)
+  const filePath = useDesign((s) => s.filePath)
+  const showInFolder = useDesign((s) => s.showInFolder)
   const setOpen = useCommandPalette((state) => state.setOpen)
 
   const handleNew = async (): Promise<void> => {
@@ -41,6 +43,7 @@ export function AppHeader(): ReactElement {
               name={design.name}
               onRename={renameDesign}
               title="Rename study design"
+              hint={filePath ? `Saved to ${filePath}` : 'Not saved yet'}
             />
             {isDirty && (
               <Tooltip>
@@ -82,14 +85,14 @@ export function AppHeader(): ReactElement {
           </kbd>
         </Button>
 
-        <div className="lg:hidden">
-          <HeaderOverflowMenu
-            onNew={handleNew}
-            onLoad={handleLoad}
-            onSave={saveDesign}
-            canSave={!!design && isDirty}
-          />
-        </div>
+        <HeaderOverflowMenu
+          onNew={handleNew}
+          onLoad={handleLoad}
+          onSave={saveDesign}
+          canSave={!!design && isDirty}
+          onShowInFolder={showInFolder}
+          canShowInFolder={!!filePath}
+        />
       </div>
     </header>
   )
