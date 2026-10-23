@@ -18,6 +18,7 @@ import { registerSettingsIPC } from './ipc/settings.ipc'
 import { registerSimulationIPC } from './ipc/simulation.ipc'
 import { registerThemeIPC } from './ipc/theme.ipc'
 import { registerUpdateIPC } from './ipc/update.ipc'
+import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
 import { settingsService } from './services/settings.service'
 import { simulationService } from './services/simulation.service'
@@ -122,7 +123,9 @@ function createWindow(): void {
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: isHeadlessContainer ? false : true
+      // Off only for the Docker dev container, never in a packaged build:
+      // ELECTRON_DISABLE_GPU is an env var anyone could set
+      sandbox: !(isHeadlessContainer && !app.isPackaged)
     }
   })
 
@@ -199,8 +202,18 @@ function createWindow(): void {
   })
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\/\//i.test(url)) shell.openExternal(url)
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url).catch(() => {})
     return { action: 'deny' }
+  })
+
+  // The app is a single page, so the window itself never needs to load a
+  // different one. Block that (e.g. a link without target="_blank", or a
+  // URL dropped on the window) so no other page can get the preload API;
+  // web links open in the browser instead.
+  mainWindow.webContents.on('will-navigate', (details) => {
+    if (details.isSameDocument) return
+    details.preventDefault()
+    if (/^https?:\/\//i.test(details.url)) shell.openExternal(details.url).catch(() => {})
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -273,9 +286,11 @@ if (!isRelaunching) {
 
   // Kill any in-flight R work before the process exits. Rscript now runs
   // detached in its own process group (see RManager.runProcess), so without
-  // this a running simulation would outlive the app.
+  // this a running simulation would outlive the app. Forced straight away:
+  // the app won't be around for the usual grace period after a cancel.
   app.on('before-quit', () => {
     batchService.cancel()
     simulationService.cancel()
+    rManager.killAll()
   })
 }

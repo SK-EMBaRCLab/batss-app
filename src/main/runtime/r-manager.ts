@@ -10,6 +10,27 @@ import { REQUIRED_R_VERSION } from './r-config'
 
 const execFileAsync = promisify(execFile)
 
+// How long a cancelled R process gets to exit after SIGTERM before its
+// whole process group is sent SIGKILL (R/INLA workers can ignore SIGTERM)
+const KILL_GRACE_MS = 5000
+
+// Stops `pid`'s process tree. Windows' taskkill /F is already forceful;
+// elsewhere the process group (R plus forked workers) gets `signal`.
+function signalProcessTree(pid: number, signal: NodeJS.Signals): void {
+  if (process.platform === 'win32') {
+    // Without an 'error' listener, taskkill failing to start would be an
+    // unhandled error that crashes the main process
+    spawn('taskkill', ['/pid', String(pid), '/T', '/F']).on('error', () => {})
+    return
+  }
+
+  try {
+    process.kill(-pid, signal)
+  } catch {
+    /* already gone */
+  }
+}
+
 type ExecuteResult = { stdout: string; stderr: string }
 
 /** Called with each complete line of output as it arrives, tagged with
@@ -32,6 +53,19 @@ export type ExecuteOptions = {
 }
 
 export class RManager {
+  // R processes still running, so quitting the app can force them down
+  private readonly running = new Set<number>()
+
+  /**
+   * Immediately force-stops every R process this manager started. For
+   * app quit, where there's no time for the usual SIGTERM grace period
+   * and nothing is waiting on the results.
+   */
+  killAll(): void {
+    for (const pid of this.running) signalProcessTree(pid, 'SIGKILL')
+    this.running.clear()
+  }
+
   private resolvedExecutable?: string
 
   private async getCandidates(): Promise<string[]> {
@@ -290,17 +324,22 @@ export class RManager {
         windowsHide: true
       })
 
+      const pid = child.pid
+      let exited = false
+      if (pid) this.running.add(pid)
+      child.once('exit', () => {
+        exited = true
+        if (pid) this.running.delete(pid)
+      })
+
+      // Ask politely first; force it if R is still around after the grace
+      // period, so a cancel can't leave the engine stuck "cancelling"
       const killTree = (): void => {
-        if (!child.pid) return
-        if (process.platform === 'win32') {
-          spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'])
-        } else {
-          try {
-            process.kill(-child.pid, 'SIGTERM')
-          } catch {
-            /* already gone */
-          }
-        }
+        if (!pid) return
+        signalProcessTree(pid, 'SIGTERM')
+        setTimeout(() => {
+          if (!exited) signalProcessTree(pid, 'SIGKILL')
+        }, KILL_GRACE_MS).unref()
       }
       controller.signal.addEventListener('abort', killTree, { once: true })
 

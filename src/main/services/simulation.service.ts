@@ -162,11 +162,15 @@ export class SimulationService {
         break
     }
 
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
-    const outputPath = path.join(tmpDir, 'result.json')
     const cores = resolveCores(input.corePercent, input.R)
+    // Created inside the try so a failure here (e.g. disk full) still ends
+    // as an error result and clears activeRun, instead of escaping
+    let tmpDir: string | null = null
 
     try {
+      tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
+      const outputPath = path.join(tmpDir, 'result.json')
+
       await this.r.executeFile(
         getSimulationScriptPath(),
         {
@@ -204,7 +208,8 @@ export class SimulationService {
       }
     } finally {
       this.activeRun = null
-      await rm(tmpDir, { recursive: true, force: true })
+      // Best effort: a cleanup failure mustn't replace the run's result
+      if (tmpDir) await rm(tmpDir, { recursive: true, force: true }).catch(() => {})
     }
   }
   /** Abort whatever Rscript is alive, regardless of who owns the engine. */

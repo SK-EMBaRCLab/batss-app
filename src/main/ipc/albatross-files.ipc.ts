@@ -138,7 +138,22 @@ export function registerAlbatrossFilesIPC(): void {
     if (canceled || filePaths.length === 0) return null
 
     const filePath = filePaths[0]
-    const text = await fs.readFile(filePath, 'utf8')
+
+    // Same dialog as the JSON and schema errors below, rather than a
+    // rejection the renderer has nothing to show for (e.g. no permission)
+    let text: string
+    try {
+      text = await fs.readFile(filePath, 'utf8')
+    } catch {
+      await dialog.showMessageBox({
+        type: 'error',
+        title: 'Invalid Design File',
+        message: 'This file could not be opened.',
+        detail: 'The file could not be read. Check that it still exists and that you can open it.'
+      })
+
+      return null
+    }
 
     let parsed: unknown
 
