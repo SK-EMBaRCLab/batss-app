@@ -45,6 +45,7 @@ export function DataTableToolbar<TData extends DataTableRow>({
             value={globalFilter}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search all columns..."
+            aria-label="Search all columns"
             className="pl-8"
           />
           <InputGroupAddon>

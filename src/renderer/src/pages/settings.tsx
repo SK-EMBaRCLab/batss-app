@@ -200,7 +200,7 @@ export default function Settings(): ReactElement {
         <h1 className="text-xl font-semibold">Settings</h1>
 
         <p className="text-muted-foreground mt-2">
-          Customize preferences and theme and default behaviour.
+          Customize the theme, notifications and how simulations run.
         </p>
 
         <div className="mt-8 grid items-start gap-8 @5xl:grid-cols-2">
@@ -216,7 +216,7 @@ export default function Settings(): ReactElement {
               </ItemContent>
               <ItemActions>
                 <Select items={items} value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="w-45">
+                  <SelectTrigger className="w-45" aria-label="Color scheme">
                     <SelectValue placeholder="Theme" />
                   </SelectTrigger>
                   <SelectContent>

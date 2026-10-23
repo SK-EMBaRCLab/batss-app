@@ -1,5 +1,5 @@
 import type { DecisionRule } from '@shared/simulation-types'
-import { type ReactElement } from 'react'
+import { type ReactElement, useId } from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -41,11 +41,12 @@ export function DecisionRuleFields({
   thresholdErrors
 }: DecisionRuleFieldsProps): ReactElement {
   const locked = useFormLocked()
+  const id = useId()
   return (
     <div className="@container">
       <div className="grid gap-5 @md:grid-cols-2">
         <Field>
-          <FieldLabel className="">Decision rule type</FieldLabel>
+          <FieldLabel id={`${id}-type`}>Decision rule type</FieldLabel>
 
           <Select
             disabled={locked}
@@ -56,7 +57,7 @@ export function DecisionRuleFields({
               }
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-labelledby={`${id}-type`}>
               <SelectValue placeholder="Select rule type" />
             </SelectTrigger>
 
@@ -70,7 +71,7 @@ export function DecisionRuleFields({
         </Field>
 
         <Field>
-          <FieldLabel className="">Direction</FieldLabel>
+          <FieldLabel id={`${id}-direction`}>Direction</FieldLabel>
 
           <Select
             disabled={locked}
@@ -81,7 +82,7 @@ export function DecisionRuleFields({
               }
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-labelledby={`${id}-direction`}>
               <SelectValue placeholder="Select direction" />
             </SelectTrigger>
 
@@ -93,9 +94,10 @@ export function DecisionRuleFields({
         </Field>
 
         <Field data-invalid={marginErrors !== undefined}>
-          <FieldLabel className="">Superiority margin (SM)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-margin`}>Superiority margin (SM)</FieldLabel>
 
           <Input
+            id={`${id}-margin`}
             type="number"
             step="0.01"
             value={margin ?? ''}
@@ -106,9 +108,10 @@ export function DecisionRuleFields({
         </Field>
 
         <Field data-invalid={thresholdErrors !== undefined}>
-          <FieldLabel className="">Decision threshold (DT)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-threshold`}>Decision threshold (DT)</FieldLabel>
 
           <Input
+            id={`${id}-threshold`}
             type="number"
             step="0.01"
             value={threshold ?? ''}

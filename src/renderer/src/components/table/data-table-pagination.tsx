@@ -1,6 +1,6 @@
 import { type ReactTable, type RowData } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useId } from 'react'
 
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,8 @@ interface DataTablePaginationProps<TData extends RowData> {
 export function DataTablePagination<TData extends RowData>({
   table
 }: DataTablePaginationProps<TData>): ReactElement {
+  const rowsPerPageId = useId()
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -27,14 +29,16 @@ export function DataTablePagination<TData extends RowData>({
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p id={rowsPerPageId} className="text-sm font-medium">
+            Rows per page
+          </p>
           <Select
             value={`${table.state.pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value))
             }}
           >
-            <SelectTrigger className="h-8 w-17.5">
+            <SelectTrigger className="h-8 w-17.5" aria-labelledby={rowsPerPageId}>
               <SelectValue placeholder={table.state.pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">

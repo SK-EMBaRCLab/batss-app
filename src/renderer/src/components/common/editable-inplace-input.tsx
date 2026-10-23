@@ -47,6 +47,7 @@ export function EditableInPlaceInput({
         ref={focusAndSelectOnMount}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
+        aria-label={title}
         onBlur={commit}
         onKeyDown={(event) => {
           if (event.key === 'Enter') commit()

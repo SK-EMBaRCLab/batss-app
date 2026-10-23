@@ -1,5 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
-import { type ComponentProps, type ReactElement } from 'react'
+import { type ComponentProps, type ReactElement, useId } from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -30,15 +30,19 @@ export function NumericField({
   className,
   ...inputProps
 }: NumericFieldProps): ReactElement {
+  const generatedId = useId()
+  const id = inputProps.id ?? generatedId
+
   return (
     <FormischField of={form} path={path}>
       {(field) => (
         <Field data-invalid={field.errors !== null} className={className}>
-          <FieldLabel>{label}</FieldLabel>
+          <FieldLabel htmlFor={id}>{label}</FieldLabel>
 
           <Input
             {...field.props}
             {...inputProps}
+            id={id}
             type="number"
             value={field.input ?? ''}
             onChange={(event) => field.onChange(event.target.value)}

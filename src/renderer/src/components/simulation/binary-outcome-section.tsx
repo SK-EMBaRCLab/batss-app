@@ -1,5 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useId } from 'react'
 
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import {
@@ -17,6 +17,7 @@ import { NumericField } from './numeric-field'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
+  const labelId = useId()
   return (
     <div className="space-y-6">
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
@@ -39,9 +40,9 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
 
             return (
               <Field data-invalid={field.errors !== null} className="max-w-lg">
-                <FieldLabel>Treatment effect</FieldLabel>
+                <FieldLabel id={labelId}>Treatment effect</FieldLabel>
                 <FieldDescription>
-                  Difference betweeen treatment arm and control arm
+                  Difference between treatment arm and control arm
                 </FieldDescription>
 
                 <Select
@@ -57,7 +58,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                     }
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-labelledby={labelId}>
                     <SelectValue placeholder="Select effect type">
                       {selectedTreatmentEffect?.label}
                     </SelectValue>

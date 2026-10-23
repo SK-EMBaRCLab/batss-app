@@ -1,5 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useId } from 'react'
 
 import {
   Field as ShadcnField,
@@ -23,13 +23,14 @@ type OutcomeType = (typeof outcomeTypes)[number]['value']
 
 export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
+  const labelId = useId()
   return (
     <FormischField of={form} path={['outcomeType']}>
       {(field) => {
         return (
           <>
             <ShadcnField data-invalid={field.errors !== null} className="max-w-lg">
-              <FieldLabel>Outcome Type</FieldLabel>
+              <FieldLabel id={labelId}>Outcome Type</FieldLabel>
               <FieldDescription>
                 Select the outcome type that matches your primary study endpoint
               </FieldDescription>
@@ -43,7 +44,7 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-labelledby={labelId}>
                   <SelectValue placeholder="Select outcome type" className="capitalize" />
                 </SelectTrigger>
 
