@@ -12,13 +12,29 @@ type LogViewerProps = {
 
 export function LogViewer({ logs, className, header }: LogViewerProps): ReactElement {
   const logScrollRef = useRef<HTMLDivElement>(null)
+  // Follow new output only while the user is at (or near) the bottom, so
+  // scrolling up to read something isn't undone by the next line
+  const followRef = useRef(true)
+
+  const getViewport = (): HTMLDivElement | null | undefined =>
+    logScrollRef.current?.querySelector<HTMLDivElement>('[data-slot="scroll-area-viewport"]')
 
   useEffect(() => {
-    const viewport = logScrollRef.current?.querySelector<HTMLDivElement>(
-      '[data-slot="scroll-area-viewport"]'
-    )
+    const viewport = getViewport()
+    if (!viewport) return
 
-    if (viewport) {
+    const onScroll = (): void => {
+      const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight
+      followRef.current = distanceFromBottom < 24
+    }
+
+    viewport.addEventListener('scroll', onScroll, { passive: true })
+    return () => viewport.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const viewport = getViewport()
+    if (viewport && followRef.current) {
       viewport.scrollTop = viewport.scrollHeight
     }
   }, [logs])

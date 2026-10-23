@@ -110,7 +110,8 @@ export const columns = columnHelper.columns([
       const value = getValue()
       const date = new Date(value)
 
-      return date.toLocaleString('en-US', {
+      // The user's own locale, like every other date in the app
+      return date.toLocaleString(undefined, {
         dateStyle: 'medium',
         timeStyle: 'short'
       })

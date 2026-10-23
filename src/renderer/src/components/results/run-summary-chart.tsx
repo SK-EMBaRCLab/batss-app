@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { toast } from '@/components/ui/toast'
 import { useSelectedEntry } from '@/stores/design'
 
 import { ResultsBarChart } from './bar-chart'
@@ -29,15 +30,25 @@ export function RunSummaryChart(): ReactElement | null {
   const download = async (): Promise<void> => {
     if (!chartRef.current) return
 
-    const dataUrl = await toPng(chartRef.current, {
-      pixelRatio: 2, // higher resolution
-      backgroundColor: '#fff'
-    })
+    // The card's own background, so a dark-mode export isn't light text on
+    // white
+    const card = chartRef.current.closest('[data-slot="card"]') ?? document.body
+    const backgroundColor = getComputedStyle(card).backgroundColor
 
-    const link = document.createElement('a')
-    link.download = 'results-chart.png'
-    link.href = dataUrl
-    link.click()
+    try {
+      const dataUrl = await toPng(chartRef.current, {
+        pixelRatio: 2, // higher resolution
+        backgroundColor
+      })
+
+      const link = document.createElement('a')
+      link.download = 'results-chart.png'
+      link.href = dataUrl
+      link.click()
+    } catch (error) {
+      console.error('Chart export failed:', error)
+      toast.add({ type: 'error', title: "Couldn't export the chart" })
+    }
   }
 
   const result = selectedEntry?.result
