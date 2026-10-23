@@ -1,23 +1,22 @@
 import { AlertTriangle, Copy, RefreshCw } from 'lucide-react'
-import { type ReactElement } from 'react'
+import { type ReactElement, useEffect, useMemo, useState } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
+import { createErrorReference, errorDetails, logError } from '@/lib/error-reference'
 import { toError } from '@/lib/utils'
 
 export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactElement {
-  const err = toError(error)
+  // Memoised so the log effect below runs once per error, not per render
+  const err = useMemo(() => toError(error), [error])
+  const [reference] = useState(createErrorReference)
+
+  useEffect(() => logError(reference, err), [reference, err])
+
   const copy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(
-      `${err.name}
-
-      ${err.message}
-
-      ${err.stack ?? ''}`
-    )
+    await navigator.clipboard.writeText(errorDetails(reference, err))
   }
 
   return (
@@ -34,8 +33,8 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
 
               <CardDescription>
                 The application could not recover from an unexpected problem. You can try reloading
-                the application. If the problem continues, copy the error details and include them
-                in a bug report.
+                the application. If the problem continues, copy the details and include them in a
+                bug report.
               </CardDescription>
             </div>
           </div>
@@ -44,11 +43,9 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
         <Separator />
 
         <CardContent className="space-y-6 pt-6">
-          <div className="rounded-lg border bg-muted/50 p-4">
-            <p className="font-medium">{err.name}</p>
-
-            <p className="mt-1 text-sm text-muted-foreground">{err.message}</p>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Reference: <span className="font-mono font-medium text-foreground">{reference}</span>
+          </p>
 
           <div className="flex gap-2">
             <Button onClick={() => window.app.reload()}>
@@ -58,25 +55,13 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
 
             <Button variant="outline" onClick={copy}>
               <Copy className="mr-2 size-4" />
-              Copy Error
+              Copy details
             </Button>
 
             <Button variant="ghost" onClick={resetErrorBoundary}>
               Retry Render
             </Button>
           </div>
-
-          <Collapsible>
-            <CollapsibleTrigger className="text-sm font-medium hover:underline">
-              Technical Details
-            </CollapsibleTrigger>
-
-            <CollapsibleContent>
-              <pre className="mt-3 max-h-72 overflow-auto rounded-md border bg-muted p-4 font-mono text-xs">
-                {err.stack}
-              </pre>
-            </CollapsibleContent>
-          </Collapsible>
         </CardContent>
       </Card>
     </main>
