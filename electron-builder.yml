@@ -37,8 +37,6 @@ mac:
   gatekeeperAssess: false
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
@@ -52,7 +50,7 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: Arlene Jiang <arlene.jiang@sickkids.ca>
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}

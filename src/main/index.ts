@@ -1,6 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { spawn } from 'child_process'
-import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, screen, session, shell } from 'electron'
 import { join } from 'path'
 
 import icon from '../../resources/icon.png?asset'
@@ -236,6 +236,19 @@ function createWindow(): void {
 if (!isRelaunching) {
   app.whenReady().then(() => {
     electronApp.setAppUserModelId('com.albatross.app')
+
+    // Electron grants most web permissions (camera, microphone, location,
+    // ...) by default. Albatross needs none of them; notifications come
+    // from main. Clipboard writes are the one exception, for the "Copy
+    // details" buttons.
+    const allowPermission = (permission: string): boolean =>
+      permission === 'clipboard-sanitized-write'
+    session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) =>
+      callback(allowPermission(permission))
+    )
+    session.defaultSession.setPermissionCheckHandler((_webContents, permission) =>
+      allowPermission(permission)
+    )
 
     app.on('browser-window-created', (_, window) => {
       optimizer.watchWindowShortcuts(window)
