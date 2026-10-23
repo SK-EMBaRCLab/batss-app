@@ -200,6 +200,8 @@ const update = {
   // date"/error feedback) from a user clicking "Check for Updates".
   check: (silent?: boolean): Promise<void> => ipcRenderer.invoke(IPC.update.check, silent),
 
+  download: (): Promise<void> => ipcRenderer.invoke(IPC.update.download),
+
   install: (): Promise<void> => ipcRenderer.invoke(IPC.update.install),
 
   onStatus: (callback: (state: UpdateState) => void) => {

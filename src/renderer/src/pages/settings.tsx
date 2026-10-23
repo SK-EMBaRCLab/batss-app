@@ -88,8 +88,7 @@ export default function Settings(): ReactElement {
 
   const updateStatus = useUpdate((state) => state.status)
   const updateProgress = useUpdate((state) => state.progress)
-  const checkForAppUpdate = useUpdate((state) => state.check)
-  const installAppUpdate = useUpdate((state) => state.install)
+  const advanceAppUpdate = useUpdate((state) => state.advance)
   const isBusyCheckingForAppUpdate = updateStatus === 'checking' || updateStatus === 'downloading'
 
   const handleThemeChange = (value: Theme | null): void => {
@@ -293,9 +292,7 @@ export default function Settings(): ReactElement {
               </ItemContent>
               <ItemActions>
                 <Button
-                  onClick={() =>
-                    updateStatus === 'downloaded' ? installAppUpdate() : checkForAppUpdate()
-                  }
+                  onClick={() => void advanceAppUpdate()}
                   disabled={isBusyCheckingForAppUpdate}
                 >
                   {updateButtonLabel(updateStatus, updateProgress)}

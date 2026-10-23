@@ -16,6 +16,7 @@ export function UpdateBanner(): ReactElement | null {
   const error = useUpdate((state) => state.error)
   const silent = useUpdate((state) => state.silent)
   const install = useUpdate((state) => state.install)
+  const download = useUpdate((state) => state.download)
 
   const [dismissedKey, setDismissedKey] = useState<string | null>(null)
 
@@ -29,7 +30,27 @@ export function UpdateBanner(): ReactElement | null {
     }
   }, [status, message, silent])
 
-  if (status === 'available' || status === 'downloading') {
+  if (status === 'available') {
+    const key = `available:${version}`
+    if (dismissedKey === key) return null
+
+    return (
+      <Banner
+        variant="info"
+        title={message}
+        description="Download it now, or later from Settings."
+        action={
+          <Button size="sm" onClick={() => void download()}>
+            Download
+          </Button>
+        }
+        dismissible
+        onDismiss={() => setDismissedKey(key)}
+      />
+    )
+  }
+
+  if (status === 'downloading') {
     return (
       <Banner
         variant="loading"

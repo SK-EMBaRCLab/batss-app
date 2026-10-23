@@ -6,7 +6,11 @@ type UpdateStore = UpdateState & {
   initialized: boolean
   initialize: () => Promise<void>
   check: (silent?: boolean) => Promise<void>
+  download: () => Promise<void>
   install: () => void
+  // Whatever comes next: install a downloaded update, download an
+  // available one, otherwise check. Used by every "update" button.
+  advance: () => Promise<void>
 }
 
 export const useUpdate = create<UpdateStore>((set, get) => ({
@@ -37,7 +41,18 @@ export const useUpdate = create<UpdateStore>((set, get) => ({
     await window.update.check(silent)
   },
 
+  download: async () => {
+    await window.update.download()
+  },
+
   install: () => {
     window.update.install()
+  },
+
+  advance: async () => {
+    const { status, install, download, check } = get()
+    if (status === 'downloaded') install()
+    else if (status === 'available') await download()
+    else await check()
   }
 }))

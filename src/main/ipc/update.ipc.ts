@@ -10,6 +10,8 @@ export function registerUpdateIPC(): void {
 
   ipcMain.handle(IPC.update.check, (_event, silent?: boolean) => updateService.check(silent))
 
+  ipcMain.handle(IPC.update.download, () => updateService.download())
+
   ipcMain.handle(IPC.update.install, () => updateService.install())
 
   // Global state → every window, same pattern as engine:state.

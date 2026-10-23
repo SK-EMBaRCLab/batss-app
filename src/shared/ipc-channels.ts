@@ -61,6 +61,7 @@ export const IPC = {
   },
   update: {
     check: 'update:check',
+    download: 'update:download',
     install: 'update:install',
     get: 'update:get',
     status: 'update:status'

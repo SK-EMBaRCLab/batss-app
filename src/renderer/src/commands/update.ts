@@ -16,14 +16,7 @@ export const updateCommands: AppCommand[] = [
       return status !== 'checking' && status !== 'downloading'
     },
     action: async () => {
-      const { status, install, check } = useUpdate.getState()
-
-      if (status === 'downloaded') {
-        install()
-        return
-      }
-
-      await check()
+      await useUpdate.getState().advance()
     }
   }
 ]

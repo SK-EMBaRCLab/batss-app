@@ -8,7 +8,9 @@ type Listener = (state: UpdateState) => void
  * Wraps electron-updater. A silent check runs once automatically on
  * launch (see check(true) in the renderer's update store) so users
  * learn about new releases without visiting Settings — if it finds
- * one, the normal banner/download/"Restart & Install" flow takes over.
+ * one, the banner offers it. Nothing is downloaded until the user
+ * clicks Download: releases aren't code-signed yet, so the only check
+ * on a download is a hash published in the same GitHub release.
  * Launch checks stay quiet when there's nothing to report (no "up to
  * date" toast, no error banner); only an explicit, user-triggered
  * check surfaces those. Installing always requires the user to click
@@ -51,7 +53,9 @@ class UpdateService {
     if (this.initialized) return
     this.initialized = true
 
-    autoUpdater.autoDownload = true
+    // Until releases are code-signed, an update is only as trustworthy
+    // as the GitHub release it came from, so download only on request
+    autoUpdater.autoDownload = false
 
     // Only ever install when the user explicitly confirms via the
     // "Restart & Install" action — never silently on quit.
@@ -68,9 +72,8 @@ class UpdateService {
     autoUpdater.on('update-available', (info) => {
       this.set({
         status: 'available',
-        message: `Update ${info.version} found — downloading…`,
+        message: `Update ${info.version} available`,
         version: info.version,
-        progress: 0,
         silent: this.silentCheck
       })
     })
@@ -131,6 +134,30 @@ class UpdateService {
         message: 'Update check failed',
         error: error instanceof Error ? error.message : String(error),
         silent
+      })
+    }
+  }
+
+  async download(): Promise<void> {
+    if (this.state.status !== 'available') return
+
+    this.set({
+      status: 'downloading',
+      message: 'Downloading update… 0%',
+      version: this.state.version,
+      progress: 0,
+      silent: false
+    })
+
+    try {
+      await autoUpdater.downloadUpdate()
+    } catch (error) {
+      // Usually also reported via the 'error' event; this covers the rest
+      this.set({
+        status: 'error',
+        message: 'Update download failed',
+        error: error instanceof Error ? error.message : String(error),
+        silent: false
       })
     }
   }

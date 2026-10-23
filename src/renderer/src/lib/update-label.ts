@@ -7,6 +7,7 @@ export function updateButtonLabel(status: UpdateStatus, progress: number | undef
     case 'checking':
       return 'Checking for Updates…'
     case 'available':
+      return 'Download Update'
     case 'downloading':
       return `Downloading Update… ${Math.round(progress ?? 0)}%`
     case 'downloaded':
