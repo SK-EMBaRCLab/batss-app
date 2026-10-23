@@ -11,6 +11,16 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+# Electron fuses, flipped in the packaged binary. Stops anything else on
+# the machine running code as Albatross (as plain Node, via NODE_OPTIONS or
+# a debugger) and checks app.asar hasn't been altered (macOS/Windows).
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  enableCookieEncryption: true
 win:
   executableName: albatross
   icon: build/icon.ico
