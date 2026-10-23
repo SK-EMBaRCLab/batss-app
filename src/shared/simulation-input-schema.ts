@@ -7,11 +7,19 @@ import * as v from 'valibot'
 
 import type { SimulationRunInput } from './simulation-types'
 
-const positiveInteger = (label: string): v.GenericSchema<number> =>
+// Upper limits, far above any real design (the largest runs so far are
+// N≈200 and R=1,000), so a typo or a bad CSV can't tie R up for hours or
+// build an input too large to hand to R
+export const MAX_SAMPLE_SIZE = 100_000
+export const MAX_SIMULATED_TRIALS = 100_000
+export const MAX_BATCH_ROWS = 500
+
+const positiveInteger = (label: string, max: number): v.GenericSchema<number> =>
   v.pipe(
     v.number(`${label} must be a number.`),
     v.integer(`${label} must be a whole number.`),
-    v.minValue(1, `${label} must be greater than 0.`)
+    v.minValue(1, `${label} must be greater than 0.`),
+    v.maxValue(max, `${label} must be at most ${max.toLocaleString('en-CA')}.`)
   )
 
 const finiteNumber = (label: string): v.GenericSchema<number> =>
@@ -31,13 +39,15 @@ const decisionRuleSchema = v.object({
 })
 
 const commonFields = {
-  N: positiveInteger('Maximum sample size'),
-  m0: positiveInteger('Burn-in'),
-  m: positiveInteger('Patients between interim analyses'),
-  R: positiveInteger('Number of simulated trials'),
+  N: positiveInteger('Maximum sample size', MAX_SAMPLE_SIZE),
+  m0: positiveInteger('Burn-in', MAX_SAMPLE_SIZE),
+  m: positiveInteger('Patients between interim analyses', MAX_SAMPLE_SIZE),
+  R: positiveInteger('Number of simulated trials', MAX_SIMULATED_TRIALS),
+  // Only the first rule is used by batss-simulation.R
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
-    v.minLength(1, 'At least one decision rule is required.')
+    v.minLength(1, 'A decision rule is required.'),
+    v.maxLength(1, 'Only one decision rule is supported.')
   ),
   corePercent: v.optional(v.picklist([25, 50, 75, 100], 'Core usage must be 25, 50, 75 or 100%.'))
 }
@@ -85,7 +95,11 @@ const simulationRunInputSchema = v.pipe(
     [binaryInputSchema, continuousInputSchema],
     'Only binary and continuous outcomes are supported.'
   ),
-  v.check((input) => input.m0 < input.N, 'Burn-in must be smaller than the maximum sample size.')
+  v.check((input) => input.m0 < input.N, 'Burn-in must be smaller than the maximum sample size.'),
+  v.check(
+    (input) => input.m <= input.N,
+    'Patients between interim analyses must be at most the maximum sample size.'
+  )
 )
 
 export type SimulationRunInputCheck =
