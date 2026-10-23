@@ -10,9 +10,12 @@ on:
         description: 'Tag to build and attach artifacts to'
         required: true
 
-permissions:
-  contents: write
-  pull-requests: write
+# No token permissions by default; each job asks only for what it needs.
+# Only release-please and publish can write, and neither installs npm
+# packages, so a compromised dependency (npm ci runs their install
+# scripts) can't alter releases. Actions are pinned to commit SHAs since
+# tags can be moved; the version is in the comment for updating.
+permissions: {}
 
 concurrency:
   group: release-${{ github.ref }}
@@ -21,11 +24,14 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -35,6 +41,8 @@ jobs:
   build:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -47,11 +55,13 @@ jobs:
             script: build:linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ github.event.inputs.tag_name || needs.release-please.outputs.tag_name }}
+          # Don't leave the token in .git/config for later steps
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
@@ -70,8 +80,39 @@ jobs:
             codesign --verify --deep --strict --verbose=2 "$app"
           done
 
+      # Handed to the publish job, which is the only one allowed to write
+      # to the release
+      - name: Keep installers for publishing
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: installers-${{ matrix.os }}
+          if-no-files-found: error
+          path: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/*.dmg
+            dist/*.dmg.blockmap
+            dist/*.AppImage
+            dist/*.deb
+            dist/latest*.yml
+
+  publish:
+    needs: [release-please, build]
+    # Like the old per-platform upload (fail-fast: false), publish whatever
+    # built even if one platform failed
+    if: ${{ !cancelled() && (needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: installers-*
+          path: dist
+          merge-multiple: true
+
       - name: Upload artifacts to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ github.event.inputs.tag_name || needs.release-please.outputs.tag_name }}
           files: |
