@@ -22,7 +22,7 @@ function ReviewList({ items }: { items: ReviewItem[] }): ReactElement {
       {items.map(([label, value]) => (
         <Fragment key={label}>
           <dt className="font-medium text-muted-foreground">{label}</dt>
-          <dd>{value ?? '-'}</dd>
+          <dd>{value ?? '—'}</dd>
         </Fragment>
       ))}
     </dl>
@@ -138,7 +138,9 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
         </CardHeader>
         <CardContent>
           <div className="rounded-md bg-muted p-3 text-sm">
-            <div className="font-medium">Rule 1: {rule?.type}</div>
+            <div className="font-medium">
+              Rule 1: <span className="capitalize">{rule?.type}</span>
+            </div>
             <div className="font-mono">{decisionRuleSummary(snapshot)}</div>
           </div>
         </CardContent>

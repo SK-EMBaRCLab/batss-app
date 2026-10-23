@@ -20,10 +20,10 @@ export function OutcomeParametersHelp({
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Control arm event probability</h4>
 
-            <p className="space-y-2 pl-5 leading-relaxed">
-              The probability that patient in the control group experiences the outcome of interest.
-              If the control arm event probabilty is 0.4, then about 40% of patients in the control
-              group experiences the event of interest
+            <p className="pl-5 leading-relaxed">
+              The probability that a patient in the control group experiences the outcome of
+              interest. If the control arm event probability is 0.4, then about 40% of patients in
+              the control group experience the event of interest.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export function OutcomeParametersHelp({
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Treatment effect value</h4>
 
-            <p className="space-y-2 pl-5 leading-relaxed">
+            <p className="pl-5 leading-relaxed">
               The assumed size of the treatment effect used in the simulation. This value is often
               based on previous research, clinical expertise, or the minimum improvement that would
               justify adopting the treatment in practice
@@ -59,14 +59,14 @@ export function OutcomeParametersHelp({
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Mean Outcome in Control arm</h4>
 
-            <p className="space-y-2 pl-5 leading-relaxed">
+            <p className="pl-5 leading-relaxed">
               The average outcome for participants receiving the control intervention
             </p>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Standard Deviation of Outcome</h4>
-            <p className="space-y-2 pl-5 leading-relaxed">
+            <p className="pl-5 leading-relaxed">
               A measure of individual variation around the mean outcome
             </p>
           </div>
@@ -74,7 +74,7 @@ export function OutcomeParametersHelp({
           <div className="space-y-2">
             <h4 className="font-medium text-primary">Mean Difference for the treatment effect</h4>
 
-            <p className="space-y-2 pl-5 leading-relaxed">
+            <p className="pl-5 leading-relaxed">
               The difference in the average outcome between treatment and control arms
             </p>
           </div>
