@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.7.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.6.1...v5.7.0) (2026-10-23)
+
+
+### Features
+
+* **design:** show where a design is saved and reveal it in the file manager ([8dad6d5](https://github.com/SK-EMBaRCLab/batss-app/commit/8dad6d54d3d21a095aa8d146fc4b925682021bab))
+
+
+### Bug Fixes
+
+* **security:** only save designs to paths chosen in a dialog ([2fabdde](https://github.com/SK-EMBaRCLab/batss-app/commit/2fabdde9deff0b3ada82010669a53858fcb29b32))
+* **simulation:** validate run inputs and BATSS results in the main process ([de53410](https://github.com/SK-EMBaRCLab/batss-app/commit/de53410f0d8d94e11ffcabb7af1aeccc739fb18b))
+
 ## [5.6.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.6.0...v5.6.1) (2026-10-23)
 
 ### Bug Fixes
