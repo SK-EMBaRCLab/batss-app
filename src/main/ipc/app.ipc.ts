@@ -4,6 +4,8 @@ import os from 'os'
 import type { TaskbarProgressMode } from '../../shared/engine-types'
 import { IPC } from '../../shared/ipc-channels'
 
+const PROGRESS_MODES: readonly TaskbarProgressMode[] = ['normal', 'indeterminate', 'error']
+
 export function registerAppIPC(): void {
   ipcMain.handle(IPC.app.version, () => {
     return app.getVersion()
@@ -42,7 +44,11 @@ export function registerAppIPC(): void {
   // since it owns the stage-based estimate. On Linux this only shows on
   // docks with Unity launcher support, and only with an installed
   // .desktop file, so not for the AppImage.
-  ipcMain.on(IPC.app.setProgress, (event, value: number, mode: TaskbarProgressMode) => {
-    BrowserWindow.fromWebContents(event.sender)?.setProgressBar(value, { mode })
+  ipcMain.on(IPC.app.setProgress, (event, value: unknown, mode: unknown) => {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return
+    if (!PROGRESS_MODES.includes(mode as TaskbarProgressMode)) return
+    BrowserWindow.fromWebContents(event.sender)?.setProgressBar(value, {
+      mode: mode as TaskbarProgressMode
+    })
   })
 }

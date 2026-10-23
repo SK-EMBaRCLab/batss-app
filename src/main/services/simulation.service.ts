@@ -4,6 +4,7 @@ import os from 'os'
 import path from 'path'
 
 import { resolveCoreCount } from '../../shared/cores'
+import { parseSimulationRunResult } from '../../shared/design-file-schema'
 import { describeBusy } from '../../shared/engine-types'
 import { DEFAULT_SIMULATION_TIMEOUT_MINUTES } from '../../shared/settings-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
@@ -192,7 +193,17 @@ export class SimulationService {
       // (Not `Omit<SimulationRunResult, 'durationMs'>` here: Omit over
       // a discriminated union collapses it down to the keys common to
       // every branch, losing the status-based narrowing.)
-      const parsed = JSON.parse(await readFile(outputPath, 'utf8')) as SimulationRunResult
+      const parsed = parseSimulationRunResult(JSON.parse(await readFile(outputPath, 'utf8')))
+      if (!parsed) {
+        // e.g. a BATSS update changing its output; don't let it reach the
+        // Results page or the design file
+        onOutput?.('BATSS result file did not match the expected format.', 'stderr')
+        return {
+          status: 'error',
+          message: 'BATSS returned results in an unexpected format. See the log for details.',
+          durationMs: Date.now() - startedAt
+        }
+      }
       return { ...parsed, durationMs: Date.now() - startedAt }
     } catch (error) {
       const durationMs = Date.now() - startedAt

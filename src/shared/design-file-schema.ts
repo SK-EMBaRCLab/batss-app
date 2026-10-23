@@ -13,7 +13,7 @@
 // shapes a well-formed file can contain.
 import * as v from 'valibot'
 
-import type { StudyDesign } from './simulation-types'
+import type { SimulationRunResult, StudyDesign } from './simulation-types'
 
 const decisionRuleFileSchema = v.object({
   type: v.picklist(['superiority', 'futility']),
@@ -96,6 +96,16 @@ const simulationRunResultFileSchema = v.union([
     durationMs: v.optional(v.number())
   })
 ])
+
+/**
+ * Checks a single run's result on its own, e.g. the JSON that
+ * batss-simulation.R writes, rather than trusting it with a cast.
+ * Returns null if it doesn't match.
+ */
+export function parseSimulationRunResult(data: unknown): SimulationRunResult | null {
+  const result = v.safeParse(simulationRunResultFileSchema, data)
+  return result.success ? (result.output as SimulationRunResult) : null
+}
 
 const simulationResultEntryFileSchema = v.object({
   id: v.string(),
