@@ -14,13 +14,21 @@ const execFileAsync = promisify(execFile)
 // whole process group is sent SIGKILL (R/INLA workers can ignore SIGTERM)
 const KILL_GRACE_MS = 5000
 
+// Full paths to Windows system tools: a bare name is looked up in the
+// current folder before System32, so a planted reg.exe/taskkill.exe there
+// would run instead
+const WINDOWS_SYSTEM32 = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32')
+
 // Stops `pid`'s process tree. Windows' taskkill /F is already forceful;
 // elsewhere the process group (R plus forked workers) gets `signal`.
 function signalProcessTree(pid: number, signal: NodeJS.Signals): void {
   if (process.platform === 'win32') {
     // Without an 'error' listener, taskkill failing to start would be an
     // unhandled error that crashes the main process
-    spawn('taskkill', ['/pid', String(pid), '/T', '/F']).on('error', () => {})
+    spawn(path.join(WINDOWS_SYSTEM32, 'taskkill.exe'), ['/pid', String(pid), '/T', '/F']).on(
+      'error',
+      () => {}
+    )
     return
   }
 
@@ -106,7 +114,12 @@ export class RManager {
       'HKCU\\SOFTWARE\\R-core\\R'
     ]) {
       try {
-        const { stdout } = await execFileAsync('reg', ['query', key, '/v', 'InstallPath'])
+        const { stdout } = await execFileAsync(path.join(WINDOWS_SYSTEM32, 'reg.exe'), [
+          'query',
+          key,
+          '/v',
+          'InstallPath'
+        ])
         const match = stdout.match(/InstallPath\s+REG_SZ\s+(.+)/)
 
         if (match) {
