@@ -37,6 +37,7 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
   - [CI/CD](#cicd)
     - [Automatic Versioning](#automatic-versioning)
     - [Multi-Platform Releases](#multi-platform-releases)
+    - [Release Security](#release-security)
   - [Contributing](#contributing)
   - [Creating a Release](#creating-a-release)
   - [License](#license)
@@ -242,6 +243,42 @@ On every merged release PR, GitHub Actions builds and uploads:
 - **Linux** — `.AppImage` (portable) and `.deb` package
 - **Windows** — `.exe` NSIS installer
 - **macOS** — `.dmg` disk image (Apple Silicon)
+
+### Release Security
+
+Whoever can change a release can change what every installed copy of Albatross runs, so the release pipeline is locked down.
+
+**Least-privilege jobs.** `.github/workflows/release.yml` grants no token permissions by default; each job asks only for what it needs:
+
+| Job              | Permissions                               | Why                                                                            |
+| ---------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| `release-please` | `contents: write`, `pull-requests: write` | Opens the release PR and creates the tag                                       |
+| `build`          | `contents: read`                          | Runs `npm ci` and builds the installers, then saves them as workflow artifacts |
+| `publish`        | `contents: write`                         | Attaches the installers to the GitHub release; installs no npm packages        |
+
+`npm ci` runs every dependency's install scripts, so the build jobs can't write to the repository or releases, and `actions/checkout` uses `persist-credentials: false` so the token isn't left on disk.
+
+**Actions are pinned to commit SHAs**, not tags:
+
+```yaml
+uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+```
+
+A tag such as `@v2` is a movable label: whoever controls the action's repository can point it at different code, and the next run executes it with this workflow's permissions. That has happened in practice: in March 2025 the `tj-actions/changed-files` tags were moved to a malicious commit that leaked CI secrets. A commit SHA can't be moved, so the workflow always runs exactly the code that was reviewed. The comment records the version the SHA corresponds to.
+
+To update a pinned action, look up the commit for the new release tag and replace both the SHA and the version comment:
+
+```bash
+gh api repos/softprops/action-gh-release/commits/v2.6.3 -q .sha
+```
+
+Dependabot's `github-actions` ecosystem can automate this (it bumps the SHA and the comment together in a PR) if it's set up for this repository.
+
+**Electron fuses.** `electron-builder.yml` sets `electronFuses` so a packaged Albatross can't be used to run other code: `runAsNode`, `NODE_OPTIONS` and `--inspect` are disabled, the app only loads from its own `app.asar`, and on macOS and Windows a modified `app.asar` won't load.
+
+**Updates are downloaded only on request.** Releases aren't code-signed yet, so the auto-updater can only check a download against a hash published in the same GitHub release. Albatross therefore never downloads an update by itself: when one is available it offers a **Download** button, and installing still needs **Restart & Install**.
+
+**Still to do:** code-sign the Windows build (and set `publisherName` so the updater verifies it), and sign and notarize the macOS build with an Apple Developer ID. Signing certificates must be stored as GitHub Actions secrets, never in the repository.
 
 ---
 
