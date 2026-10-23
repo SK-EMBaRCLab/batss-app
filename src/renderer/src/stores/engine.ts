@@ -18,10 +18,19 @@ export const useEngine = create<EngineStore>((set, get) => ({
     if (get().initialized) return
     set({ initialized: true })
 
-    window.engine.onState((state) => set(state))
+    let receivedPush = false
+    const unsubscribe = window.engine.onState((state) => {
+      receivedPush = true
+      set(state)
+    })
+    // Dev only: a hot-reloaded store would otherwise leave this listener behind
+    import.meta.hot?.dispose(unsubscribe)
 
     // Catch up: if the renderer was reloaded mid-run, main is still busy.
-    set(await window.engine.get())
+    // Skipped if a pushed state or a local tryAcquire landed while this
+    // was in flight, since either is newer than the snapshot.
+    const snapshot = await window.engine.get()
+    if (!receivedPush && get().busy === 'idle') set(snapshot)
   },
 
   tryAcquire: (kind) => {

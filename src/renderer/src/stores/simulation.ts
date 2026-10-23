@@ -113,7 +113,7 @@ export const useSimulation = create<SimulationState>((set) => ({
   },
 
   // Fire-and-forget: the pending run() above settles on its own with a
-  // "cancelled" error result once main aborts the Rscript process.
+  // result of status 'cancelled' once main stops the Rscript process.
   cancel: async () => {
     await window.simulation.cancelSimulation()
   }

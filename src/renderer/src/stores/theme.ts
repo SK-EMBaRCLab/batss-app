@@ -28,7 +28,8 @@ export const useTheme = create<ThemeState>((set, get) => {
     initialize: async () => {
       if (get().initialized) return
       set({ initialized: true })
-      window.theme.onUpdated(applyAppearance)
+      // Dev only: a hot-reloaded store would otherwise leave this listener behind
+      import.meta.hot?.dispose(window.theme.onUpdated(applyAppearance))
       applyAppearance(await window.theme.get())
     },
 

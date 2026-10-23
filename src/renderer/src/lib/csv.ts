@@ -1,4 +1,3 @@
-// src/renderer/src/lib/csv.ts
 import type { BatchCsvRow } from '@shared/batch-types'
 import Papa from 'papaparse'
 

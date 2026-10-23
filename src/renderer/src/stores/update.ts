@@ -22,7 +22,8 @@ export const useUpdate = create<UpdateStore>((set, get) => ({
     if (get().initialized) return
     set({ initialized: true })
 
-    window.update.onStatus((state) => set(state))
+    // Dev only: a hot-reloaded store would otherwise leave this listener behind
+    import.meta.hot?.dispose(window.update.onStatus((state) => set(state)))
 
     const current = await window.update.get()
     set(current)

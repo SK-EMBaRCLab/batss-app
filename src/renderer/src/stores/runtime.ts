@@ -25,9 +25,9 @@ type RuntimeState = {
 // subscribes to the live update/log channels, runs `operation`, maps
 // the resulting RuntimeResult into store state, and always cleans up
 // the subscriptions - regardless of success, R-level failure, or a
-// rejected IPC call. checkRuntime and updatePackages previously
-// duplicated this wiring; both now just describe what makes them
-// different (the operation itself and the ready/failure messages).
+// rejected IPC call. checkRuntime and updatePackages only describe what
+// makes them different (the operation itself and the ready/failure
+// messages).
 async function runTrackedOperation(
   set: (partial: Partial<RuntimeState> | ((state: RuntimeState) => Partial<RuntimeState>)) => void,
   operation: () => Promise<{ ready: boolean; packages: RuntimePackage[] }>,
