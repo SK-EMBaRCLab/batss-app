@@ -98,7 +98,10 @@ export function registerAlbatrossFilesIPC(): void {
     }
   })
 
-  ipcMain.handle(IPC.design.confirmStopRun, async (_, kind: Exclude<EngineBusy, 'idle'>) => {
+  ipcMain.handle(IPC.design.confirmStopRun, async (_, data: unknown) => {
+    // Only two valid values; never put an unchecked value in dialog text
+    const kind: Exclude<EngineBusy, 'idle'> = data === 'batch' ? 'batch' : 'simulation'
+
     const result = await dialog.showMessageBox({
       type: 'warning',
       title: kind === 'batch' ? 'Batch Running' : 'Simulation Running',

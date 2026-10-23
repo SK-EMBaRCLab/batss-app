@@ -7,7 +7,15 @@ export type ParsedCsv = {
   rows: BatchCsvRow[]
 }
 
+// A full batch (MAX_BATCH_ROWS rows) is only tens of KB; anything this
+// large is the wrong file, and parsing it whole could freeze the app
+const MAX_CSV_BYTES = 1024 * 1024
+
 export function parseCsvFile(file: File): Promise<ParsedCsv> {
+  if (file.size > MAX_CSV_BYTES) {
+    return Promise.reject(new Error('This file is too large for a batch CSV (over 1 MB).'))
+  }
+
   return new Promise((resolve, reject) => {
     Papa.parse<BatchCsvRow>(file, {
       header: true,

@@ -1,5 +1,6 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { existsSync, statSync } from 'fs'
+import path from 'path'
 
 import { IPC } from '../../shared/ipc-channels'
 import type { SetOutputPathResult, SetSimulationTimeoutResult } from '../../shared/settings-types'
@@ -21,11 +22,16 @@ export function registerSettingsIPC(): void {
     return settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath())
   })
 
-  ipcMain.handle(IPC.settings.setOutputPath, (_event, outputPath: string): SetOutputPathResult => {
-    const trimmed = outputPath.trim()
+  ipcMain.handle(IPC.settings.setOutputPath, (_event, outputPath: unknown): SetOutputPathResult => {
+    const trimmed = typeof outputPath === 'string' ? outputPath.trim() : ''
 
     if (!trimmed) {
       return { saved: false, error: 'Enter a folder path.' }
+    }
+
+    // A relative path would depend on whatever folder the app started in
+    if (!path.isAbsolute(trimmed)) {
+      return { saved: false, error: 'Enter a full folder path.' }
     }
 
     if (!existsSync(trimmed)) {
@@ -36,7 +42,7 @@ export function registerSettingsIPC(): void {
       return { saved: false, error: 'This path is a file, not a folder.' }
     }
 
-    settingsService.set(OUTPUT_PATH_KEY, trimmed)
+    settingsService.set(OUTPUT_PATH_KEY, path.resolve(trimmed))
 
     return { saved: true }
   })

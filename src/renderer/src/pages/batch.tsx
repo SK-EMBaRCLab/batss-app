@@ -1,4 +1,5 @@
 import type { BatchRowValidation } from '@shared/batch-types'
+import { MAX_BATCH_ROWS } from '@shared/simulation-input-schema'
 import { Download, Play, Square, Upload } from 'lucide-react'
 import { type ChangeEvent, type ReactElement, useMemo, useState } from 'react'
 
@@ -84,6 +85,15 @@ export default function Batch(): ReactElement {
 
       if (parsed.rows.length === 0) {
         setParseError('The CSV has no data rows.')
+        setValidations([])
+        return
+      }
+
+      // Same limit the main process enforces, reported before Run
+      if (parsed.rows.length > MAX_BATCH_ROWS) {
+        setParseError(
+          `A batch can have at most ${MAX_BATCH_ROWS} rows; this file has ${parsed.rows.length}.`
+        )
         setValidations([])
         return
       }

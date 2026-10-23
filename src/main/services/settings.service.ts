@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs'
 
 import { getSettingsPath } from './filesystem/app-paths'
 
@@ -26,7 +26,12 @@ class SettingsService {
     settings[key] = value
     this.cache = settings
 
-    writeFileSync(this.path, JSON.stringify(settings, null, 2))
+    // Write a temporary file and rename it over the original: a crash or
+    // power cut mid-write then leaves the old file intact rather than a
+    // half-written one that load() would discard (resetting every setting)
+    const tmpPath = `${this.path}.tmp`
+    writeFileSync(tmpPath, JSON.stringify(settings, null, 2))
+    renameSync(tmpPath, this.path)
   }
 
   private load(): Record<string, unknown> {
