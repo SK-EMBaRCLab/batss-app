@@ -249,7 +249,19 @@ export default function Batch(): ReactElement {
                       onClick={() => {
                         if (match) openResults([match.id])
                       }}
-                      className={match ? 'cursor-pointer hover:bg-muted/50' : undefined}
+                      // Reachable and openable from the keyboard, not just by click
+                      tabIndex={match ? 0 : undefined}
+                      onKeyDown={(event) => {
+                        if (match && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault()
+                          openResults([match.id])
+                        }
+                      }}
+                      className={
+                        match
+                          ? 'cursor-pointer outline-none hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring'
+                          : undefined
+                      }
                     >
                       <TableCell>{entry.rowIndex + 1}</TableCell>
                       <TableCell>

@@ -26,12 +26,13 @@ export default function Results(): ReactElement {
       {/* Run history for this design */}
       <RunsHistory />
 
-      {/* Selected run detail */}
-      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
+      {/* Selected run detail. A div, not <main>: the app layout's <main>
+          already wraps every page */}
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
         <section className="flex flex-col gap-6">
           <Button variant="link" onClick={() => navigate('table')}>
             <Table />
-            Navigate through all designs
+            View all runs
           </Button>
           <RunHeader />
 
@@ -43,7 +44,7 @@ export default function Results(): ReactElement {
           <RunSummaryChart />
           <RunSampleSizeSummary />
         </section>
-      </main>
+      </div>
     </div>
   )
 }

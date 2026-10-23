@@ -52,7 +52,8 @@ export function Stepper({
                   clickable && !active && 'hover:text-foreground'
                 )}
               >
-                <div
+                {/* spans, not divs: only phrasing content is valid inside a button */}
+                <span
                   className={cn(
                     'flex h-8 w-8 items-center justify-center rounded-full border text-sm font-medium transition-colors',
                     active &&
@@ -68,22 +69,22 @@ export function Stepper({
                   )}
                 >
                   {completed ? <Check className="h-4 w-4" /> : index + 1}
-                </div>
+                </span>
 
-                <div
+                <span
                   className={cn(
-                    'mt-2 text-center text-xs',
+                    'mt-2 block text-center text-xs',
                     active ? 'font-bold text-foreground' : 'text-muted-foreground'
                   )}
                 >
                   {step.title}
 
                   {step.description && (
-                    <div className="mt-1 hidden text-xs text-muted-foreground lg:block">
+                    <span className="mt-1 hidden text-xs text-muted-foreground lg:block">
                       {step.description}
-                    </div>
+                    </span>
                   )}
-                </div>
+                </span>
               </Button>
 
               {index < steps.length - 1 && (

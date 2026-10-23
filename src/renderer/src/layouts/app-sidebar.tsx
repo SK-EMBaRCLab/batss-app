@@ -45,10 +45,10 @@ export function AppSidebar(): ReactElement {
                 className="size-10 shrink-0 object-contain group-data-[collapsible=icon]:size-8"
               />
 
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-extrabold font-mono uppercase">Albatross</span>
                 <span className="truncate text-xs font-extralight">ABC-INLA</span>
-              </div>
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

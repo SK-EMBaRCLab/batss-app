@@ -43,29 +43,39 @@ export function RunsHistory(): ReactElement | null {
           {[...list].reverse().map((entry) => {
             const Icon = outcomeTypes.find((type) => type.value === entry.input.outcomeType)?.icon
             const isSelected = entry.id === selectedEntry?.id
+            const createdAt = new Date(entry.createdAt).toLocaleString()
             return (
+              // A div with a full-size button laid over it, rather than the
+              // Item rendered as a <button>: Item's parts are divs and a <p>,
+              // which aren't valid inside a button
               <Item
                 key={entry.id}
-                render={
-                  <button type="button" className="w-full text-left" aria-current={isSelected}>
-                    <ItemMedia variant="icon">
-                      <RunStatusIcon status={entry.result.status} />
-                    </ItemMedia>
-                    <ItemContent>
-                      <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
-                      <ItemDescription>
-                        {runStatusLabel(entry.result.status)}
-                        {entry.result.durationMs != null &&
-                          ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
-                      </ItemDescription>
-                    </ItemContent>
-                    <ItemActions>{Icon ? <Icon /> : null}</ItemActions>
-                  </button>
-                }
                 variant={isSelected ? 'outline' : 'muted'}
-                className={cn('border-border hover:bg-muted', isSelected && 'border-primary')}
-                onClick={() => selectResult(entry.id)}
-              />
+                className={cn(
+                  'relative border-border hover:bg-muted',
+                  isSelected && 'border-primary'
+                )}
+              >
+                <ItemMedia variant="icon">
+                  <RunStatusIcon status={entry.result.status} />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>{createdAt}</ItemTitle>
+                  <ItemDescription>
+                    {runStatusLabel(entry.result.status)}
+                    {entry.result.durationMs != null &&
+                      ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>{Icon ? <Icon aria-hidden /> : null}</ItemActions>
+                <button
+                  type="button"
+                  aria-label={`${createdAt}, ${runStatusLabel(entry.result.status)}`}
+                  aria-current={isSelected ? 'true' : undefined}
+                  onClick={() => selectResult(entry.id)}
+                  className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </Item>
             )
           })}
         </div>
