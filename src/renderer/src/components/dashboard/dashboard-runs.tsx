@@ -1,6 +1,6 @@
-import { CheckCircle2, CircleAlert, CircleOff } from 'lucide-react'
 import { type ReactElement, useMemo } from 'react'
 
+import { RunStatusIcon } from '@/components/common/run-status-icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -12,6 +12,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { runResultDetail } from '@/lib/run-status'
 import { formatDurationLabel } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 
@@ -55,20 +56,12 @@ export function DashboardRecentRuns({
               onClick={() => openResult(entry.id)}
             >
               <ItemMedia>
-                {entry.result.status === 'success' ? (
-                  <CheckCircle2 className="text-green-700 dark:text-green-200 h-4 w-4" />
-                ) : entry.result.status === 'cancelled' ? (
-                  <CircleOff className="text-muted-foreground h-4 w-4" />
-                ) : (
-                  <CircleAlert className="text-destructive h-4 w-4" />
-                )}
+                <RunStatusIcon status={entry.result.status} />
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
                 <ItemDescription>
-                  {entry.result.status === 'success'
-                    ? `BATSS v${entry.result.package}`
-                    : entry.result.message}
+                  {runResultDetail(entry.result)}
                   {entry.result.durationMs != null &&
                     ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
                 </ItemDescription>

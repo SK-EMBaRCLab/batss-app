@@ -1,12 +1,15 @@
-import { ChevronDown, ChevronUp, CircleCheck, TriangleAlert, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
+import { RunStatusIcon } from '@/components/common/run-status-icon'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { batchOutcome, type RunOutcome, useActiveRunPercent } from '@/hooks/use-active-run-progress'
+import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds'
 import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
 import { STAGE_LABEL } from '@/lib/run-progress'
+import { runTitle } from '@/lib/run-status'
 import { cn, formatDuration, formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useEngine } from '@/stores/engine'
@@ -63,7 +66,7 @@ export function RunProgressPanel(): ReactElement | null {
   const [run, setRun] = useState<PanelRun | null>(runFromEngine)
   const [closed, setClosed] = useState(false)
   const [collapsed, setCollapsed] = usePersistentBoolean(COLLAPSED_KEY, false)
-  const [now, setNow] = useState(() => Date.now())
+  const elapsed = useElapsedSeconds(run?.startedAt ?? null, run?.endedAt ?? null)
 
   // Track run start/end from the engine. A run that finishes while the
   // user is on its own page has already been shown there, so the panel
@@ -81,12 +84,6 @@ export function RunProgressPanel(): ReactElement | null {
   }, [])
 
   const running = run !== null && run.endedAt === null
-
-  useEffect(() => {
-    if (!running) return
-    const id = window.setInterval(() => setNow(Date.now()), 1000)
-    return () => window.clearInterval(id)
-  }, [running])
 
   // null while running, or for the moment between the engine going idle
   // and the store recording the result
@@ -109,18 +106,7 @@ export function RunProgressPanel(): ReactElement | null {
   }
 
   const isBatch = run.kind === 'batch'
-  const noun = isBatch ? 'Batch' : 'Simulation'
-  const elapsed = ((run.endedAt ?? now) - run.startedAt) / 1000
-
-  const title = running
-    ? `${noun} running`
-    : outcome === 'success'
-      ? `${noun} complete`
-      : outcome === 'error'
-        ? isBatch
-          ? 'Batch stopped'
-          : 'Simulation failed'
-        : `${noun} finished`
+  const title = runTitle(run.kind, running ? 'running' : (outcome ?? 'finished'))
 
   let detail: string
   if (running) {
@@ -155,13 +141,7 @@ export function RunProgressPanel(): ReactElement | null {
     // Below the toast layer (z-50) so a toast never ends up hidden under it
     <div className="fixed right-4 bottom-4 z-40 w-80 overflow-hidden rounded-lg border bg-card text-card-foreground shadow-lg">
       <div className="flex items-center gap-2 border-b px-3 py-2">
-        {running ? (
-          <Spinner className="shrink-0" />
-        ) : outcome === 'error' ? (
-          <TriangleAlert className="h-4 w-4 shrink-0 text-destructive" />
-        ) : (
-          <CircleCheck className="h-4 w-4 shrink-0 text-primary" />
-        )}
+        {outcome ? <RunStatusIcon status={outcome} /> : <Spinner className="shrink-0" />}
 
         <span role="status" className="min-w-0 flex-1 truncate text-sm font-medium">
           {title}

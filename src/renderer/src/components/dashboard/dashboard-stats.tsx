@@ -1,6 +1,7 @@
-import { CheckCircle2, CircleAlert, CircleOff, Clock, SquareStack } from 'lucide-react'
+import { Clock, SquareStack } from 'lucide-react'
 import { type ReactElement } from 'react'
 
+import { RunStatusIcon } from '@/components/common/run-status-icon'
 import {
   Item,
   ItemContent,
@@ -9,6 +10,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { runStatusLabel } from '@/lib/run-status'
 import { useDesign } from '@/stores/design'
 
 export function DashboardStats(): ReactElement | null {
@@ -34,24 +36,11 @@ export function DashboardStats(): ReactElement | null {
 
       <Item variant="outline" size="sm">
         <ItemMedia variant="icon">
-          {latestRun?.result.status === 'success' ? (
-            <CheckCircle2 className="text-green-700 dark:text-green-200" />
-          ) : latestRun?.result.status === 'cancelled' ? (
-            <CircleOff className="text-muted-foreground" />
-          ) : (
-            <CircleAlert className="text-destructive" />
-          )}
+          {latestRun && <RunStatusIcon status={latestRun.result.status} />}
         </ItemMedia>
         <ItemContent>
           <ItemDescription>Latest Status</ItemDescription>
-          <ItemTitle>
-            {' '}
-            {latestRun?.result.status === 'success'
-              ? 'Success'
-              : latestRun?.result.status === 'cancelled'
-                ? 'Cancelled'
-                : 'Error'}
-          </ItemTitle>
+          <ItemTitle>{latestRun ? runStatusLabel(latestRun.result.status) : '—'}</ItemTitle>
         </ItemContent>
       </Item>
 

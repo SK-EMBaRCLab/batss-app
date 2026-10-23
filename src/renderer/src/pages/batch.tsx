@@ -3,6 +3,7 @@ import { Download, Play, Square, Upload } from 'lucide-react'
 import { type ChangeEvent, type ReactElement, useMemo, useState } from 'react'
 
 import { LogViewer } from '@/components/common/log-viewer'
+import { RunStatusIcon } from '@/components/common/run-status-icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -17,6 +18,7 @@ import {
 import { buildBatchValidations, buildTemplateCsv } from '@/lib/batch-mapper'
 import { downloadCsv, parseCsvFile } from '@/lib/csv'
 import { STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
+import { runResultDetail, runStatusLabel } from '@/lib/run-status'
 import { formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
@@ -251,22 +253,17 @@ export default function Batch(): ReactElement {
                     >
                       <TableCell>{entry.rowIndex + 1}</TableCell>
                       <TableCell>
-                        {entry.result.status === 'success'
-                          ? 'Success'
-                          : entry.result.status === 'cancelled'
-                            ? 'Cancelled'
-                            : 'Error'}
+                        <span className="flex items-center gap-1.5">
+                          <RunStatusIcon status={entry.result.status} />
+                          {runStatusLabel(entry.result.status)}
+                        </span>
                       </TableCell>
                       <TableCell>
                         {entry.result.durationMs != null
                           ? formatDurationLabel(entry.result.durationMs / 1000)
                           : '—'}
                       </TableCell>
-                      <TableCell>
-                        {entry.result.status === 'success'
-                          ? `BATSS v${entry.result.package}`
-                          : entry.result.message}
-                      </TableCell>
+                      <TableCell>{runResultDetail(entry.result)}</TableCell>
                     </TableRow>
                   )
                 })}

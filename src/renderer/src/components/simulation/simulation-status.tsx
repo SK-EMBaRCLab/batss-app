@@ -1,13 +1,13 @@
 import type { SimulationRunResult } from '@shared/simulation-types'
-import { ChevronDown, CircleCheck, CircleSlash, TriangleAlert } from 'lucide-react'
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement } from 'react'
 
-import { LogViewer } from '@/components/common/log-viewer'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { RunStatusIcon } from '@/components/common/run-status-icon'
+import { TechnicalDetails } from '@/components/common/technical-details'
 import { Progress } from '@/components/ui/progress'
+import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds'
 import type { DurationEstimate } from '@/lib/duration-estimate'
 import { type RunStage, STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
+import { runTitle } from '@/lib/run-status'
 import { formatDuration, formatDurationLabel } from '@/lib/utils'
 
 import { RunSteps } from './run-steps'
@@ -20,19 +20,6 @@ type SimulationStatusProps = {
   stageStartedAt: number | null
   estimate: DurationEstimate | null
   lastResult: SimulationRunResult | null
-}
-
-function useElapsedSeconds(startedAt: number | null, endedAt: number | null): number {
-  const [now, setNow] = useState(() => Date.now())
-
-  useEffect(() => {
-    if (startedAt === null || endedAt !== null) return
-    const id = window.setInterval(() => setNow(Date.now()), 250)
-    return () => window.clearInterval(id)
-  }, [startedAt, endedAt])
-
-  if (startedAt === null) return 0
-  return ((endedAt ?? now) - startedAt) / 1000
 }
 
 /**
@@ -58,41 +45,18 @@ export function SimulationStatus({
   const failed = done && lastResult !== null && lastResult.status !== 'success'
   const cancelled = done && lastResult?.status === 'cancelled'
 
-  const [detailsOpen, setDetailsOpen] = useState(false)
-
-  // Jump the raw output open automatically on failure — same reasoning
-  // as RuntimeScreen: that's exactly what a support contact will need.
-  useEffect(() => {
-    if (failed && !cancelled) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDetailsOpen(true)
-    }
-  }, [failed, cancelled])
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm font-medium">
-        {!done && <span>{stage ? STAGE_LABEL[stage] : 'Running the simulation…'}</span>}
-
-        {done && !failed && (
+        {!done ? (
+          <span>{stage ? STAGE_LABEL[stage] : 'Running the simulation…'}</span>
+        ) : lastResult ? (
           <>
-            <CircleCheck className="h-4 w-4 shrink-0 text-primary" />
-            <span>Simulation complete</span>
+            <RunStatusIcon status={lastResult.status} />
+            <span>{runTitle('simulation', lastResult.status)}</span>
           </>
-        )}
-
-        {done && cancelled && (
-          <>
-            <CircleSlash className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <span>Simulation cancelled</span>
-          </>
-        )}
-
-        {done && failed && !cancelled && (
-          <>
-            <TriangleAlert className="h-4 w-4 shrink-0 text-destructive" />
-            <span>Something went wrong</span>
-          </>
+        ) : (
+          <span>{runTitle('simulation', 'finished')}</span>
         )}
       </div>
 
@@ -114,22 +78,7 @@ export function SimulationStatus({
         </div>
       )}
 
-      <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <CollapsibleTrigger
-          render={
-            <Button variant="ghost" size="sm" className="flex text-muted-foreground">
-              <ChevronDown
-                className={`mr-1 h-4 w-4 transition-transform ${detailsOpen ? 'rotate-180' : ''}`}
-              />
-              Technical details
-            </Button>
-          }
-        />
-
-        <CollapsibleContent>
-          <LogViewer logs={logs} className="mt-2 h-48" />
-        </CollapsibleContent>
-      </Collapsible>
+      <TechnicalDetails logs={logs} failed={failed && !cancelled} />
     </div>
   )
 }

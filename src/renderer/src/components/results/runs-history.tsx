@@ -1,6 +1,6 @@
-import { ShieldAlertIcon, ShieldCheckIcon, ShieldOffIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
+import { RunStatusIcon } from '@/components/common/run-status-icon'
 import {
   Item,
   ItemActions,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { outcomeTypes } from '@/lib/design-options'
+import { runStatusLabel } from '@/lib/run-status'
 import { cn, formatDurationLabel } from '@/lib/utils'
 import { useDesign, useSelectedEntry } from '@/stores/design'
 
@@ -48,22 +49,12 @@ export function RunsHistory(): ReactElement | null {
                 render={
                   <button type="button" className="w-full text-left" aria-current={isSelected}>
                     <ItemMedia variant="icon">
-                      {entry.result.status === 'success' ? (
-                        <ShieldCheckIcon className="text-green-700 dark:text-green-200" />
-                      ) : entry.result.status === 'cancelled' ? (
-                        <ShieldOffIcon className="text-muted-foreground" />
-                      ) : (
-                        <ShieldAlertIcon className="text-destructive" />
-                      )}
+                      <RunStatusIcon status={entry.result.status} />
                     </ItemMedia>
                     <ItemContent>
                       <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
                       <ItemDescription>
-                        {entry.result.status === 'success'
-                          ? 'Success'
-                          : entry.result.status === 'cancelled'
-                            ? 'Cancelled'
-                            : 'Error'}
+                        {runStatusLabel(entry.result.status)}
                         {entry.result.durationMs != null &&
                           ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
                       </ItemDescription>
