@@ -4,6 +4,8 @@ import { Fragment, type ReactElement } from 'react'
 import { treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { HelpPanel, HelpSection } from './help-panel'
+
 export function OutcomeParametersHelp({
   form
 }: {
@@ -15,71 +17,56 @@ export function OutcomeParametersHelp({
 
   if (outcomeType.input === 'binary') {
     return (
-      <div className=" px-4 pb-4 pt-3 text-sm text-foreground/80">
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Control arm event probability</h4>
+      <HelpPanel>
+        <HelpSection title="Control arm event probability">
+          <p className="pl-5 leading-relaxed">
+            The probability that a patient in the control group experiences the outcome of interest.
+            If the control arm event probability is 0.4, then about 40% of patients in the control
+            group experience the event of interest.
+          </p>
+        </HelpSection>
 
-            <p className="pl-5 leading-relaxed">
-              The probability that a patient in the control group experiences the outcome of
-              interest. If the control arm event probability is 0.4, then about 40% of patients in
-              the control group experience the event of interest.
-            </p>
-          </div>
+        <HelpSection title="Treatment effect">
+          <dl className="space-y-2">
+            {treatmentEffects.map((effect) => (
+              <Fragment key={effect.value}>
+                <dt className="font-medium text-muted-foreground">{effect.label}</dt>
+                <dd className="space-y-2 pl-5 leading-relaxed">{effect.description}</dd>
+              </Fragment>
+            ))}
+          </dl>
+        </HelpSection>
 
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Treatment effect</h4>
-
-            <dl className="space-y-2">
-              {treatmentEffects.map((effect) => (
-                <Fragment key={effect.value}>
-                  <dt className="font-medium text-muted-foreground">{effect.label}</dt>
-                  <dd className="space-y-2 pl-5 leading-relaxed">{effect.description}</dd>
-                </Fragment>
-              ))}
-            </dl>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Treatment effect value</h4>
-
-            <p className="pl-5 leading-relaxed">
-              The assumed size of the treatment effect used in the simulation. This value is often
-              based on previous research, clinical expertise, or the minimum improvement that would
-              justify adopting the treatment in practice
-            </p>
-          </div>
-        </div>
-      </div>
+        <HelpSection title="Treatment effect value">
+          <p className="pl-5 leading-relaxed">
+            The assumed size of the treatment effect used in the simulation. This value is often
+            based on previous research, clinical expertise, or the minimum improvement that would
+            justify adopting the treatment in practice
+          </p>
+        </HelpSection>
+      </HelpPanel>
     )
   } else if (outcomeType.input === 'continuous') {
     return (
-      <div className="border-t border-primary/10 px-4 pb-4 pt-3 text-sm text-foreground/80">
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Mean Outcome in Control arm</h4>
+      <HelpPanel>
+        <HelpSection title="Mean Outcome in Control arm">
+          <p className="pl-5 leading-relaxed">
+            The average outcome for participants receiving the control intervention
+          </p>
+        </HelpSection>
 
-            <p className="pl-5 leading-relaxed">
-              The average outcome for participants receiving the control intervention
-            </p>
-          </div>
+        <HelpSection title="Standard Deviation of Outcome">
+          <p className="pl-5 leading-relaxed">
+            A measure of individual variation around the mean outcome
+          </p>
+        </HelpSection>
 
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Standard Deviation of Outcome</h4>
-            <p className="pl-5 leading-relaxed">
-              A measure of individual variation around the mean outcome
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-medium text-primary">Mean Difference for the treatment effect</h4>
-
-            <p className="pl-5 leading-relaxed">
-              The difference in the average outcome between treatment and control arms
-            </p>
-          </div>
-        </div>
-      </div>
+        <HelpSection title="Mean Difference for the treatment effect">
+          <p className="pl-5 leading-relaxed">
+            The difference in the average outcome between treatment and control arms
+          </p>
+        </HelpSection>
+      </HelpPanel>
     )
   }
 

@@ -1,21 +1,20 @@
 import type { SubmitHandler } from '@formisch/react'
 import { Form, getDeepErrorEntries, submit, useForm, validate } from '@formisch/react'
+import { checkSimulationRunInput } from '@shared/simulation-input-schema'
 import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { Info, PanelRightClose, PanelRightOpen, Play, Square } from 'lucide-react'
-import { type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react'
-import * as v from 'valibot'
+import { Info, Play, Square } from 'lucide-react'
+import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { Stepper } from '@/components/common/stepper'
 import { DecisionRuleSection } from '@/components/simulation/decision-rule-section'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
+import { toast } from '@/components/ui/toast'
+import { useTallestHeight } from '@/hooks/use-tallest-height'
 import { designSchema, initialDesignInput } from '@/lib/schema'
-import { toSimulationInput } from '@/lib/simulation-mapper'
 import { cn } from '@/lib/utils'
 import { useEngine } from '@/stores/engine'
 import { useSimulation } from '@/stores/simulation'
@@ -31,39 +30,8 @@ import { ReviewHelp } from './review-help'
 import { ReviewSection } from './review-section'
 import { SampleSizeHelp } from './sample-size-help'
 import { SampleSizeSection } from './sample-size-section'
+import { StepHelpCard } from './step-help-card'
 import { hasAnyFieldError } from './utils'
-
-// Whether the help card beside the form is expanded, remembered across
-// sessions
-const HELP_OPEN_KEY = 'albatross:simulation-help-open'
-
-/**
- * Natural height of the tallest of `count` elements, kept up to date as
- * any of them resizes (e.g. the Outcome Parameters step changing with
- * the outcome type). Attach `ref(index)` to each element to measure.
- */
-function useTallestHeight(count: number): {
-  ref: (index: number) => (el: HTMLDivElement | null) => void
-  tallest: number
-} {
-  const elements = useRef<(HTMLDivElement | null)[]>(Array(count).fill(null))
-  const [tallest, setTallest] = useState(0)
-
-  useEffect(() => {
-    const measure = (): void =>
-      setTallest(Math.max(0, ...elements.current.map((el) => el?.offsetHeight ?? 0)))
-    const observer = new ResizeObserver(measure)
-    elements.current.forEach((el) => el && observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
-
-  return {
-    ref: (index) => (el) => {
-      elements.current[index] = el
-    },
-    tallest
-  }
-}
 
 type SimulationFormProps = {
   onRun: (input: SimulationRunInput, output: DesignInput) => Promise<void>
@@ -134,7 +102,6 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   const isRunning = busy === 'simulation'
   const [step, setStep] = useState(0)
   const stepHeights = useTallestHeight(steps.length)
-  const [helpOpen, setHelpOpen] = usePersistentBoolean(HELP_OPEN_KEY, true)
   const form = useForm({
     schema: designSchema,
     validate: 'blur',
@@ -151,17 +118,15 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   }
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
-    try {
-      const input = toSimulationInput(output)
-
-      await onRun(input, output)
-    } catch (error) {
-      if (v.isValiError(error)) {
-        console.error('Invalid simulation input:', error.issues)
-        return
-      }
-      throw error
+    // The same check the main process applies before running, so anything
+    // it would refuse is reported here instead
+    const checked = checkSimulationRunInput(output)
+    if (!checked.success) {
+      toast.add({ type: 'error', title: "Can't run this simulation", description: checked.message })
+      return
     }
+
+    await onRun(checked.input, output)
   }
 
   const handleBack = (): void => {
@@ -320,57 +285,7 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
         </CardContent>
       </Card>
 
-      {/* Help lives in its own, quieter card beside the form rather than
-          inside it, so the form card is only inputs. Below lg it's the
-          Help sheet above instead. Scrolls past the window's height in a
-          plain overflow div rather than ScrollArea, which needs a
-          fixed-height parent. */}
-      {helpOpen ? (
-        <Card className="hidden max-h-full w-88 shrink-0 flex-col bg-muted/30 lg:flex">
-          <CardHeader className="shrink-0">
-            <CardTitle className="text-base">{helpTitle}</CardTitle>
-            <CardAction>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Hide help"
-                      onClick={() => setHelpOpen(false)}
-                    >
-                      <PanelRightClose />
-                    </Button>
-                  }
-                />
-                <TooltipContent>Hide help</TooltipContent>
-              </Tooltip>
-            </CardAction>
-          </CardHeader>
-          <CardContent className="min-h-0 overflow-y-auto px-2">{help}</CardContent>
-        </Card>
-      ) : (
-        // Collapsed to a single button; the form card takes the freed width
-        <Card className="hidden shrink-0 bg-muted/30 p-1 lg:flex">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Show help"
-                  onClick={() => setHelpOpen(true)}
-                >
-                  <PanelRightOpen />
-                </Button>
-              }
-            />
-            <TooltipContent>Show help</TooltipContent>
-          </Tooltip>
-        </Card>
-      )}
+      <StepHelpCard title={helpTitle}>{help}</StepHelpCard>
     </div>
   )
 }

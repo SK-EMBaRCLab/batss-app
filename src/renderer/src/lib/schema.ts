@@ -1,3 +1,4 @@
+import { MAX_SAMPLE_SIZE, MAX_SIMULATED_TRIALS } from '@shared/simulation-input-schema'
 import { DecisionRule, DesignInput } from '@shared/simulation-types'
 import * as v from 'valibot'
 
@@ -23,18 +24,24 @@ export const requiredNumber = (label: string) =>
     v.finite(`${label} must be a finite number.`)
   )
 
+// Same upper limits as the main process's run check (shared), so they're
+// reported while typing rather than only when Run is clicked
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const positiveInteger = (label: string) =>
+const positiveInteger = (label: string, max: number) =>
   v.pipe(
     requiredNumber(label),
     v.integer(`${label} must be a whole number.`),
-    v.minValue(1, `${label} must be greater than 0.`)
+    v.minValue(1, `${label} must be greater than 0.`),
+    v.maxValue(max, `${label} must be at most ${max.toLocaleString('en-CA')}.`)
   )
 /**
  * Decision rules
  */
 const decisionRuleSchema = v.object({
-  type: v.picklist(['superiority', 'futility'], 'Select a decision rule type.'),
+  type: v.pipe(
+    v.picklist(['superiority', 'futility'], 'Select a decision rule type.'),
+    v.check((t) => t === 'superiority', 'Only superiority rules are currently supported.')
+  ),
 
   direction: v.picklist(['greater', 'less'], 'Select greater than or less than.'),
 
@@ -48,13 +55,13 @@ const decisionRuleSchema = v.object({
 })
 
 const commonDesignFields = {
-  N: positiveInteger('Maximum sample size'),
+  N: positiveInteger('Maximum sample size', MAX_SAMPLE_SIZE),
 
-  m0: positiveInteger('Burn-in'),
+  m0: positiveInteger('Burn-in', MAX_SAMPLE_SIZE),
 
-  m: positiveInteger('Patients between interim analyses'),
+  m: positiveInteger('Patients between interim analyses', MAX_SAMPLE_SIZE),
 
-  R: positiveInteger('Number of simulated trials'),
+  R: positiveInteger('Number of simulated trials', MAX_SIMULATED_TRIALS),
 
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
@@ -146,58 +153,6 @@ export const designSchema = v.pipe(
     ['decisionRules', 0, 'margin']
   )
 )
-
-const runnableCommonSchema = {
-  N: positiveInteger('Maximum sample size'),
-
-  m0: positiveInteger('Burn-in'),
-
-  m: positiveInteger('Patients between interim analyses'),
-
-  R: positiveInteger('Number of simulations'),
-
-  decisionRules: v.array(decisionRuleSchema),
-
-  corePercent: v.optional(v.picklist([25, 50, 75, 100]))
-}
-
-const runnableBinarySchema = v.object({
-  outcomeType: v.literal('binary'),
-
-  probability: v.number(),
-
-  treatmentEffectType: v.picklist(['oddsRatio', 'riskDifference', 'riskRatio']),
-
-  treatmentEffect: v.number(),
-
-  ...runnableCommonSchema
-})
-
-const runnableContinuousSchema = v.object({
-  outcomeType: v.literal('continuous'),
-
-  meanOutcome: v.number(),
-
-  meanDiff: v.number(),
-
-  sd: v.pipe(v.number(), v.minValue(0, 'Standard deviation must be greater than 0.')),
-
-  ...runnableCommonSchema
-})
-
-const runnableOrdinalSchema = v.object({
-  outcomeType: v.literal('ordinal'),
-
-  // Add ordinal-specific fields here
-
-  ...runnableCommonSchema
-})
-
-export const runnableDesignSchema = v.variant('outcomeType', [
-  runnableBinarySchema,
-  runnableContinuousSchema,
-  runnableOrdinalSchema
-])
 
 export const defaultDecisionRule: DecisionRule = {
   type: 'superiority',

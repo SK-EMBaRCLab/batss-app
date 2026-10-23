@@ -1,9 +1,8 @@
-// src/renderer/src/lib/batch-mapper.ts
 import type { BatchCsvRow, BatchRowValidation } from '@shared/batch-types'
+import { checkSimulationRunInput } from '@shared/simulation-input-schema'
 import * as v from 'valibot'
 
 import { designSchema } from './schema'
-import { toSimulationInput } from './simulation-mapper'
 
 const cell = (value: string | undefined): string | undefined => value?.trim() || undefined
 
@@ -73,7 +72,17 @@ export function buildBatchValidations(rows: BatchCsvRow[]): BatchRowValidation[]
       }
     }
 
-    return { rowIndex, status: 'valid' as const, input: toSimulationInput(result.output) }
+    // Same check the main process applies, so a row marked valid will run
+    const checked = checkSimulationRunInput(result.output)
+    if (!checked.success) {
+      return {
+        rowIndex,
+        status: 'invalid' as const,
+        errors: [`Row ${rowIndex + 1}: ${checked.message}`]
+      }
+    }
+
+    return { rowIndex, status: 'valid' as const, input: checked.input }
   })
 }
 

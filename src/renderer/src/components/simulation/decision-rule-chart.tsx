@@ -1,14 +1,6 @@
 import { DecisionRule } from '@shared/simulation-types'
 import { type ReactElement, useMemo, useState } from 'react'
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ReferenceLine,
-  ResponsiveContainer,
-  XAxis,
-  YAxis
-} from 'recharts'
+import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart'
 
@@ -61,21 +53,30 @@ export function DecisionChart({
   type,
   onMarginChange
 }: DecisionChartProps): ReactElement {
-  const [isDragging, setIsDragging] = useState(false)
-  const data = useMemo(() => {
-    // Visual spread only — NOT the statistical SE. Scales with the
-    // treatment effect itself, not with the margin: moving the
-    // decision boundary should pan/zoom the chart, not change how
-    // "confident" the curve looks.
-    const curveSpread = Math.max(0.1, Math.abs(value) * 0.25)
+  // Visual spread only — NOT the statistical SE. Scales with the
+  // treatment effect itself, not with the margin: moving the decision
+  // boundary should pan/zoom the chart, not change how "confident" the
+  // curve looks.
+  const curveSpread = Math.max(0.1, Math.abs(value) * 0.25)
 
-    // The viewport has to fit both the effect estimate and the margin
-    // reference line, with enough padding around each to read clearly.
+  // The viewport has to fit both the effect estimate and the margin
+  // reference line, with enough padding around each to read clearly.
+  const fittedRange = useMemo(() => {
     const padding = Math.max(curveSpread * 4, Math.abs(value - rule.margin) * 0.5)
     const lo = Math.min(value, rule.margin) - padding
-    const min = type === 'binary' ? Math.max(0, lo) : lo
-    const max = Math.max(value, rule.margin) + padding
+    return {
+      min: type === 'binary' ? Math.max(0, lo) : lo,
+      max: Math.max(value, rule.margin) + padding
+    }
+  }, [curveSpread, value, rule.margin, type])
 
+  // Frozen while dragging the margin line: refitting to every new margin
+  // would shift the axis under the cursor. Refits when the drag ends.
+  const [dragRange, setDragRange] = useState<{ min: number; max: number } | null>(null)
+  const isDragging = dragRange !== null
+  const { min, max } = dragRange ?? fittedRange
+
+  const data = useMemo(() => {
     const points = 200
     const key = getChartType(type).key
 
@@ -96,7 +97,7 @@ export function DecisionChart({
         decisionRegion: isDecisionRegion ? distribution : null
       }
     })
-  }, [value, rule.margin, rule.direction, type])
+  }, [min, max, curveSpread, value, rule.margin, rule.direction, type])
 
   const chartType = getChartType(type)
 
@@ -114,103 +115,102 @@ export function DecisionChart({
   }
 
   return (
+    // ChartContainer already provides the ResponsiveContainer
     <ChartContainer config={chartConfig} className="h-40 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 20,
-            left: 10,
-            bottom: 10
+      <AreaChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 20,
+          left: 10,
+          bottom: 10
+        }}
+        style={onMarginChange ? { cursor: isDragging ? 'grabbing' : 'ew-resize' } : undefined}
+        onMouseDown={(chartState) => {
+          if (!onMarginChange) return
+          setDragRange(fittedRange)
+          updateMarginFromChart(chartState)
+        }}
+        onMouseMove={(chartState) => {
+          if (!isDragging) return
+          updateMarginFromChart(chartState)
+        }}
+        onMouseUp={() => setDragRange(null)}
+        onMouseLeave={() => setDragRange(null)}
+      >
+        <CartesianGrid vertical={false} className="stroke-muted" />
+
+        <XAxis
+          dataKey={chartType.key}
+          type="number"
+          domain={['dataMin', 'dataMax']}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => Number(value).toFixed(2)}
+        />
+
+        <YAxis hide />
+
+        <ChartTooltip
+          content={({ active, payload }) => {
+            if (!active || !payload?.length) {
+              return null
+            }
+
+            let value = Number.POSITIVE_INFINITY
+            if (type === 'binary') {
+              value = Number(payload[0]?.payload?.oddsRatio)
+            } else if (type === 'continuous') {
+              value = Number(payload[0]?.payload?.meanDiff)
+            }
+
+            if (!Number.isFinite(value)) {
+              return null
+            }
+
+            return (
+              <div className="rounded-lg border bg-background px-3 py-2 text-sm shadow-sm">
+                <div className="font-medium">{chartType.label}</div>
+
+                <div className="text-muted-foreground">{value.toFixed(2)}</div>
+              </div>
+            )
           }}
-          style={onMarginChange ? { cursor: isDragging ? 'grabbing' : 'ew-resize' } : undefined}
-          onMouseDown={(chartState) => {
-            if (!onMarginChange) return
-            setIsDragging(true)
-            updateMarginFromChart(chartState)
+        />
+
+        {/* Light outline of the entire normal distribution */}
+        <Area
+          type="monotone"
+          dataKey="distribution"
+          stroke="var(--chart-1)"
+          fill="var(--chart-1)"
+          fillOpacity={0.04}
+          strokeWidth={2}
+        />
+
+        {/* ONLY the decision side is shaded */}
+        <Area
+          type="monotone"
+          dataKey="decisionRegion"
+          stroke="none"
+          fill="var(--chart-2)"
+          fillOpacity={0.55}
+        />
+
+        {/* Null odds ratio */}
+        <ReferenceLine x={chartType.x} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
+
+        {/* Superiority margin */}
+        <ReferenceLine
+          x={rule.margin}
+          stroke="var(--destructive)"
+          strokeWidth={3}
+          label={{
+            value: `SM = ${rule.margin}`,
+            position: 'top'
           }}
-          onMouseMove={(chartState) => {
-            if (!isDragging) return
-            updateMarginFromChart(chartState)
-          }}
-          onMouseUp={() => setIsDragging(false)}
-          onMouseLeave={() => setIsDragging(false)}
-        >
-          <CartesianGrid vertical={false} className="stroke-muted" />
-
-          <XAxis
-            dataKey={chartType.key}
-            type="number"
-            domain={['dataMin', 'dataMax']}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => Number(value).toFixed(2)}
-          />
-
-          <YAxis hide />
-
-          <ChartTooltip
-            content={({ active, payload }) => {
-              if (!active || !payload?.length) {
-                return null
-              }
-
-              let value = Number.POSITIVE_INFINITY
-              if (type === 'binary') {
-                value = Number(payload[0]?.payload?.oddsRatio)
-              } else if (type === 'continuous') {
-                value = Number(payload[0]?.payload?.meanDiff)
-              }
-
-              if (!Number.isFinite(value)) {
-                return null
-              }
-
-              return (
-                <div className="rounded-lg border bg-background px-3 py-2 text-sm shadow-sm">
-                  <div className="font-medium">{chartType.label}</div>
-
-                  <div className="text-muted-foreground">{value.toFixed(2)}</div>
-                </div>
-              )
-            }}
-          />
-
-          {/* Light outline of the entire normal distribution */}
-          <Area
-            type="monotone"
-            dataKey="distribution"
-            stroke="var(--chart-1)"
-            fill="var(--chart-1)"
-            fillOpacity={0.04}
-            strokeWidth={2}
-          />
-
-          {/* ONLY the decision side is shaded */}
-          <Area
-            type="monotone"
-            dataKey="decisionRegion"
-            stroke="none"
-            fill="var(--chart-2)"
-            fillOpacity={0.55}
-          />
-
-          {/* Null odds ratio */}
-          <ReferenceLine x={chartType.x} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
-
-          {/* Superiority margin */}
-          <ReferenceLine
-            x={rule.margin}
-            stroke="var(--destructive)"
-            strokeWidth={3}
-            label={{
-              value: `SM = ${rule.margin}`,
-              position: 'top'
-            }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+        />
+      </AreaChart>
     </ChartContainer>
   )
 }
