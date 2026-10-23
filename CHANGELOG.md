@@ -1,5 +1,23 @@
 # Changelog
 
+## [5.6.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.6.0...v5.6.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **a11y:** fix invalid HTML and keyboard access ([386ea42](https://github.com/SK-EMBaRCLab/batss-app/commit/386ea423cbfec2560d1695640f902a2b531da3dc))
+* **a11y:** link form labels to their inputs and label unlabelled controls ([f19fd1c](https://github.com/SK-EMBaRCLab/batss-app/commit/f19fd1cde5c9ee92730a677c480b3eebaf14a0bb))
+* **batch:** end a batch as failed if its run call errors ([ae6013f](https://github.com/SK-EMBaRCLab/batss-app/commit/ae6013feb7a4ce6e9ae1972fdbfb9955443ab361))
+* **batch:** report a batch cancelled during its last row as cancelled ([b00999b](https://github.com/SK-EMBaRCLab/batss-app/commit/b00999bfa800b96f3591aa8429fb1d5eb7a77015))
+* **design:** keep the CPU usage setting when loading a design ([cf485b7](https://github.com/SK-EMBaRCLab/batss-app/commit/cf485b77a797ca4df8a6440d7942481190137c33))
+* **design:** save, keep runs and clear selection correctly when switching designs ([802e442](https://github.com/SK-EMBaRCLab/batss-app/commit/802e442f89f94785a259424921a61018feea8ee3))
+* **simulation:** honour a cancel made while a run is starting ([e1b00e8](https://github.com/SK-EMBaRCLab/batss-app/commit/e1b00e8c4b783fc62632a14af9028d7fe51edf72))
+* **simulation:** reset the form for a new or loaded design ([4796abf](https://github.com/SK-EMBaRCLab/batss-app/commit/4796abfcdea9113f9a7d28abcef0977b1b33e948))
+* **simulation:** stop stale stages showing in run progress ([9e7b5c9](https://github.com/SK-EMBaRCLab/batss-app/commit/9e7b5c9c53961ed5efa4e42605baf3cdda86b303))
+* **simulation:** use one core-count calculation so the CPU preview matches the run ([1d1f153](https://github.com/SK-EMBaRCLab/batss-app/commit/1d1f153d6d90328ee3f71b74b8fad7e6b2a4de4d))
+* **ui:** fix typos and wording in help text and the Review step ([558290f](https://github.com/SK-EMBaRCLab/batss-app/commit/558290f82809e318dddc9064bf3deea61deeae66))
+* **ui:** show run status the same way on every screen ([b8ad2a5](https://github.com/SK-EMBaRCLab/batss-app/commit/b8ad2a56b38250b910ca8f90d1af8a82589cf9c2))
+
 ## [5.6.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.5.0...v5.6.0) (2026-10-22)
 
 ### Features
