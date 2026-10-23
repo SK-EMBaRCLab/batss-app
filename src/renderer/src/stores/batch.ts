@@ -76,11 +76,10 @@ export const useBatch = create<BatchState>((set) => ({
       // marker can't override the new row's 'init' below
       teardownLog.flush()
 
-      // BatchService emits this exact message right before executing
-      // each row (see batch.service.ts) — the one reliable "a new row
-      // is starting" signal, as opposed to the identical completed=0
-      // emitted once up front for "Starting batch of N run(s)".
-      const startingRow = update.status === 'running' && update.message.startsWith('Running row ')
+      // Set by BatchService just before each row runs — as opposed to the
+      // identical completed=0 update sent once up front for "Starting
+      // batch of N run(s)"
+      const startingRow = update.status === 'running' && update.startingRow === true
       const rowInput = startingRow ? inputs[update.completed]?.input : undefined
 
       set({

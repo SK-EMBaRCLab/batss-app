@@ -1,4 +1,3 @@
-// src/main/services/batch.service.ts
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../../shared/batch-types'
 import { describeBusy } from '../../shared/engine-types'
 import type { OutputListener } from '../runtime/r-manager'
@@ -65,7 +64,8 @@ export class BatchService {
           status: 'running',
           completed: index,
           total,
-          message: `Running row ${rowIndex + 1} (${index + 1}/${total})`
+          message: `Running row ${rowIndex + 1} (${index + 1}/${total})`,
+          startingRow: true
         })
 
         const result = await this.simulation.execute(input, onOutput)

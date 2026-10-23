@@ -142,7 +142,9 @@ function createWindow(): void {
   const persistBounds = (): void => {
     if (!mainWindow?.isMinimized()) {
       settingsService.set('windowState', {
-        bounds: mainWindow?.getBounds(),
+        // Normal (un-maximized) bounds, so un-maximizing after a restart
+        // goes back to the size the user actually chose
+        bounds: mainWindow?.getNormalBounds(),
         isMaximized: mainWindow?.isMaximized()
       })
     }

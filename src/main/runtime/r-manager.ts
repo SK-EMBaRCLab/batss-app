@@ -150,8 +150,8 @@ export class RManager {
         }
         const versions = entries
           .filter((v) => v.startsWith('R-'))
-          .sort()
-          .reverse()
+          // Newest first, comparing numbers numerically (R-4.10 after R-4.9)
+          .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
 
         for (const version of versions) {
           candidates.push(path.join(rDir, version, 'bin', 'x64', 'Rscript.exe'))
@@ -189,12 +189,6 @@ export class RManager {
     const { stdout } = await execFileAsync(executable, ['--version'])
 
     return stdout.trim()
-  }
-
-  async rVersion(): Promise<string> {
-    return this.evaluate<string>(`
-      paste(R.version$major, R.version$minor, sep = ".")
-    `)
   }
 
   async isInstalled(): Promise<boolean> {
@@ -253,29 +247,6 @@ export class RManager {
     return stdout.trim()
   }
 
-  async evaluate<T>(
-    script: string,
-    env: NodeJS.ProcessEnv = {},
-    onOutput?: OutputListener
-  ): Promise<T> {
-    const result = await this.execute(
-      `
-        result <- ${script}
-
-        cat(
-          jsonlite::toJSON(
-            result,
-            auto_unbox = TRUE
-          )
-        )
-      `,
-      env,
-      onOutput
-    )
-
-    return JSON.parse(result) as T
-  }
-
   // R honours R_LIBS_USER natively at interpreter startup (see
   // `?Startup` / `?.libPaths`) — no need to inject a `.libPaths()`
   // prologue into every script by hand. Node creates the directory
@@ -297,7 +268,7 @@ export class RManager {
   // as a stream and forwarded line-by-line to `onOutput`, rather than
   // only being available once the whole process has exited. Still
   // resolves with the full accumulated stdout/stderr for callers (like
-  // getStatus/evaluate) that need to parse the complete output.
+  // getStatus) that need to parse the complete output.
   private async runProcess(
     args: string[],
     env: NodeJS.ProcessEnv,

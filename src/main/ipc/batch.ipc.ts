@@ -1,4 +1,3 @@
-// src/main/ipc/batch.ipc.ts
 import { BrowserWindow, ipcMain } from 'electron'
 
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../../shared/batch-types'

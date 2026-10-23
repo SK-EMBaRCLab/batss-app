@@ -9,6 +9,9 @@ import type { SimulationRunResult } from '../../shared/simulation-types'
 import { NOTIFY_ON_RUN_FINISH_KEY } from '../settings.constants'
 import { settingsService } from './settings.service'
 
+// Windows already waiting for focus to stop flashing
+const flashing = new WeakSet<BrowserWindow>()
+
 // Electron drops a Notification's click handler once it's garbage
 // collected, so hold on to the latest one until it's replaced.
 let current: Notification | null = null
@@ -29,7 +32,14 @@ function alertRunFinished(
 
   if (!window.isFocused()) {
     window.flashFrame(true)
-    window.once('focus', () => window.flashFrame(false))
+    // One stop-flashing listener per window, not one per finished run
+    if (!flashing.has(window)) {
+      flashing.add(window)
+      window.once('focus', () => {
+        flashing.delete(window)
+        window.flashFrame(false)
+      })
+    }
   }
 
   if (!settingsService.get(NOTIFY_ON_RUN_FINISH_KEY, true)) return
