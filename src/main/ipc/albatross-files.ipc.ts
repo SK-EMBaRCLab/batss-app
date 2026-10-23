@@ -27,6 +27,16 @@ function sanitizeFileName(name: string): string {
   return cleaned.length > 0 ? cleaned : 'Untitled Design'
 }
 
+// Paths the user picked in an Open or Save dialog this session. Save only
+// writes straight to one of these: any other path the renderer sends goes
+// through the Save dialog instead, so the renderer can never make main
+// overwrite an arbitrary file.
+const userChosenPaths = new Set<string>()
+
+function rememberChosenPath(filePath: string): void {
+  userChosenPaths.add(path.resolve(filePath))
+}
+
 async function saveViaDialog(data: StudyDesign): Promise<SaveResultResponse> {
   const designName = data.name || 'Untitled Design'
   const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
@@ -41,6 +51,7 @@ async function saveViaDialog(data: StudyDesign): Promise<SaveResultResponse> {
   if (canceled || !filePath) return { saved: false }
 
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8')
+  rememberChosenPath(filePath)
   designHasUnsavedChanges = false
   return { saved: true, filePath }
 }
@@ -107,7 +118,7 @@ export function registerAlbatrossFilesIPC(): void {
   ipcMain.handle(
     IPC.design.saveResult,
     async (_, data: StudyDesign, knownPath?: string): Promise<SaveResultResponse> => {
-      if (!knownPath) {
+      if (!knownPath || !userChosenPaths.has(path.resolve(knownPath))) {
         return saveViaDialog(data)
       }
       try {
@@ -183,6 +194,7 @@ export function registerAlbatrossFilesIPC(): void {
       return null
     }
 
+    rememberChosenPath(filePath)
     return { design: validation.data, filePath }
   })
 }
