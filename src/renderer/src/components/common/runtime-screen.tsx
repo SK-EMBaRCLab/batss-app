@@ -1,22 +1,13 @@
-import {
-  CheckCircle2,
-  ChevronDown,
-  CircleAlert,
-  Copy,
-  ExternalLink,
-  Loader2,
-  RefreshCw
-} from 'lucide-react'
+import { CheckCircle2, CircleAlert, Copy, ExternalLink, Loader2, RefreshCw } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Progress } from '@/components/ui/progress'
 import { formatDuration } from '@/lib/utils'
 import { useRuntime } from '@/stores/runtime'
 
-import { LogViewer } from './log-viewer'
+import { TechnicalDetails } from './technical-details'
 
 function useElapsedSeconds(active: boolean): number {
   const [seconds, setSeconds] = useState(0)
@@ -54,17 +45,6 @@ export function RuntimeScreen(): ReactElement {
   const isWorking = isChecking || isInstalling
 
   const elapsed = useElapsedSeconds(isChecking || isInstalling)
-
-  const [detailsOpen, setDetailsOpen] = useState(false)
-
-  // Jump the technical log open automatically on failure — that's
-  // exactly what a support contact will need to see.
-  useEffect(() => {
-    if (isError) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDetailsOpen(true)
-    }
-  }, [isError])
 
   const copyDetails = async (): Promise<void> => {
     const details = [
@@ -162,30 +142,16 @@ export function RuntimeScreen(): ReactElement {
             </div>
           )}
           {(isWorking || isError) && (
-            <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-              <CollapsibleTrigger
-                render={
-                  <Button variant="ghost" size="sm" className="mx-auto flex text-muted-foreground">
-                    <ChevronDown
-                      className={`mr-1 h-4 w-4 transition-transform ${detailsOpen ? 'rotate-180' : ''}`}
-                    />
-                    Technical details
-                  </Button>
-                }
-              />
-
-              <CollapsibleContent>
-                <LogViewer
-                  logs={logs}
-                  className="mt-3 h-48"
-                  header={
-                    logs.length === 0 ? (
-                      <div className="text-muted-foreground">Waiting for output…</div>
-                    ) : undefined
-                  }
-                />
-              </CollapsibleContent>
-            </Collapsible>
+            <TechnicalDetails
+              logs={logs}
+              failed={isError}
+              centered
+              header={
+                logs.length === 0 ? (
+                  <div className="text-muted-foreground">Waiting for output…</div>
+                ) : undefined
+              }
+            />
           )}
         </CardContent>
       </Card>
