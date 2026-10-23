@@ -13,7 +13,6 @@ export const appCommands: AppCommand[] = [
       binding: 'mod+k'
     },
     showInPalette: false,
-    showInMenu: true,
     action: () => {
       useCommandPalette.getState().toggle()
     }

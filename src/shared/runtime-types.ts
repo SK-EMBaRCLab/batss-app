@@ -17,6 +17,5 @@ export type RuntimePackage = {
 export type RuntimeResult = {
   ready: boolean
   r: boolean
-  rVersion?: string
   packages: RuntimePackage[]
 }

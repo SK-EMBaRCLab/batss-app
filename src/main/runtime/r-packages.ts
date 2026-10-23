@@ -14,7 +14,9 @@ export const R_PACKAGES = {
   //   INLA    — from its own repo (not CRAN). Requires fmesher already
   //     present.
   //   BATSS   — from CRAN, now that its INLA dependency is satisfied.
-  //   jsonlite
+  //   jsonlite — reads the run input and writes results in batss-simulation.R.
+  //   R.utils — imported by BATSS itself; listed so it's checked and
+  //     reported like the rest.
   ordered: ['fmesher', 'INLA', 'BATSS', 'jsonlite', 'R.utils']
 } as const
 

@@ -6,7 +6,7 @@ import { decisionRuleFormula } from '@/lib/utils'
 /**
  * A loosely-typed "whatever design values we currently have" bag. Two
  * very different callers feed this:
- *  - DesignParams / CompactDesignParams pass an already-validated
+ *  - DesignParams passes an already-validated
  *    SimulationRunInput or saved DesignInput — real numbers, complete
  *    DecisionRule objects.
  *  - ReviewSection passes a live formisch form snapshot, where numeric

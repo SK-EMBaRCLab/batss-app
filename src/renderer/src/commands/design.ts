@@ -14,10 +14,7 @@ export const designCommands: AppCommand[] = [
       binding: 'mod+n'
     },
     showInPalette: true,
-    showInMenu: true,
     action: async () => {
-      // You need to provide the input from your UI/wizard
-      // This command usually opens a "New Design" dialog
       await useDesign.getState().newDesign(initialDesignInput)
     }
   },
@@ -30,7 +27,6 @@ export const designCommands: AppCommand[] = [
       binding: 'mod+o'
     },
     showInPalette: true,
-    showInMenu: true,
     action: async () => {
       await useDesign.getState().loadDesign()
     }
@@ -44,7 +40,6 @@ export const designCommands: AppCommand[] = [
       binding: 'mod+s'
     },
     showInPalette: true,
-    showInMenu: true,
     enabled: () => useDesign.getState().isDirty,
     action: async () => {
       await useDesign.getState().saveDesign()
@@ -57,7 +52,6 @@ export const designCommands: AppCommand[] = [
     icon: SavePen,
     shortcut: { binding: 'mod+shift+s' },
     showInPalette: true,
-    showInMenu: true,
     enabled: () => !!useDesign.getState().design,
     action: async () => {
       await useDesign.getState().saveDesignAs()
@@ -69,7 +63,6 @@ export const designCommands: AppCommand[] = [
     group: 'Design',
     icon: FolderSearch,
     showInPalette: true,
-    showInMenu: true,
     enabled: () => !!useDesign.getState().filePath,
     action: async () => {
       await useDesign.getState().showInFolder()

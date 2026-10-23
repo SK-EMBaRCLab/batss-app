@@ -13,7 +13,6 @@ export const navigationCommands: AppCommand[] = [
       binding: 'mod+1'
     },
     showInPalette: true,
-    showInMenu: true,
     action: () => {
       useNavigation.getState().navigate('dashboard')
     }

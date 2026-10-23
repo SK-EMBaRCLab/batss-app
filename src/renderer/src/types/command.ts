@@ -11,7 +11,6 @@ export type AppCommand = {
   icon?: LucideIcon
   shortcut?: AppShortcut
   showInPalette: boolean
-  showInMenu: boolean
   enabled?: () => boolean
   action: () => void | Promise<void>
 }

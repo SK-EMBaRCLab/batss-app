@@ -10,7 +10,6 @@ export const updateCommands: AppCommand[] = [
     group: 'Application',
     icon: RefreshCw,
     showInPalette: true,
-    showInMenu: true,
     enabled: () => {
       const status = useUpdate.getState().status
       return status !== 'checking' && status !== 'downloading'
