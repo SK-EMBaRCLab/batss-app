@@ -1,3 +1,12 @@
+import { BrowserWindow } from 'electron'
+
+/** Sends `payload` on `channel` to every open window, e.g. app-wide state. */
+export function broadcast(channel: string, payload: unknown): void {
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.webContents.isDestroyed()) window.webContents.send(channel, payload)
+  }
+}
+
 export function safeSend(sender: Electron.WebContents) {
   return (channel: string, payload?: unknown): void => {
     if (!sender.isDestroyed()) sender.send(channel, payload)

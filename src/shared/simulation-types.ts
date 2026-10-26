@@ -131,6 +131,9 @@ export interface StudyDesign {
   results: SimulationResultEntry[]
 }
 
+/** What saving a design returns; filePath is where it was written. */
+export type SaveResultResponse = { saved: boolean; filePath?: string }
+
 export type SampleSizeScenario = {
   control: number[]
   experimental: number[]

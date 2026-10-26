@@ -1,9 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-import { SaveResultResponse } from '../main/ipc/albatross-files.ipc'
 import type { AppearanceState, IconAppearance } from '../shared/appearance-types'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
-import {
+import type {
   EngineBusy,
   EngineState,
   RunFinishedSummary,
@@ -11,13 +10,15 @@ import {
 } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
-import { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
+import type { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
 import type {
+  SaveResultResponse,
   SimulationRunInput,
   SimulationRunResult,
   StudyDesign
 } from '../shared/simulation-types'
 import type { UpdateState } from '../shared/update-types'
+import { listen, listenToLog } from './listen'
 
 const app = {
   version: () => ipcRenderer.invoke(IPC.app.version),
@@ -32,14 +33,8 @@ const app = {
   setProgress: (value: number, mode: TaskbarProgressMode) =>
     ipcRenderer.send(IPC.app.setProgress, value, mode),
 
-  onOpenRunResult: (callback: (summary: RunFinishedSummary) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, summary: RunFinishedSummary): void =>
-      callback(summary)
-    ipcRenderer.on(IPC.app.openRunResult, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.app.openRunResult, listener)
-    }
-  }
+  onOpenRunResult: (callback: (summary: RunFinishedSummary) => void) =>
+    listen(IPC.app.openRunResult, callback)
 }
 
 const runtime = {
@@ -48,25 +43,9 @@ const runtime = {
   update: (packageNames: string[]): Promise<RuntimeResult> =>
     ipcRenderer.invoke(IPC.runtime.update, packageNames),
 
-  onUpdate: (callback: (update: RuntimeUpdate) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, update: RuntimeUpdate): void => {
-      callback(update)
-    }
-    ipcRenderer.on(IPC.runtime.update, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.runtime.update, listener)
-    }
-  },
+  onUpdate: (callback: (update: RuntimeUpdate) => void) => listen(IPC.runtime.update, callback),
 
-  onLog: (callback: (line: string) => void) => {
-    // Main sends log lines in batches (see batchedLogSender)
-    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
-      lines.forEach((line) => callback(line))
-    ipcRenderer.on(IPC.runtime.log, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.runtime.log, listener)
-    }
-  }
+  onLog: (callback: (line: string) => void) => listenToLog(IPC.runtime.log, callback)
 }
 
 const design = {
@@ -78,13 +57,7 @@ const design = {
   loadResult: (): Promise<{ design: StudyDesign; filePath: string } | null> =>
     ipcRenderer.invoke(IPC.design.loadResult),
 
-  onSaveRequested: (callback: () => void) => {
-    const listener = (): void => callback()
-    ipcRenderer.on(IPC.design.saveRequested, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.design.saveRequested, listener)
-    }
-  },
+  onSaveRequested: (callback: () => void) => listen(IPC.design.saveRequested, () => callback()),
 
   closeConfirmed: () => ipcRenderer.send(IPC.design.closeConfirmed),
 
@@ -103,15 +76,7 @@ const simulation = {
 
   cancelSimulation: (): Promise<boolean> => ipcRenderer.invoke(IPC.simulation.cancel),
 
-  onLog: (callback: (line: string) => void) => {
-    // Main sends log lines in batches (see batchedLogSender)
-    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
-      lines.forEach((line) => callback(line))
-    ipcRenderer.on(IPC.simulation.log, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.simulation.log, listener)
-    }
-  }
+  onLog: (callback: (line: string) => void) => listenToLog(IPC.simulation.log, callback)
 }
 
 const theme = {
@@ -123,14 +88,7 @@ const theme = {
   setIconAppearance: (choice: IconAppearance): Promise<AppearanceState> =>
     ipcRenderer.invoke(IPC.theme.setIconAppearance, choice),
 
-  onUpdated: (callback: (theme: AppearanceState) => void) => {
-    const listener = (_: Electron.IpcRendererEvent, payload: AppearanceState): void =>
-      callback(payload)
-    ipcRenderer.on(IPC.theme.updated, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.theme.updated, listener)
-    }
-  }
+  onUpdated: (callback: (theme: AppearanceState) => void) => listen(IPC.theme.updated, callback)
 }
 
 const settings = {
@@ -161,46 +119,17 @@ const batch = {
 
   cancel: (): Promise<boolean> => ipcRenderer.invoke(IPC.batch.cancel),
 
-  onUpdate: (callback: (update: BatchUpdate) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, update: BatchUpdate): void =>
-      callback(update)
-    ipcRenderer.on(IPC.batch.update, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.batch.update, listener)
-    }
-  },
+  onUpdate: (callback: (update: BatchUpdate) => void) => listen(IPC.batch.update, callback),
 
-  onRowDone: (callback: (entry: BatchRunEntry) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, entry: BatchRunEntry): void =>
-      callback(entry)
-    ipcRenderer.on(IPC.batch.rowDone, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.batch.rowDone, listener)
-    }
-  },
+  onRowDone: (callback: (entry: BatchRunEntry) => void) => listen(IPC.batch.rowDone, callback),
 
-  onLog: (callback: (line: string) => void) => {
-    // Main sends log lines in batches (see batchedLogSender)
-    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
-      lines.forEach((line) => callback(line))
-    ipcRenderer.on(IPC.batch.log, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.batch.log, listener)
-    }
-  }
+  onLog: (callback: (line: string) => void) => listenToLog(IPC.batch.log, callback)
 }
 
 const engine = {
   get: (): Promise<EngineState> => ipcRenderer.invoke(IPC.engine.get),
 
-  onState: (callback: (state: EngineState) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, state: EngineState): void =>
-      callback(state)
-    ipcRenderer.on(IPC.engine.state, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.engine.state, listener)
-    }
-  }
+  onState: (callback: (state: EngineState) => void) => listen(IPC.engine.state, callback)
 }
 
 const update = {
@@ -214,14 +143,7 @@ const update = {
 
   install: (): Promise<void> => ipcRenderer.invoke(IPC.update.install),
 
-  onStatus: (callback: (state: UpdateState) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, state: UpdateState): void =>
-      callback(state)
-    ipcRenderer.on(IPC.update.status, listener)
-    return (): void => {
-      ipcRenderer.removeListener(IPC.update.status, listener)
-    }
-  }
+  onStatus: (callback: (state: UpdateState) => void) => listen(IPC.update.status, callback)
 }
 
 if (process.contextIsolated) {

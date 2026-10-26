@@ -40,8 +40,8 @@ export function registerAppIPC(): void {
   // on Windows/Linux — those rely on document.title's own "• " prefix
   // instead (see useDocumentTitle), since there's no window-chrome
   // equivalent there.
-  on(IPC.app.setDocumentEdited, (event, edited: boolean) => {
-    BrowserWindow.fromWebContents(event.sender)?.setDocumentEdited(edited)
+  on(IPC.app.setDocumentEdited, (event, edited: unknown) => {
+    BrowserWindow.fromWebContents(event.sender)?.setDocumentEdited(edited === true)
   })
 
   // Taskbar (Windows) / dock (macOS) progress for a running simulation

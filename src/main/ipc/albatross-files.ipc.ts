@@ -5,14 +5,13 @@ import path from 'path'
 import { parseStudyDesignFile } from '../../shared/design-file-schema'
 import type { EngineBusy } from '../../shared/engine-types'
 import { IPC } from '../../shared/ipc-channels'
-import { StudyDesign } from '../../shared/simulation-types'
+import type { SaveResultResponse, StudyDesign } from '../../shared/simulation-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
 import { handle, on } from './trusted-ipc'
 
 const DESIGN_FILE_EXTENSION = 'design'
-export type SaveResultResponse = { saved: boolean; filePath?: string }
 
 function sanitizeFileName(name: string): string {
   const withoutControlChars = Array.from(name)
@@ -92,8 +91,8 @@ export function clearUnsavedDesignChanges(): void {
 }
 
 export function registerAlbatrossFilesIPC(): void {
-  on(IPC.design.dirty, (_event, dirty: boolean) => {
-    designHasUnsavedChanges = dirty
+  on(IPC.design.dirty, (_event, dirty: unknown) => {
+    designHasUnsavedChanges = dirty === true
   })
 
   handle(IPC.design.canLeave, async () => {

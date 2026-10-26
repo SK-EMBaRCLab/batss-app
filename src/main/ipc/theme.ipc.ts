@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, nativeTheme } from 'electron'
 
 import brandIcon from '../../../resources/icon.png?asset'
 import darkIcon from '../../../resources/icon-dark.png?asset'
@@ -7,6 +7,7 @@ import type { AppearanceState, IconAppearance } from '../../shared/appearance-ty
 import { isIconAppearance, isThemeSource, resolveIconVariant } from '../../shared/appearance-types'
 import { IPC } from '../../shared/ipc-channels'
 import { settingsService } from '../services/settings.service'
+import { broadcast } from './safe-send'
 import { handle } from './trusted-ipc'
 
 const iconPaths = { brand: brandIcon, light: lightIcon, dark: darkIcon }
@@ -27,11 +28,7 @@ function publishAppearance(): AppearanceState {
     app.dock?.setIcon(iconPaths[resolveIconVariant(iconAppearance, payload.dark)])
   }
 
-  for (const window of BrowserWindow.getAllWindows()) {
-    if (!window.webContents.isDestroyed()) {
-      window.webContents.send(IPC.theme.updated, payload)
-    }
-  }
+  broadcast(IPC.theme.updated, payload)
 
   return payload
 }
