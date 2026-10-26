@@ -32,11 +32,13 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
     - [Local Development](#local-development)
     - [Development with Docker](#development-with-docker)
   - [Available Scripts](#available-scripts)
+  - [Testing](#testing)
   - [Project Structure](#project-structure)
   - [How It Works](#how-it-works)
   - [Troubleshooting](#troubleshooting)
     - [Error Log](#error-log)
   - [CI/CD](#cicd)
+    - [Checks](#checks)
     - [Automatic Versioning](#automatic-versioning)
     - [Multi-Platform Releases](#multi-platform-releases)
     - [Release Security](#release-security)
@@ -164,7 +166,43 @@ The container provides a Linux environment with Node, R, and every system librar
 | `npm run build:unpack` | Build an unpacked app directory, for quick local testing of a build |
 | `npm run typecheck`    | Type-check both the main/preload and renderer TypeScript projects   |
 | `npm run lint`         | Lint and auto-fix with ESLint                                       |
+| `npm run lint:check`   | Lint without changing files                                         |
 | `npm run format`       | Format the codebase with Prettier                                   |
+| `npm run format:check` | Check formatting without changing files                             |
+| `npm test`             | Run the automated tests once                                        |
+| `npm run test:watch`   | Re-run the tests whenever a file is saved                           |
+| `npm run check`        | Typecheck, lint, formatting and tests: what CI runs on every push   |
+
+---
+
+## Testing
+
+Automated tests use [Vitest](https://vitest.dev/). Each test file sits next to the code it tests and ends in `.test.ts`, e.g. `src/main/ipc/app-page.test.ts` for `app-page.ts`. Test files are never bundled into the app.
+
+```bash
+npm test              # run every test once (about a second)
+npm run test:watch    # keep running and re-test on every save
+```
+
+The tests cover code where a mistake would be serious but easy to miss by clicking around:
+
+| Test file                                     | What it checks                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/main/ipc/app-page.test.ts`               | Only the app's own page can talk to the main process (spaces, Windows case) |
+| `src/main/ipc/runtime-queue.test.ts`          | R checks and updates never overlap, and an update is never skipped          |
+| `src/main/services/error-log.service.test.ts` | The error log is written, kept small, and never causes a second error       |
+| `src/shared/design-file-schema.test.ts`       | `.design` files load, and damaged ones are rejected with a clear message    |
+| `src/shared/settings-types.test.ts`           | A damaged or hand-edited timeout setting falls back to the default          |
+| `src/shared/error-reference.test.ts`          | Error references look like `7F3A-92CD` and don't repeat                     |
+
+Simulations themselves (R, BATSS, INLA) and the screens aren't tested automatically; check those by hand before a release.
+
+**Keeping the tests useful:**
+
+- **When you fix a bug, add a test that would have caught it.** That's how the tests grow.
+- **When you change on purpose how something behaves, update its test.** A failing test means either the code is broken (fix the code) or the rule changed (fix the test).
+- Test what a function returns, not how it works inside, so reorganizing code doesn't break tests.
+- Code that imports Electron is hard to test. Put logic worth testing in a small file without Electron imports (like `app-page.ts` or `runtime-queue.ts`) and keep the Electron wiring separate.
 
 ---
 
@@ -269,6 +307,10 @@ One line per error, in JSON:
 
 ## CI/CD
 
+### Checks
+
+`.github/workflows/check.yml` runs `npm run check` (types, lint, formatting and tests) on every push and pull request, with read-only permissions. The result shows as a ✓ or ✗ next to the commit on GitHub. Release builds also run `npm test` on Windows, macOS and Linux before building; a platform whose tests fail is not built or published.
+
 ### Automatic Versioning
 
 Commits follow the [Conventional Commits](https://www.conventionalcommits.org/) spec. [Release Please](https://github.com/googleapis/release-please) automatically generates changelogs and bumps versions:
@@ -338,7 +380,7 @@ Dependabot's `github-actions` ecosystem can automate this (it bumps the SHA and 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feat/my-feature`
 3. Follow conventional commits
-4. Before opening a PR, make sure `npm run typecheck` and `npm run lint` both pass
+4. Before opening a PR, make sure `npm run check` passes (types, lint, formatting and tests)
 5. Open a pull request
 
 ---
