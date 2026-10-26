@@ -28,8 +28,11 @@ export const useTheme = create<ThemeState>((set, get) => {
     initialize: async () => {
       if (get().initialized) return
       set({ initialized: true })
+      // Not inside import.meta.hot?.dispose(...), which production builds
+      // skip entirely (see stores/update.ts)
+      const unsubscribe = window.theme.onUpdated(applyAppearance)
       // Dev only: a hot-reloaded store would otherwise leave this listener behind
-      import.meta.hot?.dispose(window.theme.onUpdated(applyAppearance))
+      import.meta.hot?.dispose(unsubscribe)
       applyAppearance(await window.theme.get())
     },
 

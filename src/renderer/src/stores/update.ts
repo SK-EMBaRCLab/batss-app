@@ -22,8 +22,12 @@ export const useUpdate = create<UpdateStore>((set, get) => ({
     if (get().initialized) return
     set({ initialized: true })
 
+    // Subscribed on its own line: inside `import.meta.hot?.dispose(...)`
+    // it would be skipped in production builds, where import.meta.hot is
+    // undefined, and the window would never hear about updates
+    const unsubscribe = window.update.onStatus((state) => set(state))
     // Dev only: a hot-reloaded store would otherwise leave this listener behind
-    import.meta.hot?.dispose(window.update.onStatus((state) => set(state)))
+    import.meta.hot?.dispose(unsubscribe)
 
     const current = await window.update.get()
     set(current)
