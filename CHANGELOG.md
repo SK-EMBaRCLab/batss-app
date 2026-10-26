@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.7.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.2...v5.7.3) (2026-10-26)
+
+
+### Bug Fixes
+
+* **build:** stop building the unpublished snap that broke Linux releases ([87c7e8f](https://github.com/SK-EMBaRCLab/batss-app/commit/87c7e8f21465e4b8af14f4e5883cb695edde74a7))
+* **security:** harden IPC, R process handling, settings and saving ([5cffad9](https://github.com/SK-EMBaRCLab/batss-app/commit/5cffad90384aee20c1da75eee0fff402f3c89618))
+* **security:** show unexpected errors as a generic message with a reference ([a464d0e](https://github.com/SK-EMBaRCLab/batss-app/commit/a464d0e12a225ede51a6f21ec35f63be8fffd883))
+
 ## [5.7.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.1...v5.7.2) (2026-10-26)
 
 ### Bug Fixes
