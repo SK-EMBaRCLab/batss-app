@@ -1,3 +1,4 @@
+import { FIELD_LABELS } from '@shared/field-labels'
 import type { DecisionRule } from '@shared/simulation-types'
 import { type ReactElement, useId } from 'react'
 
@@ -46,7 +47,7 @@ export function DecisionRuleFields({
     <div className="@container">
       <div className="grid gap-5 @md:grid-cols-2">
         <Field>
-          <FieldLabel id={`${id}-type`}>Decision rule type</FieldLabel>
+          <FieldLabel id={`${id}-type`}>{FIELD_LABELS.decisionRuleType}</FieldLabel>
 
           <Select
             disabled={locked}
@@ -71,7 +72,7 @@ export function DecisionRuleFields({
         </Field>
 
         <Field>
-          <FieldLabel id={`${id}-direction`}>Direction</FieldLabel>
+          <FieldLabel id={`${id}-direction`}>{FIELD_LABELS.direction}</FieldLabel>
 
           <Select
             disabled={locked}
@@ -94,7 +95,7 @@ export function DecisionRuleFields({
         </Field>
 
         <Field data-invalid={marginErrors !== undefined}>
-          <FieldLabel htmlFor={`${id}-margin`}>Superiority margin (SM)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-margin`}>{FIELD_LABELS.margin} (SM)</FieldLabel>
 
           <Input
             id={`${id}-margin`}
@@ -108,7 +109,7 @@ export function DecisionRuleFields({
         </Field>
 
         <Field data-invalid={thresholdErrors !== undefined}>
-          <FieldLabel htmlFor={`${id}-threshold`}>Decision threshold (DT)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-threshold`}>{FIELD_LABELS.threshold} (DT)</FieldLabel>
 
           <Input
             id={`${id}-threshold`}

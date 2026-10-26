@@ -1,4 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
+import { FIELD_LABELS } from '@shared/field-labels'
 import { type ReactElement, useId } from 'react'
 
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -25,7 +26,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
         <NumericField
           form={form}
           path={['probability']}
-          label="Control arm event probability"
+          label={FIELD_LABELS.probability}
           min={0}
           max={1}
           step="0.01"
@@ -40,7 +41,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
 
             return (
               <Field data-invalid={field.errors !== null} className="max-w-lg">
-                <FieldLabel id={labelId}>Treatment effect</FieldLabel>
+                <FieldLabel id={labelId}>{FIELD_LABELS.treatmentEffectType}</FieldLabel>
                 <FieldDescription>
                   Difference between treatment arm and control arm
                 </FieldDescription>
@@ -90,7 +91,7 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
         <NumericField
           form={form}
           path={['treatmentEffect']}
-          label="Treatment effect value"
+          label={FIELD_LABELS.treatmentEffect}
           className="max-w-lg"
         />
       </div>

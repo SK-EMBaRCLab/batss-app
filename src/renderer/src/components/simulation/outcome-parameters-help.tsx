@@ -1,4 +1,5 @@
 import { useField } from '@formisch/react'
+import { FIELD_LABELS } from '@shared/field-labels'
 import { Fragment, type ReactElement } from 'react'
 
 import { treatmentEffects } from '@/lib/design-options'
@@ -18,7 +19,7 @@ export function OutcomeParametersHelp({
   if (outcomeType.input === 'binary') {
     return (
       <HelpPanel>
-        <HelpSection title="Control arm event probability">
+        <HelpSection title={FIELD_LABELS.probability}>
           <p className="pl-5 leading-relaxed">
             The probability that a patient in the control group experiences the outcome of interest.
             If the control arm event probability is 0.4, then about 40% of patients in the control
@@ -26,7 +27,7 @@ export function OutcomeParametersHelp({
           </p>
         </HelpSection>
 
-        <HelpSection title="Treatment effect">
+        <HelpSection title={FIELD_LABELS.treatmentEffectType}>
           <dl className="space-y-2">
             {treatmentEffects.map((effect) => (
               <Fragment key={effect.value}>
@@ -37,7 +38,7 @@ export function OutcomeParametersHelp({
           </dl>
         </HelpSection>
 
-        <HelpSection title="Treatment effect value">
+        <HelpSection title={FIELD_LABELS.treatmentEffect}>
           <p className="pl-5 leading-relaxed">
             The assumed size of the treatment effect used in the simulation. This value is often
             based on previous research, clinical expertise, or the minimum improvement that would
@@ -49,19 +50,19 @@ export function OutcomeParametersHelp({
   } else if (outcomeType.input === 'continuous') {
     return (
       <HelpPanel>
-        <HelpSection title="Mean Outcome in Control arm">
+        <HelpSection title={FIELD_LABELS.meanOutcome}>
           <p className="pl-5 leading-relaxed">
             The average outcome for participants receiving the control intervention
           </p>
         </HelpSection>
 
-        <HelpSection title="Standard Deviation of Outcome">
+        <HelpSection title={FIELD_LABELS.sd}>
           <p className="pl-5 leading-relaxed">
             A measure of individual variation around the mean outcome
           </p>
         </HelpSection>
 
-        <HelpSection title="Mean Difference for the treatment effect">
+        <HelpSection title={FIELD_LABELS.meanDiff}>
           <p className="pl-5 leading-relaxed">
             The difference in the average outcome between treatment and control arms
           </p>

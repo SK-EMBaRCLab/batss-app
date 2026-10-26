@@ -1,3 +1,4 @@
+import { FIELD_LABELS } from '@shared/field-labels'
 import { type ReactElement } from 'react'
 
 import { HelpPanel, HelpSection } from './help-panel'
@@ -39,7 +40,7 @@ export function DecisionRuleHelp(): ReactElement {
         </ul>
       </div>
 
-      <HelpSection title="Direction">
+      <HelpSection title={FIELD_LABELS.direction}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
             Indicates whether a larger or smaller treatment effect is considered beneficial. Use{' '}
@@ -49,7 +50,7 @@ export function DecisionRuleHelp(): ReactElement {
         </ul>
       </HelpSection>
 
-      <HelpSection title="Superiority margin">
+      <HelpSection title={FIELD_LABELS.margin}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
             The minimum treatment difference that is clinically meaningful (i.e., 0 or the minimal
@@ -58,7 +59,7 @@ export function DecisionRuleHelp(): ReactElement {
         </ul>
       </HelpSection>
 
-      <HelpSection title="Decision threshold">
+      <HelpSection title={FIELD_LABELS.threshold}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
             The probability required for a rule to be triggered. Common values include 0.90, 0.95,

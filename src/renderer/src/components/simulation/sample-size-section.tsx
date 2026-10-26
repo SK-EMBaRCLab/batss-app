@@ -1,3 +1,4 @@
+import { FIELD_LABELS } from '@shared/field-labels'
 import { type ReactElement } from 'react'
 
 import type { SimulationFormStore } from '@/types/form-types'
@@ -18,7 +19,7 @@ export function SampleSizeSection({ form }: { form: SimulationFormStore }): Reac
         <NumericField
           form={form}
           path={['m0']}
-          label="Burn-in sample size"
+          label={FIELD_LABELS.m0}
           min={1}
           step={1}
           className="max-w-lg"
@@ -26,7 +27,7 @@ export function SampleSizeSection({ form }: { form: SimulationFormStore }): Reac
         <NumericField
           form={form}
           path={['m']}
-          label="Patients between interim analyses"
+          label={FIELD_LABELS.m}
           min={1}
           step={1}
           className="max-w-lg"
@@ -34,7 +35,7 @@ export function SampleSizeSection({ form }: { form: SimulationFormStore }): Reac
         <NumericField
           form={form}
           path={['N']}
-          label="Maximum sample size"
+          label={FIELD_LABELS.N}
           min={1}
           step={1}
           className="max-w-lg"
@@ -45,7 +46,7 @@ export function SampleSizeSection({ form }: { form: SimulationFormStore }): Reac
           <NumericField
             form={form}
             path={['R']}
-            label="Number of simulated trials"
+            label={FIELD_LABELS.R}
             min={1}
             step={1}
             className="max-w-lg"

@@ -1,3 +1,4 @@
+import { FIELD_LABELS } from '@shared/field-labels'
 import type { DecisionRule, DesignInput } from '@shared/simulation-types'
 
 import { getTreatmentEffectLabel } from '@/lib/design-options'
@@ -40,9 +41,8 @@ export type DesignSnapshot = {
 type Section = 'outcome' | 'sampleSize' | 'simulation'
 
 type DesignField = {
-  key: string
+  key: keyof typeof FIELD_LABELS
   label: string
-  shortLabel?: string
   section: Section
   outcome?: 'binary' | 'continuous'
   value: (input: DesignSnapshot) => string | number | undefined
@@ -51,23 +51,20 @@ type DesignField = {
 export const designFields: DesignField[] = [
   {
     key: 'outcomeType',
-    label: 'Outcome Type',
-    shortLabel: 'Type',
+    label: FIELD_LABELS.outcomeType,
     section: 'outcome',
     value: (input) => input.outcomeType
   },
   {
     key: 'probability',
-    label: 'Control arm event probability',
-    shortLabel: 'Control Prob',
+    label: FIELD_LABELS.probability,
     section: 'outcome',
     outcome: 'binary',
     value: (input) => (input.outcomeType === 'binary' ? input.probability : undefined)
   },
   {
     key: 'treatmentEffectType',
-    label: 'Treatment effect',
-    shortLabel: 'Effect',
+    label: FIELD_LABELS.treatmentEffectType,
     section: 'outcome',
     outcome: 'binary',
     value: (input) =>
@@ -77,55 +74,48 @@ export const designFields: DesignField[] = [
   },
   {
     key: 'treatmentEffect',
-    label: 'Treatment effect value',
-    shortLabel: 'Value',
+    label: FIELD_LABELS.treatmentEffect,
     section: 'outcome',
     outcome: 'binary',
     value: (input) => (input.outcomeType === 'binary' ? input.treatmentEffect : undefined)
   },
   {
     key: 'meanOutcome',
-    label: 'Mean outcome in control arm',
-    shortLabel: 'Mean',
+    label: FIELD_LABELS.meanOutcome,
     section: 'outcome',
     outcome: 'continuous',
     value: (input) => (input.outcomeType === 'continuous' ? input.meanOutcome : undefined)
   },
   {
     key: 'sd',
-    label: 'Standard deviation',
-    shortLabel: 'SD',
+    label: FIELD_LABELS.sd,
     section: 'outcome',
     outcome: 'continuous',
     value: (input) => (input.outcomeType === 'continuous' ? input.sd : undefined)
   },
   {
     key: 'meanDiff',
-    label: 'Mean difference for the treatment effect',
-    shortLabel: 'Difference',
+    label: FIELD_LABELS.meanDiff,
     section: 'outcome',
     outcome: 'continuous',
     value: (input) => (input.outcomeType === 'continuous' ? input.meanDiff : undefined)
   },
-  { key: 'm0', label: 'Burn-in', section: 'sampleSize', value: (i) => i.m0 },
+  { key: 'm0', label: FIELD_LABELS.m0, section: 'sampleSize', value: (i) => i.m0 },
   {
     key: 'm',
-    label: 'Patients between interim analyses',
-    shortLabel: 'Interim',
+    label: FIELD_LABELS.m,
     section: 'sampleSize',
     value: (i) => i.m
   },
   {
     key: 'N',
-    label: 'Maximum sample size',
-    shortLabel: 'Max Sample Size',
+    label: FIELD_LABELS.N,
     section: 'sampleSize',
     value: (i) => i.N
   },
   {
     key: 'R',
-    label: 'Number of simulated trials',
-    shortLabel: 'Runs',
+    label: FIELD_LABELS.R,
     section: 'simulation',
     value: (i) => i.R
   }

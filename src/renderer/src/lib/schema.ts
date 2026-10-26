@@ -1,3 +1,4 @@
+import { FIELD_LABELS as L } from '@shared/field-labels'
 import { MAX_SAMPLE_SIZE, MAX_SIMULATED_TRIALS } from '@shared/simulation-input-schema'
 import { DecisionRule, DesignInput } from '@shared/simulation-types'
 import * as v from 'valibot'
@@ -45,23 +46,23 @@ const decisionRuleSchema = v.object({
 
   direction: v.picklist(['greater', 'less'], 'Select greater than or less than.'),
 
-  margin: v.pipe(requiredNumber('Superiority margin'), v.minValue(0, 'Margin must be positive.')),
+  margin: v.pipe(requiredNumber(L.margin), v.minValue(0, `${L.margin} must be at least 0.`)),
 
   threshold: v.pipe(
-    requiredNumber('Decision threshold'),
-    v.minValue(0, 'Threshold must be at least 0.'),
-    v.maxValue(1, 'Threshold must be at most 1.')
+    requiredNumber(L.threshold),
+    v.minValue(0, `${L.threshold} must be at least 0.`),
+    v.maxValue(1, `${L.threshold} must be at most 1.`)
   )
 })
 
 const commonDesignFields = {
-  N: positiveInteger('Maximum sample size', MAX_SAMPLE_SIZE),
+  N: positiveInteger(L.N, MAX_SAMPLE_SIZE),
 
-  m0: positiveInteger('Burn-in', MAX_SAMPLE_SIZE),
+  m0: positiveInteger(L.m0, MAX_SAMPLE_SIZE),
 
-  m: positiveInteger('Patients between interim analyses', MAX_SAMPLE_SIZE),
+  m: positiveInteger(L.m, MAX_SAMPLE_SIZE),
 
-  R: positiveInteger('Number of simulated trials', MAX_SIMULATED_TRIALS),
+  R: positiveInteger(L.R, MAX_SIMULATED_TRIALS),
 
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
@@ -75,9 +76,9 @@ const binaryDesignSchema = v.object({
   outcomeType: v.literal('binary'),
 
   probability: v.pipe(
-    requiredNumber('Control arm event probability'),
-    v.gtValue(0, 'Probability must be greater than 0.'),
-    v.ltValue(1, 'Probability must be less than 1.')
+    requiredNumber(L.probability),
+    v.gtValue(0, `${L.probability} must be greater than 0.`),
+    v.ltValue(1, `${L.probability} must be less than 1.`)
   ),
 
   treatmentEffectType: v.pipe(
@@ -86,8 +87,8 @@ const binaryDesignSchema = v.object({
   ),
 
   treatmentEffect: v.pipe(
-    requiredNumber('Treatment effect'),
-    v.gtValue(0, 'Odds ratio must be greater than 0.')
+    requiredNumber(L.treatmentEffect),
+    v.gtValue(0, `${L.treatmentEffect} (odds ratio) must be greater than 0.`)
   ),
 
   ...commonDesignFields
@@ -96,14 +97,11 @@ const binaryDesignSchema = v.object({
 const continuousDesignSchema = v.object({
   outcomeType: v.literal('continuous'),
 
-  meanOutcome: requiredNumber('Mean outcome in control arm'),
+  meanOutcome: requiredNumber(L.meanOutcome),
 
-  meanDiff: requiredNumber('Mean difference for the treatment effect'),
+  meanDiff: requiredNumber(L.meanDiff),
 
-  sd: v.pipe(
-    requiredNumber('Standard deviation'),
-    v.gtValue(0, 'Standard deviation must be greater than 0.')
-  ),
+  sd: v.pipe(requiredNumber(L.sd), v.gtValue(0, `${L.sd} must be greater than 0.`)),
 
   ...commonDesignFields
 })
@@ -111,14 +109,14 @@ const continuousDesignSchema = v.object({
 const ordinalDesignSchema = v.object({
   outcomeType: v.literal('ordinal'),
 
-  probability: requiredNumber('Control arm probability'),
+  probability: requiredNumber(L.probability),
 
   treatmentEffectType: v.picklist(
     ['oddsRatio', 'riskDifference', 'riskRatio'],
     'Please select a treatment effect.'
   ),
 
-  treatmentEffect: requiredNumber('Treatment effect'),
+  treatmentEffect: requiredNumber(L.treatmentEffect),
 
   ...commonDesignFields
 })
@@ -133,14 +131,14 @@ export const designSchema = v.pipe(
    * Cross-field validation
    */
   v.forward(
-    v.check((data) => data.N > data.m0, 'Maximum sample size must be greater than burn-in.'),
+    v.check((data) => data.N > data.m0, `${L.N} must be greater than the ${L.m0.toLowerCase()}.`),
     ['N']
   ),
 
   v.forward(
     v.check(
       (data) => data.m < data.N - data.m0,
-      'Number of interim patients must be less than the difference between max sample size and burn-in'
+      `${L.m} must be less than the ${L.N.toLowerCase()} minus the ${L.m0.toLowerCase()}.`
     ),
     ['m']
   ),
@@ -148,7 +146,7 @@ export const designSchema = v.pipe(
   v.forward(
     v.check(
       (data) => data.outcomeType !== 'binary' || data.decisionRules.every((r) => r.margin > 0),
-      'Superiority margin must be greater than 0 for an odds ratio.'
+      `${L.margin} must be greater than 0 for an odds ratio.`
     ),
     ['decisionRules', 0, 'margin']
   )

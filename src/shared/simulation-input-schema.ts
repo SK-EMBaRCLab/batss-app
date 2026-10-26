@@ -5,6 +5,7 @@
 // accepts what batss-simulation.R actually supports today.
 import * as v from 'valibot'
 
+import { FIELD_LABELS as L } from './field-labels'
 import type { SimulationRunInput } from './simulation-types'
 
 // Upper limits, far above any real design (the largest runs so far are
@@ -30,19 +31,19 @@ const decisionRuleSchema = v.object({
   // futility rule as a superiority one
   type: v.literal('superiority', 'Only superiority decision rules are supported.'),
   direction: v.picklist(['greater', 'less'], 'Decision rule direction must be greater or less.'),
-  margin: finiteNumber('Superiority margin'),
+  margin: finiteNumber(L.margin),
   threshold: v.pipe(
-    finiteNumber('Decision threshold'),
-    v.minValue(0, 'Decision threshold must be at least 0.'),
-    v.maxValue(1, 'Decision threshold must be at most 1.')
+    finiteNumber(L.threshold),
+    v.minValue(0, `${L.threshold} must be at least 0.`),
+    v.maxValue(1, `${L.threshold} must be at most 1.`)
   )
 })
 
 const commonFields = {
-  N: positiveInteger('Maximum sample size', MAX_SAMPLE_SIZE),
-  m0: positiveInteger('Burn-in', MAX_SAMPLE_SIZE),
-  m: positiveInteger('Patients between interim analyses', MAX_SAMPLE_SIZE),
-  R: positiveInteger('Number of simulated trials', MAX_SIMULATED_TRIALS),
+  N: positiveInteger(L.N, MAX_SAMPLE_SIZE),
+  m0: positiveInteger(L.m0, MAX_SAMPLE_SIZE),
+  m: positiveInteger(L.m, MAX_SAMPLE_SIZE),
+  R: positiveInteger(L.R, MAX_SIMULATED_TRIALS),
   // Only the first rule is used by batss-simulation.R
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
@@ -56,9 +57,9 @@ const binaryInputSchema = v.pipe(
   v.object({
     outcomeType: v.literal('binary'),
     probability: v.pipe(
-      finiteNumber('Control arm event probability'),
-      v.gtValue(0, 'Control arm event probability must be greater than 0.'),
-      v.ltValue(1, 'Control arm event probability must be less than 1.')
+      finiteNumber(L.probability),
+      v.gtValue(0, `${L.probability} must be greater than 0.`),
+      v.ltValue(1, `${L.probability} must be less than 1.`)
     ),
     // The R script always does odds-ratio maths (log of the effect and
     // margin), so the other effect types would give wrong results
@@ -67,25 +68,22 @@ const binaryInputSchema = v.pipe(
       'Only the odds ratio treatment effect is supported.'
     ),
     treatmentEffect: v.pipe(
-      finiteNumber('Odds ratio'),
-      v.gtValue(0, 'Odds ratio must be greater than 0.')
+      finiteNumber(L.treatmentEffect),
+      v.gtValue(0, `${L.treatmentEffect} (odds ratio) must be greater than 0.`)
     ),
     ...commonFields
   }),
   v.check(
     (input) => input.decisionRules.every((rule) => rule.margin > 0),
-    'The superiority margin must be greater than 0 for an odds ratio.'
+    `${L.margin} must be greater than 0 for an odds ratio.`
   )
 )
 
 const continuousInputSchema = v.object({
   outcomeType: v.literal('continuous'),
-  meanOutcome: finiteNumber('Mean outcome in the control arm'),
-  meanDiff: finiteNumber('Mean difference'),
-  sd: v.pipe(
-    finiteNumber('Standard deviation'),
-    v.gtValue(0, 'Standard deviation must be greater than 0.')
-  ),
+  meanOutcome: finiteNumber(L.meanOutcome),
+  meanDiff: finiteNumber(L.meanDiff),
+  sd: v.pipe(finiteNumber(L.sd), v.gtValue(0, `${L.sd} must be greater than 0.`)),
   ...commonFields
 })
 
@@ -95,11 +93,8 @@ const simulationRunInputSchema = v.pipe(
     [binaryInputSchema, continuousInputSchema],
     'Only binary and continuous outcomes are supported.'
   ),
-  v.check((input) => input.m0 < input.N, 'Burn-in must be smaller than the maximum sample size.'),
-  v.check(
-    (input) => input.m <= input.N,
-    'Patients between interim analyses must be at most the maximum sample size.'
-  )
+  v.check((input) => input.m0 < input.N, `${L.m0} must be smaller than the ${L.N.toLowerCase()}.`),
+  v.check((input) => input.m <= input.N, `${L.m} must be at most the ${L.N.toLowerCase()}.`)
 )
 
 export type SimulationRunInputCheck =

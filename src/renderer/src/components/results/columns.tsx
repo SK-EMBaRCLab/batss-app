@@ -1,4 +1,5 @@
-import { SimulationResultEntry } from '@shared/simulation-types'
+import { FIELD_LABELS, SHORT_FIELD_LABELS } from '@shared/field-labels'
+import type { SimulationResultEntry } from '@shared/simulation-types'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
@@ -22,16 +23,6 @@ const outcomeScopedColumnIds = [
 ] as const
 
 type OutcomeScopedColumnId = (typeof outcomeScopedColumnIds)[number]
-
-// Shorter than the field labels (which stay as each header's tooltip)
-// so the table fits narrower windows.
-const outcomeScopedHeaders: Record<OutcomeScopedColumnId, string> = {
-  treatmentEffectType: 'Effect Type',
-  treatmentEffect: 'Effect Value',
-  meanOutcome: 'Control Mean',
-  sd: 'SD',
-  meanDiff: 'Mean Difference'
-}
 
 function outcomeScopedField(key: OutcomeScopedColumnId): {
   field: ReturnType<typeof fieldsFor>[number]
@@ -59,7 +50,7 @@ export function inapplicableColumnIds(entries: SimulationResultEntry[]): string[
 
 const outcomeScopedColumns = outcomeScopedColumnIds.map((key) => {
   const { field, outcomeType } = outcomeScopedField(key)
-  const title = outcomeScopedHeaders[key]
+  const title = SHORT_FIELD_LABELS[key]
 
   return columnHelper.accessor(`input.${key}` as const, {
     id: key,
@@ -137,9 +128,9 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.outcomeType', {
     id: 'outcomeType',
     meta: {
-      label: 'Outcome Type'
+      label: SHORT_FIELD_LABELS.outcomeType
     },
-    header: 'Outcome Type',
+    header: SHORT_FIELD_LABELS.outcomeType,
     filterFn: (row, columnId, filterValue: string[]) => {
       return filterValue.includes(row.getValue(columnId))
     }
@@ -148,14 +139,14 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.N', {
     id: 'maxSampleSize',
     meta: {
-      label: 'Max Sample Size'
+      label: SHORT_FIELD_LABELS.N
     },
     header: ({ column }) => {
       return (
         <DataTableColumnHeader
           column={column}
-          title="Max Sample Size"
-          tooltip="Maximum sample size"
+          title={SHORT_FIELD_LABELS.N}
+          tooltip={FIELD_LABELS.N}
         />
       )
     }
@@ -163,23 +154,29 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.m0', {
     id: 'burnIn',
     meta: {
-      label: 'Burn-in'
-    },
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Burn-in" />
-    }
-  }),
-  columnHelper.accessor('input.m', {
-    id: 'm',
-    meta: {
-      label: 'Patients Between'
+      label: SHORT_FIELD_LABELS.m0
     },
     header: ({ column }) => {
       return (
         <DataTableColumnHeader
           column={column}
-          title="Patients Between"
-          tooltip="Patients between interim analyses"
+          title={SHORT_FIELD_LABELS.m0}
+          tooltip={FIELD_LABELS.m0}
+        />
+      )
+    }
+  }),
+  columnHelper.accessor('input.m', {
+    id: 'm',
+    meta: {
+      label: SHORT_FIELD_LABELS.m
+    },
+    header: ({ column }) => {
+      return (
+        <DataTableColumnHeader
+          column={column}
+          title={SHORT_FIELD_LABELS.m}
+          tooltip={FIELD_LABELS.m}
         />
       )
     }
@@ -187,14 +184,14 @@ export const columns = columnHelper.columns([
   columnHelper.accessor('input.R', {
     id: 'numOfSimulatedTrials',
     meta: {
-      label: 'Simulated Trials'
+      label: SHORT_FIELD_LABELS.R
     },
     header: ({ column }) => {
       return (
         <DataTableColumnHeader
           column={column}
-          title="Simulated Trials"
-          tooltip="Number of simulated trials"
+          title={SHORT_FIELD_LABELS.R}
+          tooltip={FIELD_LABELS.R}
         />
       )
     }

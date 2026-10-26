@@ -1,4 +1,5 @@
 import { Field as FormischField } from '@formisch/react'
+import { FIELD_LABELS } from '@shared/field-labels'
 import { type ReactElement, useId } from 'react'
 
 import {
@@ -30,7 +31,7 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
         return (
           <>
             <ShadcnField data-invalid={field.errors !== null} className="max-w-lg">
-              <FieldLabel id={labelId}>Outcome Type</FieldLabel>
+              <FieldLabel id={labelId}>{FIELD_LABELS.outcomeType}</FieldLabel>
               <FieldDescription>
                 Select the outcome type that matches your primary study endpoint
               </FieldDescription>
