@@ -135,3 +135,23 @@ jobs:
             dist/*.AppImage
             dist/*.deb
             dist/latest*.yml
+
+      # Runs after the upload so platforms that did build are still
+      # released, but fails the run so a missing platform can't go
+      # unnoticed (v5.7.2 shipped without any Linux files). Each platform's
+      # latest*.yml is what its installed copies check for updates.
+      - name: Check every platform was published
+        shell: bash
+        run: |
+          missing=0
+          for pattern in \
+            '*-setup.exe' '*-setup.exe.blockmap' 'latest.yml' \
+            '*.dmg' '*-mac.zip' '*-mac.zip.blockmap' 'latest-mac.yml' \
+            '*.AppImage' '*.deb' 'latest-linux.yml'
+          do
+            if ! compgen -G "dist/$pattern" > /dev/null; then
+              echo "::error::Missing from the release: $pattern"
+              missing=1
+            fi
+          done
+          exit "$missing"

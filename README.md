@@ -335,7 +335,9 @@ On every merged release PR, GitHub Actions builds and uploads:
 
 - **Linux** — `.AppImage` (portable) and `.deb` package
 - **Windows** — `.exe` NSIS installer
-- **macOS** — `.dmg` disk image (Apple Silicon)
+- **macOS** — `.dmg` disk image (Apple Silicon), plus the `.zip` the auto-updater installs
+
+Each platform also gets a `latest*.yml` file (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`), which is what installed copies on that platform check for updates. If a platform fails to build, the others are still published, but the run then fails with a "Missing from the release" error naming what's absent. Re-run the failed job from the Actions tab (**Re-run failed jobs**) to add the missing files to the same release.
 
 ### Release Security
 
