@@ -2,10 +2,9 @@
 
 ## [5.7.2](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.1...v5.7.2) (2026-10-26)
 
-
 ### Bug Fixes
 
-* **ci:** publish the macOS update zip so auto-updates can download it ([51241c8](https://github.com/SK-EMBaRCLab/batss-app/commit/51241c867370ecee08cb24b27902aaab6e84e150))
+- **ci:** publish the macOS update zip so auto-updates can download it ([51241c8](https://github.com/SK-EMBaRCLab/batss-app/commit/51241c867370ecee08cb24b27902aaab6e84e150))
 
 ## [5.7.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.0...v5.7.1) (2026-10-23)
 
