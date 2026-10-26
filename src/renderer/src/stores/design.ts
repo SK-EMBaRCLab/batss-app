@@ -32,6 +32,11 @@ async function confirmStopActiveRun(): Promise<boolean> {
 
 interface DesignState {
   design: StudyDesign | null
+  // Goes up every time a design is created, opened or closed, even when
+  // the same file is opened again. A run compares it to tell whether the
+  // design it started with is still the one open: design ids can't, as
+  // reopening a file (or a Save As copy) brings back the same id.
+  openCount: number
   filePath: string | null
   selectedResultId: string | null
   selectedResults: string[] | null
@@ -97,6 +102,7 @@ export const useDesign = create<DesignState>((set, get) => {
 
   return {
     design: null,
+    openCount: 0,
     filePath: null,
     selectedResultId: null,
     selectedResults: null,
@@ -119,7 +125,13 @@ export const useDesign = create<DesignState>((set, get) => {
         results: []
       }
 
-      set({ design, filePath: null, selectedResultId: null, selectedResults: null })
+      set((state) => ({
+        design,
+        openCount: state.openCount + 1,
+        filePath: null,
+        selectedResultId: null,
+        selectedResults: null
+      }))
 
       setDirty(true)
 
@@ -195,13 +207,14 @@ export const useDesign = create<DesignState>((set, get) => {
 
       if (!(await confirmStopActiveRun())) return false
 
-      set({
+      set((state) => ({
         design: loaded.design,
+        openCount: state.openCount + 1,
         filePath: loaded.filePath,
         selectedResultId: loaded.design.results.at(-1)?.id ?? null,
         // The previous design's run ids mean nothing here
         selectedResults: null
-      })
+      }))
 
       setDirty(false)
       toast.add({ type: 'success', description: `Design loaded: ${loaded.design.name}` })
@@ -214,12 +227,13 @@ export const useDesign = create<DesignState>((set, get) => {
 
     // Drops back to the welcome screen without touching disk.
     closeDesign: () => {
-      set({
+      set((state) => ({
         design: null,
+        openCount: state.openCount + 1,
         filePath: null,
         selectedResultId: null,
         selectedResults: null
-      })
+      }))
 
       setDirty(false)
     }

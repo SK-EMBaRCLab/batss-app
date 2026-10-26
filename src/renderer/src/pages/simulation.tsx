@@ -15,6 +15,7 @@ import { useSimulation } from '@/stores/simulation'
 export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const design = useDesign((s) => s.design)
+  const openCount = useDesign((s) => s.openCount)
   const busy = useEngine((s) => s.busy)
   const isRunning = busy === 'simulation'
   const logs = useSimulation((s) => s.logs)
@@ -24,7 +25,7 @@ export default function Simulation(): ReactElement {
   const stageStartedAt = useSimulation((s) => s.stageStartedAt)
   const estimate = useSimulation((s) => s.estimate)
   const lastResult = useSimulation((s) => s.lastResult)
-  const runDesignId = useSimulation((s) => s.designId)
+  const runOpenCount = useSimulation((s) => s.designOpenCount)
   const run = useSimulation((s) => s.run)
 
   const [logsOpen, setLogsOpen] = useState(isRunning)
@@ -34,7 +35,7 @@ export default function Simulation(): ReactElement {
   // on the Results page.
   const showProgress =
     logs.length > 0 &&
-    (isRunning || (runDesignId === design?.id && lastResult?.status !== 'success'))
+    (isRunning || (runOpenCount === openCount && lastResult?.status !== 'success'))
 
   const handleRun = async (input: SimulationRunInput, formInput: DesignInput): Promise<void> => {
     setLogsOpen(true)
@@ -57,7 +58,7 @@ export default function Simulation(): ReactElement {
       <SimulationForm
         // The form only reads initialInput when it mounts; remount for a new
         // or loaded design so it doesn't keep the previous design's values
-        key={design?.id}
+        key={openCount}
         onRun={handleRun}
         initialInput={design?.input}
         header={
