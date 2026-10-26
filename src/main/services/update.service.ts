@@ -155,7 +155,11 @@ class UpdateService {
     }
   }
 
+  // Only once an update has actually been downloaded. Unsaved designs are
+  // still protected: quitAndInstall closes the window first, and its
+  // close handler (index.ts) asks to save before anything quits.
   install(): void {
+    if (this.state.status !== 'downloaded') return
     autoUpdater.quitAndInstall(true, true)
   }
 

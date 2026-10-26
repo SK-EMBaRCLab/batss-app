@@ -1,10 +1,11 @@
-import { ipcMain, type IpcMainInvokeEvent } from 'electron'
+import { type IpcMainInvokeEvent } from 'electron'
 
 import { IPC } from '../../shared/ipc-channels'
 import { bootstrapRuntime, updateRuntime } from '../runtime/bootstrap'
 import { RuntimeReporter } from '../runtime/reporter'
 import type { RuntimeResult, RuntimeUpdate } from '../runtime/types'
-import { safeSend } from './safe-send'
+import { batchedLogSender, safeSend } from './safe-send'
+import { handle } from './trusted-ipc'
 
 type RuntimeTask = { kind: 'check' | 'update'; promise: Promise<RuntimeResult> }
 
@@ -33,27 +34,35 @@ function runExclusive(
   return promise
 }
 
-// Progress and log lines go back to the window that asked
-function reporterFor(event: IpcMainInvokeEvent): RuntimeReporter {
+// Progress and log lines go back to the window that asked. Log lines are
+// batched; the batch is flushed when the operation ends.
+function withReporter(
+  event: IpcMainInvokeEvent,
+  run: (reporter: RuntimeReporter) => Promise<RuntimeResult>
+): Promise<RuntimeResult> {
   const send = safeSend(event.sender)
-  return new RuntimeReporter(
+  const log = batchedLogSender(send, IPC.runtime.log)
+  const reporter = new RuntimeReporter(
     (update: RuntimeUpdate) => send(IPC.runtime.update, update),
-    (line: string) => send(IPC.runtime.log, line)
+    log.push
   )
+  return run(reporter).finally(log.flush)
 }
 
 export function registerRuntimeIPC(): void {
-  ipcMain.handle(IPC.runtime.check, (event) =>
-    runExclusive('check', () => bootstrapRuntime(reporterFor(event)))
+  handle(IPC.runtime.check, (event) =>
+    runExclusive('check', () => withReporter(event, bootstrapRuntime))
   )
 
-  ipcMain.handle(IPC.runtime.update, (event, data: unknown) => {
+  handle(IPC.runtime.update, (event, data: unknown) => {
     // Names are also filtered against the required package list in
     // updateRuntime; this just makes sure they're strings
     const packages = Array.isArray(data)
       ? data.filter((name): name is string => typeof name === 'string')
       : []
 
-    return runExclusive('update', () => updateRuntime(packages, reporterFor(event)))
+    return runExclusive('update', () =>
+      withReporter(event, (reporter) => updateRuntime(packages, reporter))
+    )
   })
 }

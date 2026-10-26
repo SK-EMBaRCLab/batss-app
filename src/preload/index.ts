@@ -59,7 +59,9 @@ const runtime = {
   },
 
   onLog: (callback: (line: string) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, line: string): void => callback(line)
+    // Main sends log lines in batches (see batchedLogSender)
+    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
+      lines.forEach((line) => callback(line))
     ipcRenderer.on(IPC.runtime.log, listener)
     return (): void => {
       ipcRenderer.removeListener(IPC.runtime.log, listener)
@@ -102,7 +104,9 @@ const simulation = {
   cancelSimulation: (): Promise<boolean> => ipcRenderer.invoke(IPC.simulation.cancel),
 
   onLog: (callback: (line: string) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, line: string): void => callback(line)
+    // Main sends log lines in batches (see batchedLogSender)
+    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
+      lines.forEach((line) => callback(line))
     ipcRenderer.on(IPC.simulation.log, listener)
     return (): void => {
       ipcRenderer.removeListener(IPC.simulation.log, listener)
@@ -176,7 +180,9 @@ const batch = {
   },
 
   onLog: (callback: (line: string) => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, line: string): void => callback(line)
+    // Main sends log lines in batches (see batchedLogSender)
+    const listener = (_event: Electron.IpcRendererEvent, lines: string[]): void =>
+      lines.forEach((line) => callback(line))
     ipcRenderer.on(IPC.batch.log, listener)
     return (): void => {
       ipcRenderer.removeListener(IPC.batch.log, listener)

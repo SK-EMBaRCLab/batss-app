@@ -1,6 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { spawn } from 'child_process'
-import { app, BrowserWindow, dialog, ipcMain, screen, session, shell } from 'electron'
+import { app, BrowserWindow, dialog, screen, session, shell } from 'electron'
 import { join } from 'path'
 
 import icon from '../../resources/icon.png?asset'
@@ -17,6 +17,7 @@ import { registerRuntimeIPC } from './ipc/runtime.ipc'
 import { registerSettingsIPC } from './ipc/settings.ipc'
 import { registerSimulationIPC } from './ipc/simulation.ipc'
 import { registerThemeIPC } from './ipc/theme.ipc'
+import { on } from './ipc/trusted-ipc'
 import { registerUpdateIPC } from './ipc/update.ipc'
 import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
@@ -31,7 +32,10 @@ let forceClose = false
 // LIBGL_ALWAYS_SOFTWARE), where no real GPU is available. They should
 // NOT be applied on native installs — forcing swiftshader there just
 // disables hardware acceleration for no reason.
-const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1'
+// Development builds only: ELECTRON_DISABLE_GPU is an env var anyone can
+// set, and it also turns on swiftshader ("unsafe" software rendering), so
+// an installed app ignores it.
+const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1' && !app.isPackaged
 
 // Electron 38+ defaults to Wayland on Linux, and the
 // ELECTRON_OZONE_PLATFORM_HINT env var that used to force X11 was
@@ -123,9 +127,9 @@ function createWindow(): void {
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      // Off only for the Docker dev container, never in a packaged build:
-      // ELECTRON_DISABLE_GPU is an env var anyone could set
-      sandbox: !(isHeadlessContainer && !app.isPackaged)
+      // Off only for the Docker dev container (isHeadlessContainer is never
+      // true in a packaged build)
+      sandbox: !isHeadlessContainer
     }
   })
 
@@ -274,7 +278,7 @@ if (!isRelaunching) {
 
     registerUpdateIPC()
 
-    ipcMain.on(IPC.design.closeConfirmed, () => {
+    on(IPC.design.closeConfirmed, () => {
       clearUnsavedDesignChanges()
 
       forceClose = true

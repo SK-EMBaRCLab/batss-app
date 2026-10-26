@@ -73,7 +73,7 @@ export class PackageManager {
         package_repos[[parts[1]]] <- parts[2]
       }
 
-      install_lib <- .libPaths()[1]
+      install_lib <- Sys.getenv("R_LIBS_USER")
 
       installed <- installed.packages(
         lib.loc = install_lib
@@ -201,7 +201,7 @@ export class PackageManager {
         `
           pkg <- Sys.getenv("${PACKAGE_NAME_ENV}")
           repos <- strsplit(Sys.getenv("${PACKAGE_REPOS_ENV}"), ",")[[1]]
-          install_lib <- .libPaths()[1]
+          install_lib <- Sys.getenv("R_LIBS_USER")
           pkg_type <- ${PACKAGE_TYPE}
 
           ${

@@ -1,14 +1,15 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow } from 'electron'
 
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../../shared/batch-types'
 import { IPC } from '../../shared/ipc-channels'
 import { checkSimulationRunInput, MAX_BATCH_ROWS } from '../../shared/simulation-input-schema'
 import { batchService } from '../services/batch.service'
 import { alertBatchFinished } from '../services/run-alerts'
-import { safeSend } from './safe-send'
+import { batchedLogSender, safeSend } from './safe-send'
+import { handle } from './trusted-ipc'
 
 export function registerBatchIPC(): void {
-  ipcMain.handle(IPC.batch.run, async (event, data: unknown): Promise<BatchUpdate> => {
+  handle(IPC.batch.run, async (event, data: unknown): Promise<BatchUpdate> => {
     // Check every row before starting, so one bad row doesn't stop the
     // batch partway through
     const rows = Array.isArray(data) ? (data as BatchPreparedInput[]) : []
@@ -38,19 +39,28 @@ export function registerBatchIPC(): void {
     }
 
     const send = safeSend(event.sender)
-    const sendUpdate = (update: BatchUpdate): void => send(IPC.batch.update, update)
-    const sendRowDone = (entry: BatchRunEntry): void => send(IPC.batch.rowDone, entry)
-
-    const sendLog = (line: string): void => send(IPC.batch.log, line)
+    const log = batchedLogSender(send, IPC.batch.log)
+    // Flush pending log lines first, so a row's last lines (e.g. its
+    // "Results" stage marker) always arrive before the row-done/next-row
+    // events; the batch store relies on that order
+    const sendUpdate = (update: BatchUpdate): void => {
+      log.flush()
+      send(IPC.batch.update, update)
+    }
+    const sendRowDone = (entry: BatchRunEntry): void => {
+      log.flush()
+      send(IPC.batch.rowDone, entry)
+    }
 
     const startedAt = Date.now()
-    const final = await batchService.runBatch(inputs, sendUpdate, sendRowDone, sendLog)
+    const final = await batchService.runBatch(inputs, sendUpdate, sendRowDone, log.push)
+    log.flush()
 
     alertBatchFinished(BrowserWindow.fromWebContents(event.sender), final, Date.now() - startedAt)
     return final
   })
 
-  ipcMain.handle(IPC.batch.cancel, () => {
+  handle(IPC.batch.cancel, () => {
     return batchService.cancel()
   })
 }

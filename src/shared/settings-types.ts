@@ -11,3 +11,17 @@ export type SetSimulationTimeoutResult = { saved: boolean; error?: string }
 export const DEFAULT_SIMULATION_TIMEOUT_MINUTES = 120
 export const MIN_SIMULATION_TIMEOUT_MINUTES = 5
 export const MAX_SIMULATION_TIMEOUT_MINUTES = 360
+
+/**
+ * A stored timeout, or the default if it's missing or out of range.
+ * settings.json is a plain file, so a hand-edited or damaged value (e.g.
+ * "abc", which would time every run out immediately) isn't trusted.
+ */
+export function normaliseTimeoutMinutes(value: unknown): number {
+  return typeof value === 'number' &&
+    Number.isInteger(value) &&
+    value >= MIN_SIMULATION_TIMEOUT_MINUTES &&
+    value <= MAX_SIMULATION_TIMEOUT_MINUTES
+    ? value
+    : DEFAULT_SIMULATION_TIMEOUT_MINUTES
+}

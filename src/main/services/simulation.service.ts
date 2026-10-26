@@ -7,7 +7,7 @@ import { resolveCoreCount } from '../../shared/cores'
 import { parseSimulationRunResult } from '../../shared/design-file-schema'
 import { describeBusy } from '../../shared/engine-types'
 import { withReference } from '../../shared/error-reference'
-import { DEFAULT_SIMULATION_TIMEOUT_MINUTES } from '../../shared/settings-types'
+import { normaliseTimeoutMinutes } from '../../shared/settings-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
 import { OutputListener, rManager } from '../runtime/r-manager'
 import { SIMULATION_TIMEOUT_MINUTES_KEY } from '../settings.constants'
@@ -27,9 +27,8 @@ const BATSS_OUTPUT_ENV = 'ALBATROSS_BATSS_OUTPUT'
 // each user's hardware and typical design size — this is just the
 // fallback for users who've never touched that setting.
 function getSimulationTimeoutMs(): number {
-  const minutes = settingsService.get(
-    SIMULATION_TIMEOUT_MINUTES_KEY,
-    DEFAULT_SIMULATION_TIMEOUT_MINUTES
+  const minutes = normaliseTimeoutMinutes(
+    settingsService.get<unknown>(SIMULATION_TIMEOUT_MINUTES_KEY, undefined)
   )
 
   return minutes * 60 * 1000
@@ -196,7 +195,9 @@ export class SimulationService {
           [BATSS_OUTPUT_ENV]: outputPath
         },
         onOutput,
-        { signal: controller.signal, timeoutMs: getSimulationTimeoutMs() }
+        // Results come from the output file, so only the end of R's output
+        // is kept (for the error log if it fails)
+        { signal: controller.signal, timeoutMs: getSimulationTimeoutMs(), captureLimit: 64 * 1024 }
       )
       // batss-simulation.R has no concept of durationMs — it's ours to
       // attach, measured around the whole Rscript invocation above.

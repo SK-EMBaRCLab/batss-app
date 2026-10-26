@@ -1,6 +1,7 @@
 // src/main/runtime/r-manager.ts
 
 import { execFile, spawn } from 'child_process'
+import { existsSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
 import { promisify } from 'util'
@@ -18,6 +19,19 @@ const KILL_GRACE_MS = 5000
 // current folder before System32, so a planted reg.exe/taskkill.exe there
 // would run instead
 const WINDOWS_SYSTEM32 = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32')
+
+// Full paths to `fileName` in each PATH folder, searched by hand: a bare
+// name would make Windows look in the current folder first, where a
+// planted Rscript.exe could be waiting. Relative PATH entries are skipped
+// for the same reason.
+function findOnWindowsPath(fileName: string): string[] {
+  return (process.env.PATH ?? '')
+    .split(path.delimiter)
+    .map((dir) => dir.trim().replace(/^"(.*)"$/, '$1'))
+    .filter((dir) => dir && path.isAbsolute(dir))
+    .map((dir) => path.join(dir, fileName))
+    .filter((candidate) => existsSync(candidate))
+}
 
 // Stops `pid`'s process tree. Windows' taskkill /F is already forceful;
 // elsewhere the process group (R plus forked workers) gets `signal`.
@@ -58,6 +72,23 @@ export type OutputListener = (line: string, stream: 'stdout' | 'stderr') => void
 export type ExecuteOptions = {
   signal?: AbortSignal
   timeoutMs?: number
+  // Keep only the last this-many characters of stdout/stderr, for callers
+  // that don't parse R's output (a simulation's results come from a file).
+  // Unset keeps everything, which package checks need to parse.
+  captureLimit?: number
+}
+
+// Longest single line passed on to the log; longer ones are cut, and so is
+// a "line" that never ends (e.g. \r-only progress output)
+const MAX_LINE_CHARS = 4000
+
+function clipLine(line: string): string {
+  return line.length > MAX_LINE_CHARS ? `${line.slice(0, MAX_LINE_CHARS)}… (line truncated)` : line
+}
+
+function appendCapped(buffer: string, text: string, limit: number | undefined): string {
+  const next = buffer + text
+  return limit !== undefined && next.length > limit ? next.slice(next.length - limit) : next
 }
 
 export class RManager {
@@ -89,7 +120,8 @@ export class RManager {
     if (process.platform === 'win32') {
       return [
         ...(await this.getWindowsInstallCandidates()),
-        'Rscript.exe' // PATH (only works if "add to PATH" was checked, or rig)
+        // PATH (only works if "add to PATH" was checked, or rig)
+        ...findOnWindowsPath('Rscript.exe')
       ]
     }
 
@@ -257,8 +289,15 @@ export class RManager {
 
     await fs.mkdir(libraryPath, { recursive: true })
 
+    // R_LIBS and R_LIBS_SITE (e.g. from the user's own R setup) would come
+    // before R_LIBS_USER in .libPaths(), so packages could be installed
+    // into, and loaded from, a folder outside Albatross's private library
+    const inherited: NodeJS.ProcessEnv = { ...process.env }
+    delete inherited.R_LIBS
+    delete inherited.R_LIBS_SITE
+
     return {
-      ...process.env,
+      ...inherited,
       R_LIBS_USER: libraryPath,
       ...env
     }
@@ -276,7 +315,7 @@ export class RManager {
     options: ExecuteOptions = {}
   ): Promise<ExecuteResult> {
     const executable = await this.getRExecutable()
-    const { signal: externalSignal, timeoutMs } = options
+    const { signal: externalSignal, timeoutMs, captureLimit } = options
 
     // Cancelled while the run was still being set up (temp dir, finding
     // Rscript, building the env). An abort listener added below would
@@ -358,11 +397,16 @@ export class RManager {
         tailRef.value += chunk.toString()
         const lines = tailRef.value.split('\n')
         // Last element may be an incomplete line — keep it buffered
-        // until more data (or process close) completes it.
+        // until more data (or process close) completes it, unless it has
+        // grown past the line limit without ever ending.
         tailRef.value = lines.pop() ?? ''
+        if (tailRef.value.length > MAX_LINE_CHARS) {
+          lines.push(tailRef.value)
+          tailRef.value = ''
+        }
 
         for (const line of lines) {
-          onOutput?.(line, stream)
+          onOutput?.(clipLine(line), stream)
         }
       }
 
@@ -370,12 +414,12 @@ export class RManager {
       const stderrTailRef = { value: '' }
 
       child.stdout.on('data', (chunk: Buffer) => {
-        stdoutBuffer += chunk.toString()
+        stdoutBuffer = appendCapped(stdoutBuffer, chunk.toString(), captureLimit)
         consume(chunk, 'stdout', stdoutTailRef)
       })
 
       child.stderr.on('data', (chunk: Buffer) => {
-        stderrBuffer += chunk.toString()
+        stderrBuffer = appendCapped(stderrBuffer, chunk.toString(), captureLimit)
         consume(chunk, 'stderr', stderrTailRef)
       })
 
@@ -385,8 +429,8 @@ export class RManager {
 
       child.on('close', (code) => {
         // Flush any trailing partial line that never got a trailing \n.
-        if (stdoutTailRef.value) onOutput?.(stdoutTailRef.value, 'stdout')
-        if (stderrTailRef.value) onOutput?.(stderrTailRef.value, 'stderr')
+        if (stdoutTailRef.value) onOutput?.(clipLine(stdoutTailRef.value), 'stdout')
+        if (stderrTailRef.value) onOutput?.(clipLine(stderrTailRef.value), 'stderr')
 
         if (controller.signal.aborted) {
           settleReject(this.toAbortError(controller.signal))

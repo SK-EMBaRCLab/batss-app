@@ -1,10 +1,11 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow } from 'electron'
 
 import { IPC } from '../../shared/ipc-channels'
 import { engineService } from '../services/engine.service'
+import { handle } from './trusted-ipc'
 
 export function registerEngineIPC(): void {
-  ipcMain.handle(IPC.engine.get, () => engineService.get())
+  handle(IPC.engine.get, () => engineService.get())
 
   // Global state → every window, same pattern as theme:updated.
   engineService.subscribe((state) => {

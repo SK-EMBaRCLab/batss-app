@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
+import { app, BrowserWindow, nativeTheme } from 'electron'
 
 import brandIcon from '../../../resources/icon.png?asset'
 import darkIcon from '../../../resources/icon-dark.png?asset'
@@ -7,6 +7,7 @@ import type { AppearanceState, IconAppearance } from '../../shared/appearance-ty
 import { isIconAppearance, isThemeSource, resolveIconVariant } from '../../shared/appearance-types'
 import { IPC } from '../../shared/ipc-channels'
 import { settingsService } from '../services/settings.service'
+import { handle } from './trusted-ipc'
 
 const iconPaths = { brand: brandIcon, light: lightIcon, dark: darkIcon }
 let iconAppearance: IconAppearance = 'theme'
@@ -41,9 +42,9 @@ export function registerThemeIPC(): void {
   const savedTheme = settingsService.get<unknown>('themeSource', 'system')
   nativeTheme.themeSource = isThemeSource(savedTheme) ? savedTheme : 'system'
 
-  ipcMain.handle(IPC.theme.get, () => currentTheme())
+  handle(IPC.theme.get, () => currentTheme())
 
-  ipcMain.handle(IPC.theme.set, (_event, theme: unknown) => {
+  handle(IPC.theme.set, (_event, theme: unknown) => {
     if (!isThemeSource(theme)) throw new Error('Invalid theme.')
 
     settingsService.set('themeSource', theme)
@@ -52,7 +53,7 @@ export function registerThemeIPC(): void {
     return publishAppearance()
   })
 
-  ipcMain.handle(IPC.theme.setIconAppearance, (_event, choice: unknown) => {
+  handle(IPC.theme.setIconAppearance, (_event, choice: unknown) => {
     if (!isIconAppearance(choice)) throw new Error('Invalid icon appearance.')
 
     settingsService.set('iconAppearance', choice)

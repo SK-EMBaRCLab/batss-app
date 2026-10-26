@@ -1,4 +1,4 @@
-import { dialog, ipcMain, shell } from 'electron'
+import { dialog, shell } from 'electron'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -9,6 +9,7 @@ import { StudyDesign } from '../../shared/simulation-types'
 import { getWorkspacePath } from '../services/filesystem/app-paths'
 import { settingsService } from '../services/settings.service'
 import { OUTPUT_PATH_KEY } from '../settings.constants'
+import { handle, on } from './trusted-ipc'
 
 const DESIGN_FILE_EXTENSION = 'design'
 export type SaveResultResponse = { saved: boolean; filePath?: string }
@@ -37,7 +38,31 @@ function rememberChosenPath(filePath: string): void {
   userChosenPaths.add(path.resolve(filePath))
 }
 
-async function saveViaDialog(data: StudyDesign): Promise<SaveResultResponse> {
+// Far above any real design (a run at R=10,000 is ~200 KB), so this only
+// stops absurd data from being written or read into memory
+const MAX_DESIGN_FILE_BYTES = 100 * 1024 * 1024
+
+/**
+ * The JSON to write for `data`, after checking it's a design Albatross
+ * could open again. Throws otherwise; the renderer shows a generic "Could
+ * not save" message. The original data is written, not the checked copy,
+ * which would silently drop any field the file schema doesn't list.
+ */
+function designFileText(data: unknown): { design: StudyDesign; text: string } {
+  const checked = parseStudyDesignFile(data)
+  if (!checked.success) {
+    throw new Error(`Refusing to save an invalid design: ${checked.issues.slice(0, 3).join('; ')}`)
+  }
+
+  const text = JSON.stringify(data, null, 2)
+  if (Buffer.byteLength(text, 'utf8') > MAX_DESIGN_FILE_BYTES) {
+    throw new Error('Refusing to save a design over the size limit')
+  }
+
+  return { design: checked.data, text }
+}
+
+async function saveViaDialog(data: StudyDesign, text: string): Promise<SaveResultResponse> {
   const designName = data.name || 'Untitled Design'
   const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
 
@@ -50,7 +75,7 @@ async function saveViaDialog(data: StudyDesign): Promise<SaveResultResponse> {
 
   if (canceled || !filePath) return { saved: false }
 
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8')
+  await fs.writeFile(filePath, text, 'utf8')
   rememberChosenPath(filePath)
   designHasUnsavedChanges = false
   return { saved: true, filePath }
@@ -67,11 +92,11 @@ export function clearUnsavedDesignChanges(): void {
 }
 
 export function registerAlbatrossFilesIPC(): void {
-  ipcMain.on(IPC.design.dirty, (_event, dirty: boolean) => {
+  on(IPC.design.dirty, (_event, dirty: boolean) => {
     designHasUnsavedChanges = dirty
   })
 
-  ipcMain.handle(IPC.design.canLeave, async () => {
+  handle(IPC.design.canLeave, async () => {
     if (!designHasUnsavedChanges) {
       return true
     }
@@ -98,7 +123,7 @@ export function registerAlbatrossFilesIPC(): void {
     }
   })
 
-  ipcMain.handle(IPC.design.confirmStopRun, async (_, data: unknown) => {
+  handle(IPC.design.confirmStopRun, async (_, data: unknown) => {
     // Only two valid values; never put an unchecked value in dialog text
     const kind: Exclude<EngineBusy, 'idle'> = data === 'batch' ? 'batch' : 'simulation'
 
@@ -118,20 +143,22 @@ export function registerAlbatrossFilesIPC(): void {
     return result.response === 0
   })
 
-  ipcMain.handle(
+  handle(
     IPC.design.saveResult,
-    async (_, data: StudyDesign, knownPath?: string): Promise<SaveResultResponse> => {
-      if (!knownPath || !userChosenPaths.has(path.resolve(knownPath))) {
-        return saveViaDialog(data)
+    async (_, data: unknown, knownPath?: unknown): Promise<SaveResultResponse> => {
+      const { design, text } = designFileText(data)
+
+      if (typeof knownPath !== 'string' || !userChosenPaths.has(path.resolve(knownPath))) {
+        return saveViaDialog(design, text)
       }
       try {
-        await fs.writeFile(knownPath, JSON.stringify(data, null, 2), 'utf8')
+        await fs.writeFile(knownPath, text, 'utf8')
         designHasUnsavedChanges = false
         return { saved: true, filePath: knownPath }
       } catch {
         // Remembered path is gone (moved/deleted outside the app) —
         // fall back to the picker instead of failing with no recovery.
-        return saveViaDialog(data)
+        return saveViaDialog(design, text)
       }
     }
   )
@@ -139,7 +166,7 @@ export function registerAlbatrossFilesIPC(): void {
   // Opens the file manager with the design file selected. Only for paths
   // the user chose in a dialog (see userChosenPaths). False if the file is
   // gone, so the renderer can say so.
-  ipcMain.handle(IPC.design.showInFolder, async (_, filePath: unknown): Promise<boolean> => {
+  handle(IPC.design.showInFolder, async (_, filePath: unknown): Promise<boolean> => {
     if (typeof filePath !== 'string') return false
 
     const resolved = path.resolve(filePath)
@@ -155,7 +182,7 @@ export function registerAlbatrossFilesIPC(): void {
     return true
   })
 
-  ipcMain.handle(IPC.design.loadResult, async () => {
+  handle(IPC.design.loadResult, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       // Electron 43+ defaults to Downloads; start where designs are saved.
       defaultPath: settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
@@ -176,6 +203,15 @@ export function registerAlbatrossFilesIPC(): void {
     // rejection the renderer has nothing to show for (e.g. no permission)
     let text: string
     try {
+      if ((await fs.stat(filePath)).size > MAX_DESIGN_FILE_BYTES) {
+        await dialog.showMessageBox({
+          type: 'error',
+          title: 'Invalid Design File',
+          message: 'This file could not be opened.',
+          detail: 'It is far larger than any Albatross design file.'
+        })
+        return null
+      }
       text = await fs.readFile(filePath, 'utf8')
     } catch {
       await dialog.showMessageBox({
