@@ -1,9 +1,24 @@
-// src/main/runtime/bootstrap.ts
-
+import { withReference } from '../../shared/error-reference'
+import { recordError } from '../services/error-log.service'
 import { PackageManager } from './package-manager'
 import { rManager } from './r-manager'
 import { RuntimeReporter } from './reporter'
 import type { RuntimeResult } from './types'
+
+// A setup failure whose message is written for users (R missing). Any
+// other error is unexpected: users see a generic message with a reference,
+// and the details go to the error log.
+class RuntimeSetupError extends Error {}
+
+function reportFailure(reporter: RuntimeReporter, error: unknown, context: string): void {
+  if (error instanceof RuntimeSetupError) {
+    reporter.error(error.message)
+    return
+  }
+
+  const reference = recordError(context, error)
+  reporter.error(withReference('Setting up R failed unexpectedly.', reference))
+}
 
 export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<RuntimeResult> {
   const r = rManager
@@ -14,9 +29,7 @@ export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<Runti
     const installed = await r.isInstalled()
 
     if (!installed) {
-      reporter.error('R is not installed')
-
-      throw new Error('R is required')
+      throw new RuntimeSetupError('R is not installed')
     }
 
     const packages = new PackageManager(r, reporter)
@@ -33,12 +46,7 @@ export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<Runti
       packages: status
     }
   } catch (error) {
-    if (error instanceof Error) {
-      reporter.error(error.message)
-    } else {
-      reporter.error('Runtime initialization failed')
-    }
-
+    reportFailure(reporter, error, 'runtime check')
     throw error
   }
 }
@@ -55,9 +63,7 @@ export async function updateRuntime(
     const installed = await r.isInstalled()
 
     if (!installed) {
-      reporter.error('R is required')
-
-      throw new Error('R is required')
+      throw new RuntimeSetupError('R is not installed')
     }
 
     const packages = new PackageManager(r, reporter)
@@ -96,12 +102,7 @@ export async function updateRuntime(
       packages: updatedStatus
     }
   } catch (error) {
-    if (error instanceof Error) {
-      reporter.error(error.message)
-    } else {
-      reporter.error('Runtime update failed')
-    }
-
+    reportFailure(reporter, error, 'runtime update')
     throw error
   }
 }

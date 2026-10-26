@@ -1,4 +1,5 @@
 import type { IconAppearance } from '@shared/appearance-types'
+import { FolderSearch } from 'lucide-react'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -196,6 +197,56 @@ export function UpdatesSetting(): ReactElement {
       <ItemActions>
         <Button onClick={() => void advance()} disabled={isBusy}>
           {updateButtonLabel(status, progress)}
+        </Button>
+      </ItemActions>
+    </Item>
+  )
+}
+
+export function ErrorLogSetting(): ReactElement {
+  const [logPath, setLogPath] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    window.app
+      .errorLogPath()
+      .then((value) => {
+        if (!cancelled) setLogPath(value)
+      })
+      .catch((error) => console.error('Loading the error log path failed:', error))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const showLog = async (): Promise<void> => {
+    try {
+      const exists = await window.app.showErrorLog()
+      if (!exists) {
+        toast.add({ type: 'info', description: 'No errors have been recorded yet.' })
+      }
+    } catch (error) {
+      console.error('Opening the error log failed:', error)
+      toast.add({ type: 'error', title: "Couldn't open the error log" })
+    }
+  }
+
+  return (
+    <Item variant="muted">
+      <ItemContent>
+        <ItemTitle>Error Log</ItemTitle>
+        <ItemDescription>
+          Unexpected errors are recorded here under the reference shown in the app. Attach this file
+          when reporting a problem. It stays on this computer.
+        </ItemDescription>
+        {logPath && (
+          <ItemDescription className="font-mono text-xs break-all">{logPath}</ItemDescription>
+        )}
+      </ItemContent>
+      <ItemActions>
+        <Button variant="outline" onClick={() => void showLog()}>
+          <FolderSearch />
+          Show Error Log
         </Button>
       </ItemActions>
     </Item>

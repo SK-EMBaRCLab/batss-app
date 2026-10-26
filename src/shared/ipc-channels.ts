@@ -11,6 +11,9 @@ export const IPC = {
     setDocumentEdited: 'app:set-document-edited',
     cpuCount: 'app:cpu-count',
     setProgress: 'app:set-progress',
+    recordError: 'app:record-error',
+    errorLogPath: 'app:error-log-path',
+    showErrorLog: 'app:show-error-log',
     openRunResult: 'app:open-run-result'
   },
   runtime: {

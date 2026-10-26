@@ -25,6 +25,10 @@ const app = {
   quit: () => ipcRenderer.invoke(IPC.app.quit),
   setDocumentEdited: (edited: boolean) => ipcRenderer.send(IPC.app.setDocumentEdited, edited),
   cpuCount: (): Promise<number> => ipcRenderer.invoke(IPC.app.cpuCount),
+  recordError: (reference: string, context: string, details: string) =>
+    ipcRenderer.send(IPC.app.recordError, reference, context, details),
+  errorLogPath: (): Promise<string> => ipcRenderer.invoke(IPC.app.errorLogPath),
+  showErrorLog: (): Promise<boolean> => ipcRenderer.invoke(IPC.app.showErrorLog),
   setProgress: (value: number, mode: TaskbarProgressMode) =>
     ipcRenderer.send(IPC.app.setProgress, value, mode),
 

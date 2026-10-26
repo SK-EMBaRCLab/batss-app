@@ -3,6 +3,7 @@ import type { DesignInput, SimulationRunInput, SimulationRunResult } from '@shar
 import { create } from 'zustand'
 
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
+import { createErrorReference, logError, withReference } from '@/lib/error-reference'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { type RunStage, withLogLines } from '@/lib/run-progress'
 import { formatDuration, toError } from '@/lib/utils'
@@ -79,10 +80,17 @@ export const useSimulation = create<SimulationState>((set) => ({
     try {
       const result = await window.simulation
         .runSimulation(input)
-        .catch((error): SimulationRunResult => ({
-          status: 'error',
-          message: toError(error).message
-        }))
+        .catch((error): SimulationRunResult => {
+          // The run request itself failed (not R): generic message, with
+          // the details in the error log under the reference. This is also
+          // what's saved in the design file.
+          const reference = createErrorReference()
+          logError(reference, toError(error), 'simulation request')
+          return {
+            status: 'error',
+            message: withReference('The simulation could not be started.', reference)
+          }
+        })
 
       // Skip if another design was opened mid-run (the run was stopped
       // to allow that), so the result isn't filed under the wrong one.

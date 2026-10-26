@@ -3,6 +3,7 @@ import { type ReactElement } from 'react'
 import {
   AppIconSetting,
   ColorSchemeSetting,
+  ErrorLogSetting,
   NotifySetting,
   UpdatesSetting
 } from '@/components/settings/general-settings'
@@ -33,6 +34,7 @@ export default function Settings(): ReactElement {
             <AppIconSetting />
             <NotifySetting />
             <UpdatesSetting />
+            <ErrorLogSetting />
           </section>
 
           <section className="flex max-w-2xl flex-col gap-4">

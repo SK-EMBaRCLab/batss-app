@@ -34,6 +34,8 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
   - [Available Scripts](#available-scripts)
   - [Project Structure](#project-structure)
   - [How It Works](#how-it-works)
+  - [Troubleshooting](#troubleshooting)
+    - [Error Log](#error-log)
   - [CI/CD](#cicd)
     - [Automatic Versioning](#automatic-versioning)
     - [Multi-Platform Releases](#multi-platform-releases)
@@ -213,6 +215,55 @@ albatross/
 3. **Run the simulation** — Albatross serializes the design to JSON and runs `resources/r/batss-simulation.R` via your local `Rscript`, streaming live log output back to the UI. Results are read back from a temporary file rather than parsed from console output, so nothing from R/INLA's own logging can corrupt them.
 4. **Review results** — each run is appended to the open `.design` file with its own results (outcome probability tables/charts, sample size distributions), so you can compare runs against each other over time.
 5. **Batch mode** — for exploring many design variations at once, upload a CSV (see the in-app template) and Albatross validates and runs each row sequentially, saving every result into the same design.
+
+---
+
+## Troubleshooting
+
+### Error Log
+
+When something goes wrong unexpectedly (a simulation crashing, R setup failing, an update not downloading), Albatross shows a short message with a **reference** such as `Reference: 7F3A-92CD` instead of the raw technical error. Raw errors can contain file paths, usernames and server details, and aren't meaningful to most users.
+
+The full details are saved under that same reference in an error log file, so a problem report that quotes the reference can be matched to exactly what happened.
+
+#### Where to find it
+
+The easiest way is **Settings → Error Log → Show Error Log**, which opens your file manager with the log selected (or its folder, if nothing has been recorded yet). Settings also shows the full path.
+
+The file is `logs/errors.log` in Albatross's data folder:
+
+| Platform | Location                                                  |
+| -------- | --------------------------------------------------------- |
+| macOS    | `~/Library/Application Support/albatross/logs/errors.log` |
+| Windows  | `%APPDATA%\albatross\logs\errors.log`                     |
+| Linux    | `~/.config/albatross/logs/errors.log`                     |
+
+#### What's in it
+
+One line per error, in JSON:
+
+```json
+{
+  "time": "2026-10-26T14:03:12.481Z",
+  "reference": "7F3A-92CD",
+  "context": "simulation",
+  "details": "Error: R execution failed: …"
+}
+```
+
+- `time`: when it happened (UTC)
+- `reference`: the reference shown in the app
+- `context`: what Albatross was doing, e.g. `simulation`, `runtime check`, `update download`
+- `details`: the full error and stack trace
+
+#### Good to know
+
+- The log **stays on your computer**; Albatross never uploads it.
+- It's kept small: each entry is capped at 8 KB, and once the file passes about 256 KB the oldest half is dropped.
+- It can contain local file paths and your username, so look it over before sharing it publicly (for example in a GitHub issue).
+- Expected messages, such as validation errors or "R is not installed", aren't logged; they're shown in full because they're written for users.
+
+**Reporting a problem:** include the reference from the app and attach `errors.log`, or the lines with that reference.
 
 ---
 

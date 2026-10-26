@@ -6,11 +6,13 @@ import path from 'path'
 import { resolveCoreCount } from '../../shared/cores'
 import { parseSimulationRunResult } from '../../shared/design-file-schema'
 import { describeBusy } from '../../shared/engine-types'
+import { withReference } from '../../shared/error-reference'
 import { DEFAULT_SIMULATION_TIMEOUT_MINUTES } from '../../shared/settings-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
 import { OutputListener, rManager } from '../runtime/r-manager'
 import { SIMULATION_TIMEOUT_MINUTES_KEY } from '../settings.constants'
 import { engineService } from './engine.service'
+import { recordError } from './error-log.service'
 import { settingsService } from './settings.service'
 
 const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
@@ -70,6 +72,14 @@ function getSimulationScriptPath(): string {
 // user" (see its call sites here and in batch.service.ts) — a timeout
 // abort (r-manager.ts) uses a distinct "R process timed out…"
 // message, so this check only matches genuine user cancellations.
+function isTimedOut(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.name === 'AbortError' &&
+    error.message.startsWith('R process timed out')
+  )
+}
+
 function isUserCancelled(error: unknown): error is Error {
   return (
     error instanceof Error &&
@@ -197,10 +207,14 @@ export class SimulationService {
       if (!parsed) {
         // e.g. a BATSS update changing its output; don't let it reach the
         // Results page or the design file
-        onOutput?.('BATSS result file did not match the expected format.', 'stderr')
+        const reference = recordError(
+          'simulation result',
+          'BATSS result file did not match the expected format.'
+        )
+        onOutput?.(`BATSS result file did not match the expected format (${reference}).`, 'stderr')
         return {
           status: 'error',
-          message: 'BATSS returned results in an unexpected format. See the log for details.',
+          message: withReference('BATSS returned results in an unexpected format.', reference),
           durationMs: Date.now() - startedAt
         }
       }
@@ -212,9 +226,24 @@ export class SimulationService {
         return { status: 'cancelled', message: error.message, durationMs }
       }
 
+      // Expected: the run hit the Settings timeout
+      if (isTimedOut(error)) {
+        const minutes = Math.round(getSimulationTimeoutMs() / 60_000)
+        return {
+          status: 'error',
+          message: `The simulation took longer than the ${minutes}-minute timeout in Settings and was stopped.`,
+          durationMs
+        }
+      }
+
+      // Unexpected: the raw error (R's error output, which can include
+      // local paths and usernames) goes to the error log and the run's log
+      // only. This message is what's shown, and saved in the design file.
+      const reference = recordError('simulation', error)
+      onOutput?.(`The simulation stopped unexpectedly (${reference}).`, 'stderr')
       return {
         status: 'error',
-        message: error instanceof Error ? error.message : 'Simulation run failed',
+        message: withReference('The simulation stopped unexpectedly.', reference),
         durationMs
       }
     } finally {

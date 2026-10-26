@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 
+import { createErrorReference, logError, withReference } from '@/lib/error-reference'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
+import { toError } from '@/lib/utils'
 
 import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
 
@@ -30,6 +32,7 @@ type RuntimeState = {
 // messages).
 async function runTrackedOperation(
   set: (partial: Partial<RuntimeState> | ((state: RuntimeState) => Partial<RuntimeState>)) => void,
+  get: () => RuntimeState,
   operation: () => Promise<{ ready: boolean; packages: RuntimePackage[] }>,
   messages: { ready: string; failed: string }
 ): Promise<void> {
@@ -61,11 +64,17 @@ async function runTrackedOperation(
             .join(', ')}`
     })
   } catch (error) {
-    set({
-      status: 'error',
-      message: error instanceof Error ? error.message : messages.failed,
-      error: error instanceof Error ? error.message : messages.failed
-    })
+    // For failures main caught, it has already reported a user-facing
+    // message (see bootstrap.ts), so keep that rather than the rejection's
+    // raw text. Anything else (the IPC call itself failing) gets a generic
+    // message and a reference.
+    if (get().status === 'error') {
+      set({ error: undefined })
+    } else {
+      const reference = createErrorReference()
+      logError(reference, toError(error), 'runtime')
+      set({ status: 'error', message: withReference(messages.failed, reference), error: undefined })
+    }
   } finally {
     unsubscribeUpdate()
     teardownLog()
@@ -97,7 +106,7 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
       logs: []
     })
     try {
-      await runTrackedOperation(set, () => window.runtime.check(), {
+      await runTrackedOperation(set, get, () => window.runtime.check(), {
         ready: 'Runtime ready',
         failed: 'One or more packages failed to install'
       })
@@ -122,6 +131,7 @@ export const useRuntime = create<RuntimeState>((set, get) => ({
 
     await runTrackedOperation(
       set,
+      get,
       () => window.runtime.update(packagesToUpdate.map((pkg) => pkg.name)),
       {
         ready: 'Packages updated',

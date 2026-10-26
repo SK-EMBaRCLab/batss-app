@@ -1,8 +1,12 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { existsSync, mkdirSync } from 'fs'
 import os from 'os'
+import path from 'path'
 
 import type { TaskbarProgressMode } from '../../shared/engine-types'
+import { ERROR_REFERENCE_PATTERN } from '../../shared/error-reference'
 import { IPC } from '../../shared/ipc-channels'
+import { getErrorLogPath, recordError } from '../services/error-log.service'
 
 const PROGRESS_MODES: readonly TaskbarProgressMode[] = ['normal', 'indeterminate', 'error']
 
@@ -50,5 +54,37 @@ export function registerAppIPC(): void {
     BrowserWindow.fromWebContents(event.sender)?.setProgressBar(value, {
       mode: mode as TaskbarProgressMode
     })
+  })
+
+  // Unexpected errors caught in the renderer, recorded in the same error
+  // log as main's own under the reference the user was shown
+  ipcMain.on(
+    IPC.app.recordError,
+    (_event, reference: unknown, context: unknown, details: unknown) => {
+      if (typeof reference !== 'string' || !ERROR_REFERENCE_PATTERN.test(reference)) return
+      recordError(
+        typeof context === 'string' ? context : 'renderer',
+        typeof details === 'string' ? details : String(details),
+        reference
+      )
+    }
+  )
+
+  // For Settings > Error Log: where the log lives, and opening the file
+  // manager at it (or at its folder, if nothing has been logged yet).
+  // Resolves to whether a log file exists.
+  ipcMain.handle(IPC.app.errorLogPath, () => getErrorLogPath())
+
+  ipcMain.handle(IPC.app.showErrorLog, async (): Promise<boolean> => {
+    const file = getErrorLogPath()
+    if (existsSync(file)) {
+      shell.showItemInFolder(file)
+      return true
+    }
+
+    mkdirSync(path.dirname(file), { recursive: true })
+    const openError = await shell.openPath(path.dirname(file))
+    if (openError) console.error('Could not open the error log folder:', openError)
+    return false
   })
 }

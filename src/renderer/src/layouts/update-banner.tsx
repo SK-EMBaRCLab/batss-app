@@ -92,7 +92,7 @@ export function UpdateBanner(): ReactElement | null {
     return (
       <Banner
         variant="error"
-        title="Couldn't check for updates"
+        title={message}
         description={error}
         action={
           <Button

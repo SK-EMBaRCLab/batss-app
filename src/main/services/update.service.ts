@@ -1,6 +1,8 @@
 import { autoUpdater } from 'electron-updater'
 
+import { withReference } from '../../shared/error-reference'
 import type { UpdateState } from '../../shared/update-types'
+import { recordError } from './error-log.service'
 
 type Listener = (state: UpdateState) => void
 
@@ -48,6 +50,9 @@ class UpdateService {
   // produces (checking → available/not-available → ... ) can carry the
   // same silent flag through to the renderer.
   private silentCheck = false
+
+  // Which step a failure belongs to, for its message
+  private phase: 'check' | 'download' = 'check'
 
   init(): void {
     if (this.initialized) return
@@ -106,14 +111,7 @@ class UpdateService {
       })
     })
 
-    autoUpdater.on('error', (err) => {
-      this.set({
-        status: 'error',
-        message: 'Update check failed',
-        error: err instanceof Error ? err.message : String(err),
-        silent: this.silentCheck
-      })
-    })
+    autoUpdater.on('error', (err) => this.fail(err, this.silentCheck))
   }
 
   get(): UpdateState {
@@ -122,6 +120,10 @@ class UpdateService {
 
   async check(silent = false): Promise<void> {
     this.silentCheck = silent
+    this.phase = 'check'
+    // Clear any earlier error up front, so a failure before the updater's
+    // own 'checking-for-update' event is still recorded (see fail())
+    this.set({ status: 'checking', message: 'Checking for updates…', silent })
 
     try {
       await autoUpdater.checkForUpdates()
@@ -129,18 +131,14 @@ class UpdateService {
       // Belt-and-suspenders: checkForUpdates() rejecting is usually
       // also reported via the 'error' event above, but config-level
       // failures (e.g. no publish config) can reject without one.
-      this.set({
-        status: 'error',
-        message: 'Update check failed',
-        error: error instanceof Error ? error.message : String(error),
-        silent
-      })
+      this.fail(error, silent)
     }
   }
 
   async download(): Promise<void> {
     if (this.state.status !== 'available') return
 
+    this.phase = 'download'
     this.set({
       status: 'downloading',
       message: 'Downloading update… 0%',
@@ -153,12 +151,7 @@ class UpdateService {
       await autoUpdater.downloadUpdate()
     } catch (error) {
       // Usually also reported via the 'error' event; this covers the rest
-      this.set({
-        status: 'error',
-        message: 'Update download failed',
-        error: error instanceof Error ? error.message : String(error),
-        silent: false
-      })
+      this.fail(error, false)
     }
   }
 
@@ -169,6 +162,24 @@ class UpdateService {
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener)
     return () => this.listeners.delete(listener)
+  }
+
+  // The updater's raw errors can include URLs, HTTP status and server
+  // responses, so users get a generic message with a reference and the
+  // details go to the error log. A failure is often reported both by the
+  // 'error' event and by the rejected call; only the first is recorded.
+  private fail(error: unknown, silent: boolean): void {
+    if (this.state.status === 'error') return
+
+    const downloading = this.phase === 'download'
+    const reference = recordError(downloading ? 'update download' : 'update check', error)
+
+    this.set({
+      status: 'error',
+      message: downloading ? "Couldn't download the update" : "Couldn't check for updates",
+      error: withReference('You can download the latest version from GitHub instead.', reference),
+      silent
+    })
   }
 
   private set(state: UpdateState): void {
