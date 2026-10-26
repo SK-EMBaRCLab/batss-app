@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.7.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.0...v5.7.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* queue runtime updates, keep window size, sort R versions numerically ([e8d7209](https://github.com/SK-EMBaRCLab/batss-app/commit/e8d7209321d1b72b328ebe5aaecd1b1dc32f80f5))
+* **security:** deny web permissions and remove unused macOS entitlements ([8380d3d](https://github.com/SK-EMBaRCLab/batss-app/commit/8380d3dce8094f0d942d62e72d16343434d5d499))
+* **security:** only download updates when the user asks ([09f348e](https://github.com/SK-EMBaRCLab/batss-app/commit/09f348ec7d7ed02025457d2071dec4201b40f1c4))
+* **security:** run Windows system tools by full path ([e92098a](https://github.com/SK-EMBaRCLab/batss-app/commit/e92098a10c6c03a9a4b6f865cd9314d46d2aba21))
+* **security:** set Electron fuses in packaged builds ([5c1400f](https://github.com/SK-EMBaRCLab/batss-app/commit/5c1400f59015efc4f25d16c0a4dd5543e44c2788))
+* **security:** tighten CSP, settings writes, IPC inputs and CSV imports ([599c49e](https://github.com/SK-EMBaRCLab/batss-app/commit/599c49ebfe58ef61a24d167f300bd9e849033bbc))
+* **simulation:** cap run inputs and batch size ([ab86ca9](https://github.com/SK-EMBaRCLab/batss-app/commit/ab86ca9582d05fdae398304dfa2e1c720e383a9b))
+* **simulation:** use one run check in the form, batch import and main process ([e256127](https://github.com/SK-EMBaRCLab/batss-app/commit/e256127e62337c062224efcf11e558e24bdc165f))
+* **stores:** avoid a stale engine state at startup and release listeners on reload ([43be85a](https://github.com/SK-EMBaRCLab/batss-app/commit/43be85a52fbdc3a55ff39fdb2db5aa79910d8b32))
+* **ui:** show a generic error with a reference instead of raw errors ([5ebb892](https://github.com/SK-EMBaRCLab/batss-app/commit/5ebb892e66dd30922ea0b549d9418d14e9d2aece))
+* **ui:** theme-aware chart export, steady drag axis, log scroll and local dates ([25b9894](https://github.com/SK-EMBaRCLab/batss-app/commit/25b98946f7a606182dc7c072238dbc21f2d38452))
+
 ## [5.7.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.6.1...v5.7.0) (2026-10-23)
 
 
