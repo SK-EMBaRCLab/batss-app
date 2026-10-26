@@ -1,0 +1,34 @@
+name: Check
+
+# Types, lint, formatting and tests on every push and pull request, so a
+# problem shows up as a ✗ on the commit long before a release is built
+on:
+  push:
+  pull_request:
+
+# Read-only: this workflow never writes to the repository or releases
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions pinned to commit SHAs, as in release.yml
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          # Keep in step with .nvmrc and the Dockerfile
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run check
