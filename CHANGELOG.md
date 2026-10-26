@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.7.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.4...v5.7.5) (2026-10-26)
+
+
+### Bug Fixes
+
+* **runs:** don't save a stopped run into a design opened afterwards ([74266a8](https://github.com/SK-EMBaRCLab/batss-app/commit/74266a8c061366efab9322de9a025f86c486f942))
+* **ui:** use the same name for each design field everywhere ([070606f](https://github.com/SK-EMBaRCLab/batss-app/commit/070606f6578cc696dd167be242c37175742f9c68))
+
 ## [5.7.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.3...v5.7.4) (2026-10-26)
 
 ### Bug Fixes
