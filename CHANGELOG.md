@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.7.4](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.3...v5.7.4) (2026-10-26)
+
+
+### Bug Fixes
+
+* **updates:** show update status in installed builds ([c1e0f1a](https://github.com/SK-EMBaRCLab/batss-app/commit/c1e0f1a313fd053a9b7e425a9b3f6d094257179d))
+
 ## [5.7.3](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.2...v5.7.3) (2026-10-26)
 
 
