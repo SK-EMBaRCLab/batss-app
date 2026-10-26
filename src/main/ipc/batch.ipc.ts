@@ -1,8 +1,9 @@
 import { BrowserWindow } from 'electron'
 
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../../shared/batch-types'
+import { MAX_BATCH_ROWS } from '../../shared/design-rules'
 import { IPC } from '../../shared/ipc-channels'
-import { checkSimulationRunInput, MAX_BATCH_ROWS } from '../../shared/simulation-input-schema'
+import { checkSimulationRunInput } from '../../shared/simulation-input-schema'
 import { batchService } from '../services/batch.service'
 import { alertBatchFinished } from '../services/run-alerts'
 import { batchedLogSender, safeSend } from './safe-send'

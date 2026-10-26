@@ -1,95 +1,83 @@
+import {
+  anyNumber,
+  CORE_PERCENTS,
+  CROSS_FIELD_RULES,
+  DECISION_RULE_TYPES,
+  DIRECTIONS,
+  NUMBER_FIELDS,
+  TREATMENT_EFFECT_TYPES
+} from '@shared/design-rules'
 import { FIELD_LABELS as L } from '@shared/field-labels'
-import { MAX_SAMPLE_SIZE, MAX_SIMULATED_TRIALS } from '@shared/simulation-input-schema'
 import { DecisionRule, DesignInput } from '@shared/simulation-types'
 import * as v from 'valibot'
 
+// The simulation form's check. Each field's rules (and the rules between
+// fields) come from shared/design-rules.ts, the same ones the main process
+// checks before a run, so they're reported while typing rather than only
+// when Run is clicked. What's particular to the form: values arrive as
+// typed text, messages prompt for a choice, and it accepts some designs
+// that can be saved but not run yet (see the "currently supported" checks).
+
+// What's typed, as a number for the shared rules (NaN if empty, which
+// they report as "must be a number")
+const fromText = v.pipe(
+  v.union([v.string(), v.number(), v.undefined()]),
+  v.transform((value): number => {
+    if (value === undefined) return NaN
+    if (typeof value === 'number') return value
+
+    const trimmed = value.trim()
+    return trimmed === '' ? NaN : Number(trimmed)
+  })
+)
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const requiredNumber = (label: string) =>
-  v.pipe(
-    v.union([v.string(), v.number(), v.undefined()]),
-    v.transform((value) => {
-      if (value === undefined) {
-        return NaN
-      }
-      if (typeof value === 'number') return value
+const typed = (rules: v.GenericSchema<number>) => v.pipe(fromText, rules)
 
-      const trimmed = value.trim()
-
-      if (trimmed === '') {
-        return NaN
-      }
-
-      return Number(trimmed)
-    }),
-    v.number(`${label} must be a number.`),
-    v.finite(`${label} must be a finite number.`)
-  )
-
-// Same upper limits as the main process's run check (shared), so they're
-// reported while typing rather than only when Run is clicked
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const positiveInteger = (label: string, max: number) =>
-  v.pipe(
-    requiredNumber(label),
-    v.integer(`${label} must be a whole number.`),
-    v.minValue(1, `${label} must be greater than 0.`),
-    v.maxValue(max, `${label} must be at most ${max.toLocaleString('en-CA')}.`)
-  )
 /**
  * Decision rules
  */
 const decisionRuleSchema = v.object({
   type: v.pipe(
-    v.picklist(['superiority', 'futility'], 'Select a decision rule type.'),
+    v.picklist(DECISION_RULE_TYPES, 'Select a decision rule type.'),
     v.check((t) => t === 'superiority', 'Only superiority rules are currently supported.')
   ),
 
-  direction: v.picklist(['greater', 'less'], 'Select greater than or less than.'),
+  direction: v.picklist(DIRECTIONS, 'Select greater than or less than.'),
 
-  margin: v.pipe(requiredNumber(L.margin), v.minValue(0, `${L.margin} must be at least 0.`)),
+  margin: typed(NUMBER_FIELDS.margin),
 
-  threshold: v.pipe(
-    requiredNumber(L.threshold),
-    v.minValue(0, `${L.threshold} must be at least 0.`),
-    v.maxValue(1, `${L.threshold} must be at most 1.`)
-  )
+  threshold: typed(NUMBER_FIELDS.threshold)
 })
 
 const commonDesignFields = {
-  N: positiveInteger(L.N, MAX_SAMPLE_SIZE),
+  N: typed(NUMBER_FIELDS.N),
 
-  m0: positiveInteger(L.m0, MAX_SAMPLE_SIZE),
+  m0: typed(NUMBER_FIELDS.m0),
 
-  m: positiveInteger(L.m, MAX_SAMPLE_SIZE),
+  m: typed(NUMBER_FIELDS.m),
 
-  R: positiveInteger(L.R, MAX_SIMULATED_TRIALS),
+  R: typed(NUMBER_FIELDS.R),
 
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
     v.minLength(1, 'Add at least one decision rule.')
   ),
 
-  corePercent: v.optional(v.picklist([25, 50, 75, 100], 'Select a core usage percentage.'))
+  corePercent: v.optional(v.picklist(CORE_PERCENTS, 'Select a core usage percentage.'))
 }
 
 const binaryDesignSchema = v.object({
   outcomeType: v.literal('binary'),
 
-  probability: v.pipe(
-    requiredNumber(L.probability),
-    v.gtValue(0, `${L.probability} must be greater than 0.`),
-    v.ltValue(1, `${L.probability} must be less than 1.`)
-  ),
+  probability: typed(NUMBER_FIELDS.probability),
 
   treatmentEffectType: v.pipe(
-    v.picklist(['oddsRatio', 'riskDifference', 'riskRatio'], 'Please select a treatment effect.'),
+    v.picklist(TREATMENT_EFFECT_TYPES, 'Please select a treatment effect.'),
     v.check((t) => t === 'oddsRatio', 'Only odds ratio is currently supported.')
   ),
 
-  treatmentEffect: v.pipe(
-    requiredNumber(L.treatmentEffect),
-    v.gtValue(0, `${L.treatmentEffect} (odds ratio) must be greater than 0.`)
-  ),
+  treatmentEffect: typed(NUMBER_FIELDS.treatmentEffect),
 
   ...commonDesignFields
 })
@@ -97,29 +85,29 @@ const binaryDesignSchema = v.object({
 const continuousDesignSchema = v.object({
   outcomeType: v.literal('continuous'),
 
-  meanOutcome: requiredNumber(L.meanOutcome),
+  meanOutcome: typed(NUMBER_FIELDS.meanOutcome),
 
-  meanDiff: requiredNumber(L.meanDiff),
+  meanDiff: typed(NUMBER_FIELDS.meanDiff),
 
-  sd: v.pipe(requiredNumber(L.sd), v.gtValue(0, `${L.sd} must be greater than 0.`)),
+  sd: typed(NUMBER_FIELDS.sd),
 
   ...commonDesignFields
 })
 
+// Can't be picked yet (the option is disabled), so only basic checks
 const ordinalDesignSchema = v.object({
   outcomeType: v.literal('ordinal'),
 
-  probability: requiredNumber(L.probability),
+  probability: typed(anyNumber(L.probability)),
 
-  treatmentEffectType: v.picklist(
-    ['oddsRatio', 'riskDifference', 'riskRatio'],
-    'Please select a treatment effect.'
-  ),
+  treatmentEffectType: v.picklist(TREATMENT_EFFECT_TYPES, 'Please select a treatment effect.'),
 
-  treatmentEffect: requiredNumber(L.treatmentEffect),
+  treatmentEffect: typed(anyNumber(L.treatmentEffect)),
 
   ...commonDesignFields
 })
+
+const { burnInBelowMaximum, interimFitsAfterBurnIn, oddsRatioMargin } = CROSS_FIELD_RULES
 
 export const designSchema = v.pipe(
   v.variant(
@@ -128,25 +116,22 @@ export const designSchema = v.pipe(
     'Please select an outcome type.'
   ),
   /**
-   * Cross-field validation
+   * Cross-field validation, each shown under one field
    */
   v.forward(
-    v.check((data) => data.N > data.m0, `${L.N} must be greater than the ${L.m0.toLowerCase()}.`),
+    v.check((data) => burnInBelowMaximum.holds(data), burnInBelowMaximum.message),
     ['N']
   ),
 
   v.forward(
-    v.check(
-      (data) => data.m < data.N - data.m0,
-      `${L.m} must be less than the ${L.N.toLowerCase()} minus the ${L.m0.toLowerCase()}.`
-    ),
+    v.check((data) => interimFitsAfterBurnIn.holds(data), interimFitsAfterBurnIn.message),
     ['m']
   ),
 
   v.forward(
     v.check(
-      (data) => data.outcomeType !== 'binary' || data.decisionRules.every((r) => r.margin > 0),
-      `${L.margin} must be greater than 0 for an odds ratio.`
+      (data) => data.outcomeType !== 'binary' || oddsRatioMargin.holds(data.decisionRules),
+      oddsRatioMargin.message
     ),
     ['decisionRules', 0, 'margin']
   )

@@ -72,8 +72,8 @@ describe('checkSimulationRunInput messages', () => {
     const checked = checkSimulationRunInput({ ...valid, m0: 216 })
     expect(checked.success).toBe(false)
     if (!checked.success) {
-      expect(checked.message).toContain(FIELD_LABELS.m0)
-      expect(checked.message).toContain(FIELD_LABELS.N.toLowerCase())
+      expect(checked.message).toContain(FIELD_LABELS.N)
+      expect(checked.message).toContain(FIELD_LABELS.m0.toLowerCase())
     }
   })
 })

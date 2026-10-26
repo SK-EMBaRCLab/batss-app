@@ -1,4 +1,4 @@
-import type { DecisionRule } from '@shared/simulation-types'
+import type { DecisionRule, OutcomeType } from '@shared/simulation-types'
 import { MoveHorizontal } from 'lucide-react'
 import { type ReactElement } from 'react'
 
@@ -10,7 +10,7 @@ type DecisionRulePreviewProps = {
   rule: DecisionRule
   value: number
   formula: string
-  type: 'binary' | 'continuous' | 'ordinal' | undefined
+  type: OutcomeType | undefined
   onMarginChange?: (margin: number) => void
   stale?: boolean
 }

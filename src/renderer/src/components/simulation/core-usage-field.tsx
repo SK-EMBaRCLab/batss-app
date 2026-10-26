@@ -1,5 +1,6 @@
 import { Field as FormischField, useField } from '@formisch/react'
 import { DEFAULT_CORE_PERCENT, resolveCoreCount } from '@shared/cores'
+import { CORE_PERCENTS } from '@shared/design-rules'
 import { type ReactElement, useEffect, useState } from 'react'
 
 import { Label } from '@/components/ui/label'
@@ -7,8 +8,6 @@ import { Slider } from '@/components/ui/slider'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { useFormLocked } from './form-locked'
-
-const CORE_PERCENT_STEPS = [25, 50, 75, 100] as const
 
 /**
  * How many CPU cores BATSS will use to parallelise across simulated
@@ -60,16 +59,14 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
               id="slider-core-usage"
               disabled={locked}
               value={percent}
-              onValueChange={(value) =>
-                field.onChange(value as (typeof CORE_PERCENT_STEPS)[number])
-              }
+              onValueChange={(value) => field.onChange(value as (typeof CORE_PERCENTS)[number])}
               min={25}
               max={100}
               step={25}
             />
 
             <div className="flex justify-between text-xs text-muted-foreground">
-              {CORE_PERCENT_STEPS.map((step) => (
+              {CORE_PERCENTS.map((step) => (
                 <span key={step}>{step}%</span>
               ))}
             </div>

@@ -13,29 +13,27 @@
 // shapes a well-formed file can contain.
 import * as v from 'valibot'
 
+import {
+  CORE_PERCENTS,
+  DECISION_RULE_TYPES,
+  DIRECTIONS,
+  OUTCOME_TYPES,
+  TREATMENT_EFFECT_TYPES
+} from './design-rules'
 import type { SimulationRunResult, StudyDesign } from './simulation-types'
 
 const decisionRuleFileSchema = v.object({
-  type: v.picklist(['superiority', 'futility']),
-  direction: v.picklist(['greater', 'less']),
+  type: v.picklist(DECISION_RULE_TYPES),
+  direction: v.picklist(DIRECTIONS),
   margin: v.number(),
   threshold: v.number()
 })
 
 const designInputFileSchema = v.object({
-  outcomeType: v.optional(
-    v.union([v.literal('binary'), v.literal('continuous'), v.literal('ordinal'), v.undefined()])
-  ),
+  outcomeType: v.optional(v.picklist(OUTCOME_TYPES)),
 
   probability: v.optional(v.number()),
-  treatmentEffectType: v.optional(
-    v.union([
-      v.literal('oddsRatio'),
-      v.literal('riskDifference'),
-      v.literal('riskRatio'),
-      v.undefined()
-    ])
-  ),
+  treatmentEffectType: v.optional(v.picklist(TREATMENT_EFFECT_TYPES)),
   treatmentEffect: v.optional(v.number()),
 
   meanOutcome: v.optional(v.number()),
@@ -49,7 +47,7 @@ const designInputFileSchema = v.object({
   // Must be listed or v.object strips it, and every loaded design falls
   // back to the default CPU share. An unexpected value is dropped (so the
   // default applies) rather than rejecting the whole file.
-  corePercent: v.fallback(v.optional(v.picklist([25, 50, 75, 100])), undefined),
+  corePercent: v.fallback(v.optional(v.picklist(CORE_PERCENTS)), undefined),
 
   decisionRules: v.array(decisionRuleFileSchema)
 })

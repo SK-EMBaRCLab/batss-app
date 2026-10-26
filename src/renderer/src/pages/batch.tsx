@@ -1,5 +1,5 @@
 import type { BatchRowValidation } from '@shared/batch-types'
-import { MAX_BATCH_ROWS } from '@shared/simulation-input-schema'
+import { MAX_BATCH_ROWS } from '@shared/design-rules'
 import { Download, Play, Square, Upload } from 'lucide-react'
 import { type ChangeEvent, type ReactElement, useMemo, useState } from 'react'
 

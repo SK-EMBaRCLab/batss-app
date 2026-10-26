@@ -1,3 +1,4 @@
+import type { DecisionRule, TreatmentEffectType } from '@shared/simulation-types'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -74,11 +75,11 @@ export function decisionRuleFormula({
   threshold,
   treatmentEffectType
 }: {
-  type?: 'superiority' | 'futility'
-  direction?: 'greater' | 'less'
+  type?: DecisionRule['type']
+  direction?: DecisionRule['direction']
   margin?: string | number
   threshold?: string | number
-  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio' | 'meanDifference'
+  treatmentEffectType?: TreatmentEffectType | 'meanDifference'
 }): string {
   const probabilitySymbol = direction === 'greater' ? '>' : '<'
   let treatmentEffect = 'OR'

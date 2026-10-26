@@ -1,5 +1,5 @@
 import { useField } from '@formisch/react'
-import type { DecisionRule } from '@shared/simulation-types'
+import type { DecisionRule, OutcomeType } from '@shared/simulation-types'
 import { type ReactElement, useEffect, useMemo, useState } from 'react'
 
 import { decisionRuleFormula } from '@/lib/utils'
@@ -45,7 +45,7 @@ type PreviewSnapshot = {
   rule: DecisionRule
   value: number
   formula: string
-  type: 'binary' | 'continuous' | 'ordinal' | undefined
+  type: OutcomeType | undefined
 }
 
 export function DecisionRuleCard({ form }: { form: SimulationFormStore }): ReactElement {
@@ -100,7 +100,7 @@ export function DecisionRuleCard({ form }: { form: SimulationFormStore }): React
   const preview = rule ? { rule, value, formula, type: outcomeType.input } : lastValidPreview
   const isStale = !rule && !!preview
 
-  const handleTypeChange = (type: 'superiority' | 'futility'): void => {
+  const handleTypeChange = (type: DecisionRule['type']): void => {
     typeField.onChange(type)
 
     if (type === 'superiority') {

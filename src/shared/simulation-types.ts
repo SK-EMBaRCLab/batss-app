@@ -1,3 +1,17 @@
+import type {
+  CORE_PERCENTS,
+  DECISION_RULE_TYPES,
+  DIRECTIONS,
+  OUTCOME_TYPES,
+  TREATMENT_EFFECT_TYPES
+} from './design-rules'
+
+// The allowed values come from the lists in design-rules.ts, which the
+// checks use too, so a new option is added in one place
+export type OutcomeType = (typeof OUTCOME_TYPES)[number]
+export type TreatmentEffectType = (typeof TREATMENT_EFFECT_TYPES)[number]
+export type CorePercent = (typeof CORE_PERCENTS)[number]
+
 type SimulationRunCommon = {
   N: number
   m0: number
@@ -13,7 +27,7 @@ type SimulationRunCommon = {
    * itself. Optional for backward compatibility with designs saved
    * before this setting existed.
    */
-  corePercent?: 25 | 50 | 75 | 100
+  corePercent?: CorePercent
 }
 
 type BinarySimulationRunInput = {
@@ -21,7 +35,7 @@ type BinarySimulationRunInput = {
 
   probability: number
 
-  treatmentEffectType: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+  treatmentEffectType: TreatmentEffectType
 
   treatmentEffect: number
 } & SimulationRunCommon
@@ -44,8 +58,8 @@ export type SimulationRunInput =
   BinarySimulationRunInput | ContinuousSimulationRunInput | OrdinalSimulationRunInput
 
 export type DecisionRule = {
-  type: 'superiority' | 'futility'
-  direction: 'greater' | 'less'
+  type: (typeof DECISION_RULE_TYPES)[number]
+  direction: (typeof DIRECTIONS)[number]
   margin: number
   threshold: number
 }
@@ -97,10 +111,10 @@ export interface SimulationResultEntry {
 }
 
 export type DesignInput = {
-  outcomeType?: 'binary' | 'continuous' | 'ordinal'
+  outcomeType?: OutcomeType
 
   probability?: number
-  treatmentEffectType?: 'oddsRatio' | 'riskDifference' | 'riskRatio'
+  treatmentEffectType?: TreatmentEffectType
   treatmentEffect?: number
 
   meanOutcome?: number
@@ -113,7 +127,7 @@ export type DesignInput = {
   R: number
   decisionRules: DecisionRule[]
 
-  corePercent?: 25 | 50 | 75 | 100
+  corePercent?: CorePercent
 }
 
 /**

@@ -1,4 +1,4 @@
-import { DecisionRule } from '@shared/simulation-types'
+import { DecisionRule, OutcomeType } from '@shared/simulation-types'
 import { type ReactElement, useMemo, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
@@ -7,7 +7,7 @@ import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/
 type DecisionChartProps = {
   rule: DecisionRule
   value: number
-  type: 'binary' | 'continuous' | 'ordinal' | undefined
+  type: OutcomeType | undefined
   onMarginChange?: (margin: number) => void
 }
 
@@ -30,7 +30,7 @@ function normalDensity(x: number, mean: number, standardDeviation: number): numb
   return coefficient * Math.exp(exponent)
 }
 
-function getChartType(type: 'binary' | 'continuous' | 'ordinal' | undefined): {
+function getChartType(type: OutcomeType | undefined): {
   key: string
   label: string
   x: number

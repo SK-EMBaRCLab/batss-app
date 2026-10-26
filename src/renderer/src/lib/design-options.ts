@@ -1,7 +1,8 @@
+import type { OutcomeType } from '@shared/simulation-types'
 import { ChartSpline, CircleDot, ListOrdered, type LucideIcon } from 'lucide-react'
 
 export const outcomeTypes: Array<{
-  value: 'binary' | 'continuous' | 'ordinal'
+  value: OutcomeType
   label: string
   icon: LucideIcon
   enabled: boolean
