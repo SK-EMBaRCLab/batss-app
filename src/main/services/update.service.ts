@@ -29,9 +29,9 @@ type Listener = (state: UpdateState) => void
  *    the renderer always offers a "View releases on GitHub" fallback
  *    so a user is never stuck with no path to update.
  *  - Linux: electron-updater only knows how to self-update the
- *    AppImage target. .deb/.snap installs (also built — see
- *    electron-builder.yml) are managed by the OS package
- *    manager/snapd instead; checkForUpdates() will error out for
+ *    AppImage target. .deb installs (also built — see
+ *    electron-builder.yml) are managed by the OS package manager
+ *    instead; checkForUpdates() will error out for
  *    those, which — again — just surfaces as a normal error state with
  *    the GitHub releases fallback. The AppImage restart itself always
  *    relaunches with an empty argv (see AppImageUpdater.doInstall in

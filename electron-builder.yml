@@ -46,9 +46,11 @@ linux:
   # One PNG per size: the hicolor icon theme only looks in the sizes it
   # defines (up to 512x512), so a lone 1024px PNG never shows up
   icon: build/icons
+  # No snap: it was never published (release.yml doesn't upload *.snap), and
+  # building it alongside the AppImage intermittently failed the whole
+  # Linux job (both unpack the same tool into electron-builder's cache)
   target:
     - AppImage
-    - snap
     - deb
   maintainer: Arlene Jiang <arlene.jiang@sickkids.ca>
   category: Utility
