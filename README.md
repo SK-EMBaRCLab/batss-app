@@ -84,7 +84,7 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 **To build or develop Albatross:**
 
-- Node.js 22.x or later (current Active LTS)
+- Node.js 24.x (the current LTS; see `.nvmrc`). The Docker environment and the release builds use the same version.
 - npm
 - R, as above (only needed to actually run a simulation; not required to build the app itself)
 - [Docker](https://www.docker.com/) and Docker Compose, if you'd rather develop inside a container than install Node/R locally

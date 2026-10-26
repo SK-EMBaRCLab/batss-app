@@ -6,6 +6,9 @@
   "main": "./out/main/index.js",
   "author": "https://lab.research.sickkids.ca/heath/",
   "homepage": "https://github.com/SK-EMBaRCLab/batss-app",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache . --fix",
