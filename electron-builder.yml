@@ -31,6 +31,10 @@ nsis:
   createDesktopShortcut: always
 mac:
   icon: build/icon.icns
+  # Only the .dmg: updates are installed from it by hand (see
+  # src/main/services/mac-update.ts), so the .zip Squirrel.Mac would use
+  # isn't built. The .dmg alone still produces latest-mac.yml.
+  target: dmg
   # Ad hoc signing needs no Apple account, but users must still allow the app.
   identity: '-'
   hardenedRuntime: false

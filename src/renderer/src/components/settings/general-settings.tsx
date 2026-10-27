@@ -179,6 +179,7 @@ export function UpdatesSetting(): ReactElement {
 
   const status = useUpdate((state) => state.status)
   const progress = useUpdate((state) => state.progress)
+  const manual = useUpdate((state) => state.manual)
   const advance = useUpdate((state) => state.advance)
   const isBusy = status === 'checking' || status === 'downloading'
 
@@ -196,7 +197,7 @@ export function UpdatesSetting(): ReactElement {
       </ItemContent>
       <ItemActions>
         <Button onClick={() => void advance()} disabled={isBusy}>
-          {updateButtonLabel(status, progress)}
+          {updateButtonLabel(status, progress, manual)}
         </Button>
       </ItemActions>
     </Item>

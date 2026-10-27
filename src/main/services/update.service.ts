@@ -3,6 +3,7 @@ import { autoUpdater } from 'electron-updater'
 import { withReference } from '../../shared/error-reference'
 import type { UpdateState } from '../../shared/update-types'
 import { recordError } from './error-log.service'
+import { downloadDiskImage, findDiskImage, openDiskImage, type ReleaseInfo } from './mac-update'
 
 type Listener = (state: UpdateState) => void
 
@@ -22,12 +23,13 @@ type Listener = (state: UpdateState) => void
  *  - Windows (NSIS): fully supported — differential download + silent
  *    install via quitAndInstall.
  *  - macOS: releases are ad hoc signed, not notarized (see
- *    electron-builder.yml). Squirrel.Mac can still download and apply
- *    updates, but on some macOS versions/Gatekeeper configurations the
- *    signature check on the downloaded update can fail. That surfaces
- *    here as a normal 'error' state — same as any other failure — and
- *    the renderer always offers a "View releases on GitHub" fallback
- *    so a user is never stuck with no path to update.
+ *    electron-builder.yml), and Squirrel.Mac won't install them. So the
+ *    check still uses latest-mac.yml, but Download fetches the release's
+ *    .dmg into the Downloads folder (see mac-update.ts) and the last step
+ *    opens it in Finder for the user to drag into Applications. Those
+ *    states carry `manual: true` so the renderer words them that way.
+ *    Any failure is a normal 'error' state, with the renderer's "View
+ *    releases on GitHub" fallback.
  *  - Linux: both targets self-update. A .deb install is recognised by
  *    the resources/package-type file electron-builder adds, and the
  *    update is installed with dpkg (apt-get as a fallback) through
@@ -54,6 +56,11 @@ class UpdateService {
   // Which step a failure belongs to, for its message
   private phase: 'check' | 'download' = 'check'
 
+  // macOS: the release found by the last check, and its downloaded .dmg
+  private readonly manual = process.platform === 'darwin'
+  private release: ReleaseInfo | null = null
+  private diskImagePath: string | null = null
+
   init(): void {
     if (this.initialized) return
     this.initialized = true
@@ -75,6 +82,7 @@ class UpdateService {
     })
 
     autoUpdater.on('update-available', (info) => {
+      this.release = info
       this.set({
         status: 'available',
         message: `Update ${info.version} available`,
@@ -147,6 +155,8 @@ class UpdateService {
       silent: false
     })
 
+    if (this.manual) return this.downloadDiskImage()
+
     try {
       await autoUpdater.downloadUpdate()
     } catch (error) {
@@ -160,12 +170,50 @@ class UpdateService {
   // close handler (index.ts) asks to save before anything quits.
   install(): void {
     if (this.state.status !== 'downloaded') return
+    if (this.manual) {
+      // Can be done again, e.g. if the user closed the Finder window
+      if (this.diskImagePath) void openDiskImage(this.diskImagePath)
+      return
+    }
     autoUpdater.quitAndInstall(true, true)
   }
 
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener)
     return () => this.listeners.delete(listener)
+  }
+
+  private async downloadDiskImage(): Promise<void> {
+    const image = this.release && findDiskImage(this.release)
+    const version = this.state.version
+    // Sent to the window only when the whole percentage changes
+    let shown = 0
+
+    try {
+      if (!image) throw new Error('The release has no .dmg listed in latest-mac.yml')
+
+      this.diskImagePath = await downloadDiskImage(image, (percent) => {
+        if (Math.floor(percent) === shown) return
+        shown = Math.floor(percent)
+        this.set({
+          status: 'downloading',
+          message: `Downloading update… ${shown}%`,
+          version,
+          progress: percent,
+          silent: false
+        })
+      })
+      this.set({
+        status: 'downloaded',
+        message: `Update ${version} downloaded`,
+        version,
+        progress: 100,
+        manual: true,
+        silent: false
+      })
+    } catch (error) {
+      this.fail(error, false)
+    }
   }
 
   // The updater's raw errors can include URLs, HTTP status and server

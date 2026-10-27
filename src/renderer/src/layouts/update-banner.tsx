@@ -15,6 +15,7 @@ export function UpdateBanner(): ReactElement | null {
   const version = useUpdate((state) => state.version)
   const error = useUpdate((state) => state.error)
   const silent = useUpdate((state) => state.silent)
+  const manual = useUpdate((state) => state.manual)
   const install = useUpdate((state) => state.install)
   const download = useUpdate((state) => state.download)
 
@@ -68,10 +69,14 @@ export function UpdateBanner(): ReactElement | null {
       <Banner
         variant="success"
         title={message}
-        description="Restart Albatross to finish installing it."
+        description={
+          manual
+            ? 'Open it in Finder, quit Albatross, then drag Albatross into Applications and choose Replace.'
+            : 'Restart Albatross to finish installing it.'
+        }
         action={
           <Button size="sm" onClick={() => install()}>
-            Restart & Install
+            {manual ? 'Open in Finder' : 'Restart & Install'}
           </Button>
         }
         dismissible

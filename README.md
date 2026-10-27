@@ -335,7 +335,7 @@ On every merged release PR, GitHub Actions builds and uploads:
 
 - **Linux** — `.AppImage` (portable) and `.deb` package
 - **Windows** — `.exe` NSIS installer
-- **macOS** — `.dmg` disk image (Apple Silicon), plus the `.zip` the auto-updater installs
+- **macOS** — `.dmg` disk image (Apple Silicon). Albatross also updates from it: it downloads the `.dmg` and opens it in Finder, and the user drags Albatross into Applications (unsigned macOS apps can't install their own updates)
 
 Each platform also gets a `latest*.yml` file (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`), which is what installed copies on that platform check for updates. If a platform fails to build, the others are still published, but the run then fails with a "Missing from the release" error naming what's absent. Re-run the failed job from the Actions tab (**Re-run failed jobs**) to add the missing files to the same release.
 
@@ -371,7 +371,7 @@ Dependabot's `github-actions` ecosystem can automate this (it bumps the SHA and 
 
 **Electron fuses.** `electron-builder.yml` sets `electronFuses` so a packaged Albatross can't be used to run other code: `runAsNode`, `NODE_OPTIONS` and `--inspect` are disabled, the app only loads from its own `app.asar`, and on macOS and Windows a modified `app.asar` won't load.
 
-**Updates are downloaded only on request.** Releases aren't code-signed yet, so the auto-updater can only check a download against a hash published in the same GitHub release. Albatross therefore never downloads an update by itself: when one is available it offers a **Download** button, and installing still needs **Restart & Install**.
+**Updates are downloaded only on request.** Releases aren't code-signed yet, so the auto-updater can only check a download against a hash published in the same GitHub release. Albatross therefore never downloads an update by itself: when one is available it offers a **Download** button, and installing still needs **Restart & Install** (on macOS, dragging the new copy into Applications).
 
 **Still to do:** code-sign the Windows build (and set `publisherName` so the updater verifies it), and sign and notarize the macOS build with an Apple Developer ID. Signing certificates must be stored as GitHub Actions secrets, never in the repository.
 

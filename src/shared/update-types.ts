@@ -12,4 +12,7 @@ export type UpdateState = {
   // about "up to date"/errors on launch while still surfacing a real
   // update via the normal banner.
   silent?: boolean
+  // True on macOS once the update's disk image is downloaded: the user
+  // installs it by dragging Albatross into Applications, not by restarting.
+  manual?: boolean
 }

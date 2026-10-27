@@ -8,8 +8,9 @@ type UpdateStore = UpdateState & {
   check: (silent?: boolean) => Promise<void>
   download: () => Promise<void>
   install: () => void
-  // Whatever comes next: install a downloaded update, download an
-  // available one, otherwise check. Used by every "update" button.
+  // Whatever comes next: install a downloaded update (on macOS, open it
+  // in Finder), download an available one, otherwise check. Used by
+  // every "update" button.
   advance: () => Promise<void>
 }
 
