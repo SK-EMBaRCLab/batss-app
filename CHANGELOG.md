@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.8.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.5...v5.8.0) (2026-10-27)
+
+
+### Features
+
+* **update:** on macOS, download the .dmg and open it in Finder instead of auto-installing ([13082ca](https://github.com/SK-EMBaRCLab/batss-app/commit/13082ca77fc886b893a54f938ceb10c42a67b091))
+
 ## [5.7.5](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.4...v5.7.5) (2026-10-26)
 
 
