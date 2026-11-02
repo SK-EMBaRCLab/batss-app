@@ -1,58 +1,71 @@
 import { type ReactElement, useEffect, useRef } from 'react'
 
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockLine
+} from '@/components/ui/code-block'
 import { cn } from '@/lib/utils'
-
-import { ScrollArea } from '../ui/scroll-area'
 
 type LogViewerProps = {
   logs: string[]
   className?: string
   header?: ReactElement
+  failed?: boolean
 }
 
-export function LogViewer({ logs, className, header }: LogViewerProps): ReactElement {
-  const logScrollRef = useRef<HTMLDivElement>(null)
+export function LogViewer({
+  logs,
+  className,
+  header,
+  failed = false
+}: LogViewerProps): ReactElement {
+  const contentRef = useRef<HTMLPreElement>(null)
   // Follow new output only while the user is at (or near) the bottom, so
   // scrolling up to read something isn't undone by the next line
   const followRef = useRef(true)
 
-  const getViewport = (): HTMLDivElement | null | undefined =>
-    logScrollRef.current?.querySelector<HTMLDivElement>('[data-slot="scroll-area-viewport"]')
-
   useEffect(() => {
-    const viewport = getViewport()
-    if (!viewport) return
+    const content = contentRef.current
+    if (!content) return
 
     const onScroll = (): void => {
-      const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight
+      const distanceFromBottom = content.scrollHeight - content.scrollTop - content.clientHeight
       followRef.current = distanceFromBottom < 24
     }
 
-    viewport.addEventListener('scroll', onScroll, { passive: true })
-    return () => viewport.removeEventListener('scroll', onScroll)
+    content.addEventListener('scroll', onScroll, { passive: true })
+    return () => content.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
-    const viewport = getViewport()
-    if (viewport && followRef.current) {
-      viewport.scrollTop = viewport.scrollHeight
+    const content = contentRef.current
+    if (content && followRef.current) {
+      content.scrollTop = content.scrollHeight
     }
   }, [logs])
 
   return (
-    <ScrollArea
-      ref={logScrollRef}
-      className={cn('h-full rounded-md border border-border bg-black p-3', className)}
+    <CodeBlock
+      size="sm"
+      variant={failed ? 'destructive' : 'default'}
+      className={cn('h-full', className)}
     >
-      <div className="font-mono text-xs text-green-400">
+      {logs.length > 0 && (
+        <CodeBlockActions>
+          <CodeBlockCopyButton value={logs.join('\n')} />
+        </CodeBlockActions>
+      )}
+
+      <CodeBlockContent ref={contentRef} wrap className="flex-1">
         {header}
 
         {logs.map((line, i) => (
-          <div key={i} className="whitespace-pre-wrap break-all">
-            {line}
-          </div>
+          <CodeBlockLine key={i}>{line}</CodeBlockLine>
         ))}
-      </div>
-    </ScrollArea>
+      </CodeBlockContent>
+    </CodeBlock>
   )
 }

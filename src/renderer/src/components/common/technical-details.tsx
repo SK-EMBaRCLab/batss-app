@@ -52,7 +52,7 @@ export function TechnicalDetails({
       />
 
       <CollapsibleContent>
-        <LogViewer logs={logs} className="mt-2 h-48" header={header} />
+        <LogViewer logs={logs} className="mt-2 h-48" header={header} failed={failed} />
       </CollapsibleContent>
     </Collapsible>
   )
