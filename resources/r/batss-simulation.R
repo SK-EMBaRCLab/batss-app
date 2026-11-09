@@ -33,7 +33,7 @@ logit <- function(p) {
 }
 
 input <- jsonlite::fromJSON(
-  Sys.getenv("ALBATROSS_BATSS_INPUT"),
+  Sys.getenv("BATSS_STUDIO_INPUT"),
   simplifyVector = FALSE
 )
 
@@ -133,7 +133,7 @@ if (!is.null(scenario_error)) {
       list(status = "error", message = scenario_error),
       auto_unbox = TRUE
     ),
-    Sys.getenv("ALBATROSS_BATSS_OUTPUT")
+    Sys.getenv("BATSS_STUDIO_OUTPUT")
   )
 
   quit(save = "no", status = 0)
@@ -193,5 +193,5 @@ result <- list(
 
 writeLines(
   jsonlite::toJSON(result, auto_unbox = TRUE, force = TRUE, null = "null"),
-  Sys.getenv("ALBATROSS_BATSS_OUTPUT")
+  Sys.getenv("BATSS_STUDIO_OUTPUT")
 )

@@ -21,8 +21,8 @@ done
 ``` `resources/icon.png` is
 the same launcher design used by BrowserWindow.
 
-Renderer sources are `albatross-brand.svg`, `albatross-light.svg`, and
-`albatross-dark.svg` under `src/renderer/src/assets/`.
+Renderer sources are `batss-studio-brand.svg`, `batss-studio-light.svg`, and
+`batss-studio-dark.svg` under `src/renderer/src/assets/`.
 
 Settings > App Icon defaults to Follow theme, which resolves Light, Dark,
 and System using Electron's effective native theme. Teal, Light, and Dark

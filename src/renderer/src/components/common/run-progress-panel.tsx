@@ -30,7 +30,7 @@ const SUCCESS_HIDE_MS = 10_000
 
 // Whether the panel is collapsed to its header, remembered across runs
 // and sessions
-const COLLAPSED_KEY = 'albatross:run-panel-collapsed'
+const COLLAPSED_KEY = 'batss-studio:run-panel-collapsed'
 
 function pageFor(kind: RunKind): 'simulation' | 'batch' {
   return kind === 'batch' ? 'batch' : 'simulation'

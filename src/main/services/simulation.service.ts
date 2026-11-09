@@ -15,8 +15,8 @@ import { engineService } from './engine.service'
 import { recordError } from './error-log.service'
 import { settingsService } from './settings.service'
 
-const BATSS_INPUT_ENV = 'ALBATROSS_BATSS_INPUT'
-const BATSS_OUTPUT_ENV = 'ALBATROSS_BATSS_OUTPUT'
+const BATSS_INPUT_ENV = 'BATSS_STUDIO_INPUT'
+const BATSS_OUTPUT_ENV = 'BATSS_STUDIO_OUTPUT'
 
 // BATSS/INLA runs are usually seconds to a few minutes, but a
 // pathological set of inputs (huge N/R, a model that fails to
@@ -178,7 +178,7 @@ export class SimulationService {
     let tmpDir: string | null = null
 
     try {
-      tmpDir = await mkdtemp(path.join(os.tmpdir(), 'albatross-'))
+      tmpDir = await mkdtemp(path.join(os.tmpdir(), 'batss-studio-'))
       const outputPath = path.join(tmpDir, 'result.json')
 
       await this.r.executeFile(

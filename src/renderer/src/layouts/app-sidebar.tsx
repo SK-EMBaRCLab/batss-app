@@ -1,9 +1,9 @@
 import { resolveIconVariant } from '@shared/appearance-types'
 import { type ReactElement } from 'react'
 
-import albatrossBrand from '@/assets/albatross-brand.svg'
-import albatrossDark from '@/assets/albatross-dark.svg'
-import albatrossLight from '@/assets/albatross-light.svg'
+import brandIcon from '@/assets/batss-studio-brand.svg'
+import darkIcon from '@/assets/batss-studio-dark.svg'
+import lightIcon from '@/assets/batss-studio-light.svg'
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,7 @@ export function AppSidebar(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const isDark = useTheme((state) => state.isDark)
   const iconAppearance = useTheme((state) => state.iconAppearance)
-  const icon = { brand: albatrossBrand, light: albatrossLight, dark: albatrossDark }[
+  const icon = { brand: brandIcon, light: lightIcon, dark: darkIcon }[
     resolveIconVariant(iconAppearance, isDark)
   ]
 

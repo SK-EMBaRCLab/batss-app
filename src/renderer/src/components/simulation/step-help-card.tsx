@@ -8,7 +8,7 @@ import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
 
 // Whether the help card beside the form is expanded, remembered across
 // sessions
-const HELP_OPEN_KEY = 'albatross:simulation-help-open'
+const HELP_OPEN_KEY = 'batss-studio:simulation-help-open'
 
 /** The current step's help, in a card beside the simulation form (lg and up). */
 export function StepHelpCard({

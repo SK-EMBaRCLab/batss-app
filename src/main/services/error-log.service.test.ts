@@ -20,7 +20,7 @@ function logEntries(): Record<string, string>[] {
 
 describe('recordError', () => {
   beforeEach(() => {
-    userData.dir = mkdtempSync(path.join(tmpdir(), 'albatross-test-'))
+    userData.dir = mkdtempSync(path.join(tmpdir(), 'batss-studio-test-'))
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
   })
 

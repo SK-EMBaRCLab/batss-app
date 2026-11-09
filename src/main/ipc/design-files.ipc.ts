@@ -90,7 +90,7 @@ export function clearUnsavedDesignChanges(): void {
   designHasUnsavedChanges = false
 }
 
-export function registerAlbatrossFilesIPC(): void {
+export function registerDesignFilesIPC(): void {
   on(IPC.design.dirty, (_event, dirty: unknown) => {
     designHasUnsavedChanges = dirty === true
   })

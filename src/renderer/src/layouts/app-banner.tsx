@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { readStorage, writeStorage } from '@/lib/storage'
 import { useRuntime } from '@/stores/runtime'
 
-const DISMISSED_BANNER_KEY = 'albatross:dismissed-banner'
+const DISMISSED_BANNER_KEY = 'batss-studio:dismissed-banner'
 
 export function AppBanner(): ReactElement | null {
   const [dismissedKey, setDismissedKey] = useState<string | null>(() =>

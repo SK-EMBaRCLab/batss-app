@@ -5,13 +5,13 @@ import { join } from 'path'
 
 import icon from '../../resources/icon.png?asset'
 import { IPC } from '../shared/ipc-channels'
+import { registerAppIPC } from './ipc/app.ipc'
+import { registerBatchIPC } from './ipc/batch.ipc'
 import {
   clearUnsavedDesignChanges,
   hasUnsavedDesignChanges,
-  registerAlbatrossFilesIPC
-} from './ipc/albatross-files.ipc'
-import { registerAppIPC } from './ipc/app.ipc'
-import { registerBatchIPC } from './ipc/batch.ipc'
+  registerDesignFilesIPC
+} from './ipc/design-files.ipc'
 import { registerEngineIPC } from './ipc/engine.ipc'
 import { registerRuntimeIPC } from './ipc/runtime.ipc'
 import { registerSettingsIPC } from './ipc/settings.ipc'
@@ -266,7 +266,7 @@ if (!isRelaunching) {
 
     registerSettingsIPC()
 
-    registerAlbatrossFilesIPC()
+    registerDesignFilesIPC()
 
     registerBatchIPC()
 

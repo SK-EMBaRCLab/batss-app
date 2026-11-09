@@ -139,7 +139,7 @@ The container provides a Linux environment with Node, R, and every system librar
 2. **Open a shell inside it:**
 
    ```bash
-   docker exec -it albatross-dev bash
+   docker exec -it batss-studio-dev bash
    ```
 
 3. **Install dependencies and run the app** (inside the container):

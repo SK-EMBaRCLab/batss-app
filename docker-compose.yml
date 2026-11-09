@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    container_name: albatross-dev
+    container_name: batss-studio-dev
 
     user: '${UID}:${GID}'
 
