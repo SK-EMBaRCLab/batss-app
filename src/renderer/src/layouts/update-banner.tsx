@@ -71,8 +71,8 @@ export function UpdateBanner(): ReactElement | null {
         title={message}
         description={
           manual
-            ? 'Open it in Finder, quit Albatross, then drag Albatross into Applications and choose Replace.'
-            : 'Restart Albatross to finish installing it.'
+            ? 'Open it in Finder, quit BATSS Studio, then drag BATSS Studio into Applications and choose Replace.'
+            : 'Restart BATSS Studio to finish installing it.'
         }
         action={
           <Button size="sm" onClick={() => install()}>

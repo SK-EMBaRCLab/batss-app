@@ -41,7 +41,7 @@ export function ColorSchemeSetting(): ReactElement {
       <ItemContent>
         <ItemTitle>Color Scheme</ItemTitle>
         <ItemDescription>
-          Choose whether Albatross follows the system, light, or dark theme.
+          Choose whether BATSS Studio follows the system, light, or dark theme.
         </ItemDescription>
       </ItemContent>
       <ItemActions>
@@ -98,7 +98,7 @@ export function AppIconSetting(): ReactElement {
         <ItemTitle>App Icon</ItemTitle>
         <ItemDescription>
           Follow the color scheme or choose a fixed icon for the sidebar and macOS Dock. The Dock
-          icon updates while Albatross is running.
+          icon updates while BATSS Studio is running.
         </ItemDescription>
       </ItemContent>
       <ItemActions>
@@ -158,7 +158,7 @@ export function NotifySetting(): ReactElement {
         <ItemTitle>Notify me when a run finishes</ItemTitle>
         <ItemDescription>
           Shows a system notification, with your system&apos;s notification sound, when a simulation
-          or batch finishes, even while Albatross is open.
+          or batch finishes, even while BATSS Studio is open.
         </ItemDescription>
       </ItemContent>
       <ItemActions>

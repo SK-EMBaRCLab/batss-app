@@ -69,7 +69,7 @@ export function OutputLocationSetting(): ReactElement {
             <FieldDescription>
               {setting.isDirty
                 ? 'Unsaved changes.'
-                : 'Files created by Albatross are written here.'}
+                : 'Files created by BATSS Studio are written here.'}
             </FieldDescription>
 
             {setting.error && <FieldError>{setting.error}</FieldError>}

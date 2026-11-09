@@ -29,7 +29,7 @@ export function AppError({ error, resetErrorBoundary }: FallbackProps): ReactEle
             </div>
 
             <div className="space-y-1">
-              <CardTitle>Albatross encountered an unexpected error</CardTitle>
+              <CardTitle>BATSS Studio encountered an unexpected error</CardTitle>
 
               <CardDescription>
                 The application could not recover from an unexpected problem. You can try reloading

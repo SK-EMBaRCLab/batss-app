@@ -1,6 +1,6 @@
 {
-  "name": "albatross",
-  "desktopName": "albatross",
+  "name": "batss-studio",
+  "desktopName": "batss-studio",
   "version": "5.8.0",
   "description": "Facilitating Adaptive Bayesian Clinical (ABC) Trial Design using Integrated Nested Laplace Approximations (INLA): ABC-INLA",
   "main": "./out/main/index.js",

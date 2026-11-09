@@ -6,7 +6,7 @@
   "include-component-in-tag": false,
   "packages": {
     ".": {
-      "package-name": "albatross",
+      "package-name": "batss-studio",
       "changelog-path": "CHANGELOG.md"
     }
   }

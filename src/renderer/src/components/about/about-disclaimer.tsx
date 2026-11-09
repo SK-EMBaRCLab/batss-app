@@ -9,9 +9,9 @@ export function AboutDisclaimer(): ReactElement {
       <TriangleAlert />
       <AlertTitle>Research tool, not a substitute for formal review</AlertTitle>
       <AlertDescription className="text-yellow-900/80 dark:text-yellow-200/80">
-        Albatross is developed by the Heath Lab at SickKids to support methodological work and trial
-        planning discussions — it is not intended to replace formal statistical review of a trial
-        protocol.
+        BATSS Studio is developed by the Heath Lab at SickKids to support methodological work and
+        trial planning discussions — it is not intended to replace formal statistical review of a
+        trial protocol.
       </AlertDescription>
     </Alert>
   )

@@ -1,9 +1,9 @@
-# Albatross
+# BATSS Studio
 
 ![Status](https://img.shields.io/badge/status-early%20alpha-red)
 
 > [!WARNING]
-> Albatross is in **early alpha**. Features are under active development, and the application may contain bugs or undergo significant changes. Feedback and issue reports are welcome.
+> BATSS Studio is in **early alpha**. Features are under active development, and the application may contain bugs or undergo significant changes. Feedback and issue reports are welcome.
 
 A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design using Integrated Nested Laplace Approximations (INLA): ABC-INLA
 
@@ -23,7 +23,7 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
 
 ## Table of Contents
 
-- [Albatross](#albatross)
+- [BATSS Studio](#batss-studio)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Features](#features)
@@ -51,13 +51,13 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
 
 ## About
 
-Albatross is a desktop application for designing and simulating **two-arm Bayesian adaptive clinical trials**, built around the [BATSS](https://batss-dev.github.io/BATSS/) R package (**B**ayesian **A**daptive **T**rial **S**imulator **S**oftware) and [INLA](https://www.r-inla.org/) (Integrated Nested Laplace Approximation) for fast Bayesian inference.
+BATSS Studio is a desktop application for designing and simulating **two-arm Bayesian adaptive clinical trials**, built around the [BATSS](https://batss-dev.github.io/BATSS/) R package (**B**ayesian **A**daptive **T**rial **S**imulator **S**oftware) and [INLA](https://www.r-inla.org/) (Integrated Nested Laplace Approximation) for fast Bayesian inference.
 
-Rather than hand-writing simulation scripts in R, Albatross walks you through a guided wizard to configure a trial design — outcome type (binary or continuous), treatment effect assumptions, sample size and interim analysis schedule, and a decision rule — then runs the simulation locally using your machine's R installation. Results are presented as interactive tables and charts: simulated trial outcome probabilities under the null and target-effect scenarios, and sample size distributions across simulated trials.
+Rather than hand-writing simulation scripts in R, BATSS Studio walks you through a guided wizard to configure a trial design — outcome type (binary or continuous), treatment effect assumptions, sample size and interim analysis schedule, and a decision rule — then runs the simulation locally using your machine's R installation. Results are presented as interactive tables and charts: simulated trial outcome probabilities under the null and target-effect scenarios, and sample size distributions across simulated trials.
 
 Every design and its accumulated simulation runs are saved to a single `.design` file, so you can revisit, compare, and re-run a design without losing prior results. A batch-processing mode lets you run many designs from a CSV in one pass.
 
-> ⚠️ Albatross is a research and trial-design exploration tool developed by the [Heath Lab](https://lab.research.sickkids.ca/heath/) at SickKids. It is intended to support methodological work and trial planning discussions, not to replace formal statistical review of a trial protocol.
+> ⚠️ BATSS Studio is a research and trial-design exploration tool developed by the [Heath Lab](https://lab.research.sickkids.ca/heath/) at SickKids. It is intended to support methodological work and trial planning discussions, not to replace formal statistical review of a trial protocol.
 
 ---
 
@@ -81,10 +81,10 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 **To run a downloaded release:**
 
-- [R](https://www.r-project.org/) installed and on your system (version 4.5.x recommended; other recent versions are generally compatible). Albatross detects your R installation automatically — see [How It Works](#how-it-works) — and installs the required R packages (`BATSS`, `INLA`, `fmesher`, `jsonlite`) into an app-private library on first launch, so no manual `install.packages()` step is needed.
+- [R](https://www.r-project.org/) installed and on your system (version 4.5.x recommended; other recent versions are generally compatible). BATSS Studio detects your R installation automatically — see [How It Works](#how-it-works) — and installs the required R packages (`BATSS`, `INLA`, `fmesher`, `jsonlite`) into an app-private library on first launch, so no manual `install.packages()` step is needed.
 - On Linux, installing from source requires standard build tooling (a C/Fortran toolchain, `cmake`) and the geospatial libraries INLA's dependencies need (GDAL, GEOS, PROJ, UDUNITS). See the [Dockerfile](Dockerfile) for the exact package list used in the containerised dev environment.
 
-**To build or develop Albatross:**
+**To build or develop BATSS Studio:**
 
 - Node.js 24.x (the current LTS; see `.nvmrc`). The Docker environment and the release builds use the same version.
 - npm
@@ -101,11 +101,11 @@ macOS releases are ad hoc signed, without an Apple Developer ID or Apple
 notarization. macOS may therefore block the first launch even when the app's
 signature is valid.
 
-1. Download the DMG from this repository's releases and drag Albatross into
+1. Download the DMG from this repository's releases and drag BATSS Studio into
    **Applications**.
-2. Try opening Albatross once.
+2. Try opening BATSS Studio once.
 3. If macOS blocks it, open **System Settings → Privacy & Security**, find the
-   Albatross message, and choose **Open Anyway** if available. Confirm the prompt
+   BATSS Studio message, and choose **Open Anyway** if available. Confirm the prompt
    only if you trust the download.
 
 For an older release that reports the app as damaged, download a newer release
@@ -209,7 +209,7 @@ Simulations themselves (R, BATSS, INLA) and the screens aren't tested automatica
 ## Project Structure
 
 ```
-albatross/
+batss-app/
 ├── .github/workflows/          # CI: release-please + multi-platform build/publish
 ├── resources/
 │   ├── icon.png                # App icon
@@ -248,11 +248,11 @@ albatross/
 
 ## How It Works
 
-1. **Runtime bootstrap** — on launch, Albatross searches common install locations for `Rscript` (including the Windows registry, since the CRAN installer doesn't add R to `PATH` by default), checks whether `BATSS`, `INLA`, `fmesher`, and `jsonlite` are installed in an app-private R library, and installs anything missing before the app becomes usable.
+1. **Runtime bootstrap** — on launch, BATSS Studio searches common install locations for `Rscript` (including the Windows registry, since the CRAN installer doesn't add R to `PATH` by default), checks whether `BATSS`, `INLA`, `fmesher`, and `jsonlite` are installed in an app-private R library, and installs anything missing before the app becomes usable.
 2. **Design the trial** — the simulation wizard collects the outcome type, treatment effect assumptions, sample size/interim schedule, and a decision rule, validating inputs at every step.
-3. **Run the simulation** — Albatross serializes the design to JSON and runs `resources/r/batss-simulation.R` via your local `Rscript`, streaming live log output back to the UI. Results are read back from a temporary file rather than parsed from console output, so nothing from R/INLA's own logging can corrupt them.
+3. **Run the simulation** — BATSS Studio serializes the design to JSON and runs `resources/r/batss-simulation.R` via your local `Rscript`, streaming live log output back to the UI. Results are read back from a temporary file rather than parsed from console output, so nothing from R/INLA's own logging can corrupt them.
 4. **Review results** — each run is appended to the open `.design` file with its own results (outcome probability tables/charts, sample size distributions), so you can compare runs against each other over time.
-5. **Batch mode** — for exploring many design variations at once, upload a CSV (see the in-app template) and Albatross validates and runs each row sequentially, saving every result into the same design.
+5. **Batch mode** — for exploring many design variations at once, upload a CSV (see the in-app template) and BATSS Studio validates and runs each row sequentially, saving every result into the same design.
 
 ---
 
@@ -260,7 +260,7 @@ albatross/
 
 ### Error Log
 
-When something goes wrong unexpectedly (a simulation crashing, R setup failing, an update not downloading), Albatross shows a short message with a **reference** such as `Reference: 7F3A-92CD` instead of the raw technical error. Raw errors can contain file paths, usernames and server details, and aren't meaningful to most users.
+When something goes wrong unexpectedly (a simulation crashing, R setup failing, an update not downloading), BATSS Studio shows a short message with a **reference** such as `Reference: 7F3A-92CD` instead of the raw technical error. Raw errors can contain file paths, usernames and server details, and aren't meaningful to most users.
 
 The full details are saved under that same reference in an error log file, so a problem report that quotes the reference can be matched to exactly what happened.
 
@@ -268,13 +268,13 @@ The full details are saved under that same reference in an error log file, so a 
 
 The easiest way is **Settings → Error Log → Show Error Log**, which opens your file manager with the log selected (or its folder, if nothing has been recorded yet). Settings also shows the full path.
 
-The file is `logs/errors.log` in Albatross's data folder:
+The file is `logs/errors.log` in BATSS Studio's data folder:
 
-| Platform | Location                                                  |
-| -------- | --------------------------------------------------------- |
-| macOS    | `~/Library/Application Support/albatross/logs/errors.log` |
-| Windows  | `%APPDATA%\albatross\logs\errors.log`                     |
-| Linux    | `~/.config/albatross/logs/errors.log`                     |
+| Platform | Location                                                     |
+| -------- | ------------------------------------------------------------ |
+| macOS    | `~/Library/Application Support/BATSS Studio/logs/errors.log` |
+| Windows  | `%APPDATA%\BATSS Studio\logs\errors.log`                     |
+| Linux    | `~/.config/BATSS Studio/logs/errors.log`                     |
 
 #### What's in it
 
@@ -291,12 +291,12 @@ One line per error, in JSON:
 
 - `time`: when it happened (UTC)
 - `reference`: the reference shown in the app
-- `context`: what Albatross was doing, e.g. `simulation`, `runtime check`, `update download`
+- `context`: what BATSS Studio was doing, e.g. `simulation`, `runtime check`, `update download`
 - `details`: the full error and stack trace
 
 #### Good to know
 
-- The log **stays on your computer**; Albatross never uploads it.
+- The log **stays on your computer**; BATSS Studio never uploads it.
 - It's kept small: each entry is capped at 8 KB, and once the file passes about 256 KB the oldest half is dropped.
 - It can contain local file paths and your username, so look it over before sharing it publicly (for example in a GitHub issue).
 - Expected messages, such as validation errors or "R is not installed", aren't logged; they're shown in full because they're written for users.
@@ -335,13 +335,13 @@ On every merged release PR, GitHub Actions builds and uploads:
 
 - **Linux** — `.AppImage` (portable) and `.deb` package
 - **Windows** — `.exe` NSIS installer
-- **macOS** — `.dmg` disk image (Apple Silicon). Albatross also updates from it: it downloads the `.dmg` and opens it in Finder, and the user drags Albatross into Applications (unsigned macOS apps can't install their own updates)
+- **macOS** — `.dmg` disk image (Apple Silicon). BATSS Studio also updates from it: it downloads the `.dmg` and opens it in Finder, and the user drags BATSS Studio into Applications (unsigned macOS apps can't install their own updates)
 
 Each platform also gets a `latest*.yml` file (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`), which is what installed copies on that platform check for updates. If a platform fails to build, the others are still published, but the run then fails with a "Missing from the release" error naming what's absent. Re-run the failed job from the Actions tab (**Re-run failed jobs**) to add the missing files to the same release.
 
 ### Release Security
 
-Whoever can change a release can change what every installed copy of Albatross runs, so the release pipeline is locked down.
+Whoever can change a release can change what every installed copy of BATSS Studio runs, so the release pipeline is locked down.
 
 **Least-privilege jobs.** `.github/workflows/release.yml` grants no token permissions by default; each job asks only for what it needs:
 
@@ -369,9 +369,9 @@ gh api repos/softprops/action-gh-release/commits/v2.6.3 -q .sha
 
 Dependabot's `github-actions` ecosystem can automate this (it bumps the SHA and the comment together in a PR) if it's set up for this repository.
 
-**Electron fuses.** `electron-builder.yml` sets `electronFuses` so a packaged Albatross can't be used to run other code: `runAsNode`, `NODE_OPTIONS` and `--inspect` are disabled, the app only loads from its own `app.asar`, and on macOS and Windows a modified `app.asar` won't load.
+**Electron fuses.** `electron-builder.yml` sets `electronFuses` so a packaged BATSS Studio can't be used to run other code: `runAsNode`, `NODE_OPTIONS` and `--inspect` are disabled, the app only loads from its own `app.asar`, and on macOS and Windows a modified `app.asar` won't load.
 
-**Updates are downloaded only on request.** Releases aren't code-signed yet, so the auto-updater can only check a download against a hash published in the same GitHub release. Albatross therefore never downloads an update by itself: when one is available it offers a **Download** button, and installing still needs **Restart & Install** (on macOS, dragging the new copy into Applications).
+**Updates are downloaded only on request.** Releases aren't code-signed yet, so the auto-updater can only check a download against a hash published in the same GitHub release. BATSS Studio therefore never downloads an update by itself: when one is available it offers a **Download** button, and installing still needs **Restart & Install** (on macOS, dragging the new copy into Applications).
 
 **Still to do:** code-sign the Windows build (and set `publisherName` so the updater verifies it), and sign and notarize the macOS build with an Apple Developer ID. Signing certificates must be stored as GitHub Actions secrets, never in the repository.
 

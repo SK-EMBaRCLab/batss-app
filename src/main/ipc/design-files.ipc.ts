@@ -42,7 +42,7 @@ function rememberChosenPath(filePath: string): void {
 const MAX_DESIGN_FILE_BYTES = 100 * 1024 * 1024
 
 /**
- * The JSON to write for `data`, after checking it's a design Albatross
+ * The JSON to write for `data`, after checking it's a design BATSS Studio
  * could open again. Throws otherwise; the renderer shows a generic "Could
  * not save" message. The original data is written, not the checked copy,
  * which would silently drop any field the file schema doesn't list.
@@ -69,7 +69,7 @@ async function saveViaDialog(data: StudyDesign, text: string): Promise<SaveResul
 
   const { canceled, filePath } = await dialog.showSaveDialog({
     defaultPath,
-    filters: [{ name: 'Albatross Study Design', extensions: [DESIGN_FILE_EXTENSION] }]
+    filters: [{ name: 'BATSS Studio Study Design', extensions: [DESIGN_FILE_EXTENSION] }]
   })
 
   if (canceled || !filePath) return { saved: false }
@@ -187,7 +187,7 @@ export function registerDesignFilesIPC(): void {
       defaultPath: settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
       filters: [
         {
-          name: 'Albatross Study Design',
+          name: 'BATSS Studio Study Design',
           extensions: [DESIGN_FILE_EXTENSION]
         }
       ],
@@ -207,7 +207,7 @@ export function registerDesignFilesIPC(): void {
           type: 'error',
           title: 'Invalid Design File',
           message: 'This file could not be opened.',
-          detail: 'It is far larger than any Albatross design file.'
+          detail: 'It is far larger than any BATSS Studio design file.'
         })
         return null
       }
@@ -244,7 +244,7 @@ export function registerDesignFilesIPC(): void {
       await dialog.showMessageBox({
         type: 'error',
         title: 'Invalid Design File',
-        message: "This file doesn't match the expected Albatross design format.",
+        message: "This file doesn't match the expected BATSS Studio design format.",
         detail: validation.issues.slice(0, 5).join('\n')
       })
 

@@ -65,14 +65,14 @@ export function RuntimeScreen(): ReactElement {
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Albatross</CardTitle>
+          <CardTitle className="text-2xl">BATSS Studio</CardTitle>
 
           <CardDescription>
             {isError
               ? "We couldn't finish setting up"
               : isReady
                 ? "You're all set"
-                : 'Setting up Albatross'}
+                : 'Setting up BATSS Studio'}
           </CardDescription>
         </CardHeader>
 
@@ -85,9 +85,9 @@ export function RuntimeScreen(): ReactElement {
 
           {isWorking && (
             <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
-              Albatross uses R, a free statistics program, along with a couple of add-on packages it
-              needs to run simulations. The first time you open Albatross, it checks for these and
-              installs anything missing — this only happens once.
+              BATSS Studio uses R, a free statistics program, along with a couple of add-on packages
+              it needs to run simulations. The first time you open BATSS Studio, it checks for these
+              and installs anything missing — this only happens once.
             </p>
           )}
 
@@ -110,7 +110,7 @@ export function RuntimeScreen(): ReactElement {
           {isError && (
             <div className="space-y-2 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm">
               <p className="font-medium text-destructive">
-                Albatross couldn&apos;t find or set up R, the statistics program it needs to run
+                BATSS Studio couldn&apos;t find or set up R, the statistics program it needs to run
                 simulations.
               </p>
               <p className="text-muted-foreground">

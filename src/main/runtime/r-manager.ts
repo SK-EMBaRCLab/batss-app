@@ -291,7 +291,7 @@ export class RManager {
 
     // R_LIBS and R_LIBS_SITE (e.g. from the user's own R setup) would come
     // before R_LIBS_USER in .libPaths(), so packages could be installed
-    // into, and loaded from, a folder outside Albatross's private library
+    // into, and loaded from, a folder outside BATSS Studio's private library
     const inherited: NodeJS.ProcessEnv = { ...process.env }
     delete inherited.R_LIBS
     delete inherited.R_LIBS_SITE

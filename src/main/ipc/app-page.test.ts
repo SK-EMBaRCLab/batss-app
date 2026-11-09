@@ -2,9 +2,9 @@ import { describe, expect, test } from 'vitest'
 
 import { matchesAppPage } from './app-page'
 
-const MAC_PAGE = 'file:///Users/sam/Albatross%20App/out/renderer/index.html'
+const MAC_PAGE = 'file:///Users/sam/BATSS%20Studio/out/renderer/index.html'
 const WINDOWS_PAGE =
-  'file:///C:/Program%20Files/Albatross/resources/app.asar/out/renderer/index.html'
+  'file:///C:/Program%20Files/BATSS%20Studio/resources/app.asar/out/renderer/index.html'
 
 describe('matchesAppPage', () => {
   test('accepts the bundled page', () => {
@@ -12,7 +12,7 @@ describe('matchesAppPage', () => {
   })
 
   test('accepts the bundled page whether spaces are encoded or not', () => {
-    const unencoded = 'file:///Users/sam/Albatross App/out/renderer/index.html'
+    const unencoded = 'file:///Users/sam/BATSS Studio/out/renderer/index.html'
     expect(matchesAppPage(unencoded, MAC_PAGE, undefined, false)).toBe(true)
   })
 

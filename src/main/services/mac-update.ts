@@ -2,7 +2,7 @@
 // Apple Developer ID, so Squirrel.Mac refuses to install them ("Restart &
 // Install" fails). Instead the release's .dmg is downloaded to the
 // Downloads folder, checked against the hash in latest-mac.yml and opened
-// in Finder, where the user drags Albatross into Applications.
+// in Finder, where the user drags BATSS Studio into Applications.
 import { createHash } from 'crypto'
 import { app, net, shell } from 'electron'
 import { createWriteStream } from 'fs'
@@ -87,7 +87,7 @@ export async function downloadDiskImage(
   return destination
 }
 
-/** Opens the disk image (Finder shows Albatross next to Applications), or shows it in Finder if that fails. */
+/** Opens the disk image (Finder shows BATSS Studio next to Applications), or shows it in Finder if that fails. */
 export async function openDiskImage(path: string): Promise<void> {
   const problem = await shell.openPath(path)
   if (problem) shell.showItemInFolder(path)

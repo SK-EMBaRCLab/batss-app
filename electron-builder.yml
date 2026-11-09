@@ -1,5 +1,5 @@
-appId: com.albatross.app
-productName: albatross
+appId: ca.embarclab.batss-studio
+productName: BATSS Studio
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 # Electron fuses, flipped in the packaged binary. Stops anything else on
-# the machine running code as Albatross (as plain Node, via NODE_OPTIONS or
+# the machine running code as BATSS Studio (as plain Node, via NODE_OPTIONS or
 # a debugger) and checks app.asar hasn't been altered (macOS/Windows).
 electronFuses:
   runAsNode: false
@@ -22,7 +22,7 @@ electronFuses:
   onlyLoadAppFromAsar: true
   enableCookieEncryption: true
 win:
-  executableName: albatross
+  executableName: batss-studio
   icon: build/icon.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}

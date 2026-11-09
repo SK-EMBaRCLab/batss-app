@@ -1,4 +1,4 @@
-# Albatross app icons
+# BATSS Studio app icons
 
 Palette follows `src/renderer/src/assets/globals.css` (OKLCH converted to sRGB):
 

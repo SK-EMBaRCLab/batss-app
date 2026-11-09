@@ -78,7 +78,7 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          apps=(dist/mac*/albatross.app)
+          apps=(dist/mac*/"BATSS Studio.app")
           for app in "${apps[@]}"; do
             test -d "$app"
             codesign --verify --deep --strict --verbose=2 "$app"

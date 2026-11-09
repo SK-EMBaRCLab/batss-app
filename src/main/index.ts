@@ -21,8 +21,13 @@ import { on } from './ipc/trusted-ipc'
 import { registerUpdateIPC } from './ipc/update.ipc'
 import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
+import { pinAppIdentity } from './services/filesystem/app-paths'
 import { settingsService } from './services/settings.service'
 import { simulationService } from './services/simulation.service'
+
+// First, before the Linux relaunch below: every process, including the
+// short-lived relaunch bridge, must agree on the data folder
+pinAppIdentity()
 
 let mainWindow: BrowserWindow | null = null
 let forceClose = false
@@ -43,7 +48,7 @@ const isHeadlessContainer = process.env.ELECTRON_DISABLE_GPU === '1' && !app.isP
 // app.commandLine.appendSwitch() alone isn't reliably honored by the
 // GPU process on every Wayland setup — what actually works is a real
 // `--ozone-platform=x11` process argument, the same as launching with
-// `./Albatross.AppImage --ozone-platform=x11` by hand. That matters
+// `./batss-studio.AppImage --ozone-platform=x11` by hand. That matters
 // here because electron-updater's AppImage restart
 // (AppImageUpdater.doInstall, in electron-updater) always relaunches
 // with an empty argv, silently dropping that flag and breaking
@@ -241,10 +246,10 @@ function createWindow(): void {
 // real instance for the same resources.
 if (!isRelaunching) {
   app.whenReady().then(() => {
-    electronApp.setAppUserModelId('com.albatross.app')
+    electronApp.setAppUserModelId('ca.embarclab.batss-studio')
 
     // Electron grants most web permissions (camera, microphone, location,
-    // ...) by default. Albatross needs none of them; notifications come
+    // ...) by default. BATSS Studio needs none of them; notifications come
     // from main. Clipboard writes are the one exception, for the "Copy
     // details" buttons.
     const allowPermission = (permission: string): boolean =>
@@ -285,8 +290,6 @@ if (!isRelaunching) {
 
       mainWindow?.close()
     })
-
-    app.setName('albatross')
 
     createWindow()
 

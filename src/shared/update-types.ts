@@ -13,6 +13,6 @@ export type UpdateState = {
   // update via the normal banner.
   silent?: boolean
   // True on macOS once the update's disk image is downloaded: the user
-  // installs it by dragging Albatross into Applications, not by restarting.
+  // installs it by dragging BATSS Studio into Applications, not by restarting.
   manual?: boolean
 }

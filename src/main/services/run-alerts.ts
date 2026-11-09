@@ -100,7 +100,7 @@ export function alertSimulationFinished(
     window,
     { kind: 'simulation', outcome: 'error' },
     'Simulation failed',
-    'Open Albatross to see what went wrong.'
+    'Open BATSS Studio to see what went wrong.'
   )
 }
 
@@ -125,7 +125,7 @@ export function alertBatchFinished(
       window,
       { kind: 'batch', outcome: 'error' },
       'Batch stopped',
-      `${runs}. Open Albatross for details.`
+      `${runs}. Open BATSS Studio for details.`
     )
   }
 }

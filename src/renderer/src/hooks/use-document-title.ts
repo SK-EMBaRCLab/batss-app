@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { useDesign } from '@/stores/design'
 
-const APP_NAME = 'Albatross'
+const APP_NAME = 'BATSS Studio'
 
 // Two complementary "is this edited?" signals:
 //  - document.title drives the title/taskbar/dock label on every
