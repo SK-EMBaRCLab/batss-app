@@ -131,23 +131,35 @@ export function fieldsFor(
   )
 }
 
-export function decisionRuleSummary(input: DesignSnapshot): string {
-  const rule = input.decisionRules?.[0]
-  if (!rule) return ''
+const RULE_TITLES = {
+  superiority: 'Superiority rule',
+  futility: 'Futility rule'
+} as const satisfies Record<DecisionRule['type'], string>
+
+const RULE_ORDER: DecisionRule['type'][] = ['superiority', 'futility']
+
+/**
+ * Each rule's title and formula, superiority first, for the review step
+ * and the dashboard. The formula's direction follows the treatment effect.
+ */
+export function decisionRuleSummaries(
+  input: DesignSnapshot
+): { type: DecisionRule['type']; title: string; formula: string }[] {
+  if (input.outcomeType !== 'binary' && input.outcomeType !== 'continuous') return []
 
   const direction = effectDirection(input)
+  const treatmentEffectType =
+    input.outcomeType === 'continuous' ? 'meanDifference' : input.treatmentEffectType
 
-  if (input.outcomeType === 'binary') {
-    return decisionRuleFormula({
-      ...rule,
-      direction,
-      treatmentEffectType: input.treatmentEffectType
-    })
-  }
-
-  if (input.outcomeType === 'continuous') {
-    return decisionRuleFormula({ ...rule, direction, treatmentEffectType: 'meanDifference' })
-  }
-
-  return ''
+  return RULE_ORDER.flatMap((type) => {
+    const rule = input.decisionRules?.find((candidate) => candidate?.type === type)
+    if (!rule) return []
+    return [
+      {
+        type,
+        title: RULE_TITLES[type],
+        formula: decisionRuleFormula({ ...rule, direction, treatmentEffectType })
+      }
+    ]
+  })
 }

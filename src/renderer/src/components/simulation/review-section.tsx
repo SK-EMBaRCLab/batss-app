@@ -6,7 +6,7 @@ import { Fragment, type ReactElement, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { decisionRuleSummary, type DesignSnapshot, fieldsFor } from '@/lib/design-fields'
+import { decisionRuleSummaries, type DesignSnapshot, fieldsFor } from '@/lib/design-fields'
 import { estimateSimulationDuration, formatEstimatedDurationRange } from '@/lib/duration-estimate'
 import type { SimulationFormStore } from '@/types/form-types'
 
@@ -45,8 +45,6 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
   const corePercent = useField(form, { path: ['corePercent'] })
   const rules = useField(form, { path: ['decisionRules'] })
 
-  const rule = rules.input[0]
-
   const [cpuCount, setCpuCount] = useState<number | null>(null)
   useEffect(() => {
     window.app.cpuCount().then(setCpuCount)
@@ -78,8 +76,10 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
     m0: m0.input,
     m: m.input,
     R: R.input,
-    decisionRules: rule ? [rule] : []
+    decisionRules: rules.input ?? []
   }
+
+  const ruleSummaries = decisionRuleSummaries(snapshot)
 
   return (
     <div className="space-y-4">
@@ -136,13 +136,13 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
         <CardHeader>
           <CardTitle className="text-base">Decision Rules</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md bg-muted p-3 text-sm">
-            <div className="font-medium">
-              Rule 1: <span className="capitalize">{rule?.type}</span>
+        <CardContent className="space-y-2">
+          {ruleSummaries.map((rule) => (
+            <div key={rule.type} className="rounded-md bg-muted p-3 text-sm">
+              <div className="font-medium">{rule.title}</div>
+              <div className="font-mono">{rule.formula}</div>
             </div>
-            <div className="font-mono">{decisionRuleSummary(snapshot)}</div>
-          </div>
+          ))}
         </CardContent>
       </Card>
 

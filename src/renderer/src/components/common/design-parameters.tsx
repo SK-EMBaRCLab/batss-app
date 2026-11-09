@@ -2,7 +2,7 @@ import type { DesignInput, SimulationRunInput } from '@shared/simulation-types'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { Separator } from '@/components/ui/separator'
-import { decisionRuleSummary, fieldsFor } from '@/lib/design-fields'
+import { decisionRuleSummaries, fieldsFor } from '@/lib/design-fields'
 
 export function DesignParams({
   input
@@ -32,7 +32,9 @@ export function DesignParams({
       <Separator className="h-px" />
 
       <ParameterSection title="Decision & Simulation">
-        <Parameter label="Decision Rule" value={decisionRuleSummary(input)} />
+        {decisionRuleSummaries(input).map((rule) => (
+          <Parameter key={rule.type} label={rule.title} value={rule.formula} />
+        ))}
         {fieldsFor(input.outcomeType, 'simulation').map((field) => (
           <Parameter key={field.key} label={field.label} value={field.value(input)} />
         ))}
