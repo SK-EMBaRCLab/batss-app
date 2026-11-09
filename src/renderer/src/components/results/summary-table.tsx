@@ -1,3 +1,4 @@
+import { SIMULATION_OUTCOMES } from '@shared/design-rules'
 import { SimulationSummaryRow } from '@shared/simulation-types'
 import type { ReactElement } from 'react'
 
@@ -10,7 +11,15 @@ import {
   TableRow
 } from '@/components/ui/table'
 
+// R leaves out a scenario's value when no simulated trial ended that way
+const proportion = (value: number | undefined): string => (value ?? 0).toFixed(3)
+
 export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactElement {
+  // Always superior, futility, inconclusive, whatever order R gives them in
+  const ordered = [...rows].sort(
+    (a, b) => SIMULATION_OUTCOMES.indexOf(a.Outcome) - SIMULATION_OUTCOMES.indexOf(b.Outcome)
+  )
+
   return (
     <Table>
       <TableHeader>
@@ -22,13 +31,13 @@ export function SummaryTable({ rows }: { rows: SimulationSummaryRow[] }): ReactE
       </TableHeader>
 
       <TableBody>
-        {rows.map((row) => (
+        {ordered.map((row) => (
           <TableRow key={row.Outcome}>
             <TableCell className="font-bold">{row.Outcome}</TableCell>
 
-            <TableCell>{row['Null Effect']?.toFixed(3)}</TableCell>
+            <TableCell>{proportion(row['Null Effect'])}</TableCell>
 
-            <TableCell>{row['Target Effect']?.toFixed(3)}</TableCell>
+            <TableCell>{proportion(row['Target Effect'])}</TableCell>
           </TableRow>
         ))}
       </TableBody>
