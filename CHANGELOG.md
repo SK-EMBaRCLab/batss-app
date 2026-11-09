@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.9.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.8.0...v5.9.0) (2026-11-02)
+
+
+### Features
+
+* **logs:** show run output in a theme-aware code block ([3ca3f4d](https://github.com/SK-EMBaRCLab/batss-app/commit/3ca3f4d1a7a83090b73a1251d7009d2eabd540b7))
+
 ## [5.8.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.7.5...v5.8.0) (2026-10-27)
 
 
