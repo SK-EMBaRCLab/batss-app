@@ -21,13 +21,16 @@ import { on } from './ipc/trusted-ipc'
 import { registerUpdateIPC } from './ipc/update.ipc'
 import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
-import { pinAppIdentity } from './services/filesystem/app-paths'
+import { migrateLegacyDataFolder, pinAppIdentity } from './services/filesystem/app-paths'
 import { settingsService } from './services/settings.service'
 import { simulationService } from './services/simulation.service'
 
 // First, before the Linux relaunch below: every process, including the
-// short-lived relaunch bridge, must agree on the data folder
+// short-lived relaunch bridge, must agree on the data folder. The first
+// process also moves the old Albatross folder over, before the bridge or
+// Electron can create an empty new one.
 pinAppIdentity()
+migrateLegacyDataFolder()
 
 let mainWindow: BrowserWindow | null = null
 let forceClose = false
