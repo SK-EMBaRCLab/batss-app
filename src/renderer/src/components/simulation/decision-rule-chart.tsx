@@ -1,3 +1,4 @@
+import type { Direction } from '@shared/effect-direction'
 import { DecisionRule, OutcomeType } from '@shared/simulation-types'
 import { type ReactElement, useMemo, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
@@ -6,6 +7,7 @@ import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/
 
 type DecisionChartProps = {
   rule: DecisionRule
+  direction: Direction
   value: number
   type: OutcomeType | undefined
   onMarginChange?: (margin: number) => void
@@ -47,8 +49,16 @@ function getChartType(type: OutcomeType | undefined): {
   }
 }
 
+// Short names for the margin line's label
+const MARGIN_ABBREVIATIONS = { superiority: 'SM', futility: 'FM' } as const
+
+// The shaded probability's colour, matching the outcome's bar in the
+// results: yellow for Experimental Superior, blue for Futility
+const REGION_COLOURS = { superiority: 'var(--chart-2)', futility: 'var(--chart-1)' } as const
+
 export function DecisionChart({
   rule,
+  direction,
   value,
   type,
   onMarginChange
@@ -85,7 +95,9 @@ export function DecisionChart({
 
       const distribution = normalDensity(x, value, curveSpread)
 
-      const isDecisionRegion = rule.direction === 'greater' ? x >= rule.margin : x <= rule.margin
+      // The side of the margin whose probability the rule compares with
+      // its cutoff: P(effect > margin) when the effect points up
+      const isDecisionRegion = direction === 'greater' ? x >= rule.margin : x <= rule.margin
 
       return {
         [key]: x,
@@ -97,7 +109,7 @@ export function DecisionChart({
         decisionRegion: isDecisionRegion ? distribution : null
       }
     })
-  }, [min, max, curveSpread, value, rule.margin, rule.direction, type])
+  }, [min, max, curveSpread, value, rule.margin, direction, type])
 
   const chartType = getChartType(type)
 
@@ -193,20 +205,23 @@ export function DecisionChart({
           type="monotone"
           dataKey="decisionRegion"
           stroke="none"
-          fill="var(--chart-2)"
+          fill={REGION_COLOURS[rule.type]}
           fillOpacity={0.55}
         />
 
-        {/* Null odds ratio */}
-        <ReferenceLine x={chartType.x} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
+        {/* No effect (an odds ratio of 1, a mean difference of 0). Left out
+            when the margin is on it, so the two lines don't draw as one */}
+        {rule.margin !== chartType.x && (
+          <ReferenceLine x={chartType.x} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
+        )}
 
-        {/* Superiority margin */}
+        {/* The rule's margin */}
         <ReferenceLine
           x={rule.margin}
           stroke="var(--destructive)"
           strokeWidth={3}
           label={{
-            value: `SM = ${rule.margin}`,
+            value: `${MARGIN_ABBREVIATIONS[rule.type]} = ${rule.margin}`,
             position: 'top'
           }}
         />

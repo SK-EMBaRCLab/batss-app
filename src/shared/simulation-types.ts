@@ -1,8 +1,8 @@
 import type {
   CORE_PERCENTS,
   DECISION_RULE_TYPES,
-  DIRECTIONS,
   OUTCOME_TYPES,
+  SIMULATION_OUTCOMES,
   TREATMENT_EFFECT_TYPES
 } from './design-rules'
 
@@ -11,6 +11,7 @@ import type {
 export type OutcomeType = (typeof OUTCOME_TYPES)[number]
 export type TreatmentEffectType = (typeof TREATMENT_EFFECT_TYPES)[number]
 export type CorePercent = (typeof CORE_PERCENTS)[number]
+export type SimulationOutcome = (typeof SIMULATION_OUTCOMES)[number]
 
 type SimulationRunCommon = {
   N: number
@@ -57,22 +58,27 @@ type OrdinalSimulationRunInput = {
 export type SimulationRunInput =
   BinarySimulationRunInput | ContinuousSimulationRunInput | OrdinalSimulationRunInput
 
+/**
+ * A design has a superiority rule, a futility rule, or one of each.
+ * `threshold` is the rule's cutoff on the posterior probability. Rules
+ * have no direction of their own: it follows the sign of the treatment
+ * effect (see effect-direction.ts).
+ */
 export type DecisionRule = {
   type: (typeof DECISION_RULE_TYPES)[number]
-  direction: (typeof DIRECTIONS)[number]
   margin: number
   threshold: number
 }
 
 export interface SimulationSummaryRow {
-  Outcome: 'Experimental Superior' | 'Inconclusive'
+  Outcome: SimulationOutcome
   'Null Effect': number
   'Target Effect': number
 }
 
 export interface SimulationChartRow {
   Scenario: 'Null Effect' | 'Target Effect'
-  Outcome: 'Experimental Superior' | 'Inconclusive'
+  Outcome: SimulationOutcome
   Proportion: number
 }
 

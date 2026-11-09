@@ -12,7 +12,7 @@ const INPUT = {
   m: 25,
   R: 1000,
   corePercent: 50,
-  decisionRules: [{ type: 'superiority', direction: 'greater', margin: 0, threshold: 0.95 }]
+  decisionRules: [{ type: 'superiority', margin: 1, threshold: 0.95 }]
 }
 
 function designFile(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -44,6 +44,27 @@ describe('parseStudyDesignFile', () => {
       }
     ]
     expect(parseStudyDesignFile(designFile({ results })).success).toBe(true)
+  })
+
+  test('loads a design with both a superiority and a futility rule', () => {
+    const decisionRules = [
+      { type: 'superiority', margin: 1, threshold: 0.95 },
+      { type: 'futility', margin: 1, threshold: 0.05 }
+    ]
+    const parsed = parseStudyDesignFile(designFile({ input: { ...INPUT, decisionRules } }))
+    expect(parsed.success).toBe(true)
+    if (parsed.success) expect(parsed.data.input.decisionRules).toEqual(decisionRules)
+  })
+
+  test('drops the direction older files stored on a rule', () => {
+    const decisionRules = [
+      { type: 'superiority', direction: 'greater', margin: 1, threshold: 0.95 }
+    ]
+    const parsed = parseStudyDesignFile(designFile({ input: { ...INPUT, decisionRules } }))
+    expect(parsed.success).toBe(true)
+    if (parsed.success) {
+      expect(parsed.data.input.decisionRules[0]).not.toHaveProperty('direction')
+    }
   })
 
   test('ignores keys added by a newer version of the app', () => {
@@ -82,6 +103,26 @@ describe('parseSimulationRunResult', () => {
       status: 'error',
       message: 'R failed'
     })
+  })
+
+  test('accepts a result with trials stopped for futility', () => {
+    const result = {
+      status: 'success',
+      package: '1.2.1',
+      table: [
+        { Outcome: 'Futility', 'Null Effect': 0.7, 'Target Effect': 0.1 },
+        { Outcome: 'Inconclusive', 'Null Effect': 0.3, 'Target Effect': 0.9 }
+      ],
+      chart: [
+        { Scenario: 'Null Effect', Outcome: 'Futility', Proportion: 0.7 },
+        { Scenario: 'Null Effect', Outcome: 'Inconclusive', Proportion: 0.3 }
+      ],
+      sampleSize: {
+        H0: { control: [40], experimental: [40] },
+        H1: { control: [100], experimental: [100] }
+      }
+    }
+    expect(parseSimulationRunResult(result)).toEqual(result)
   })
 
   test('returns null for anything else', () => {

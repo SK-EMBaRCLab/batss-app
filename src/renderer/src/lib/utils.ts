@@ -1,3 +1,4 @@
+import type { Direction } from '@shared/effect-direction'
 import type { DecisionRule, TreatmentEffectType } from '@shared/simulation-types'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -76,7 +77,7 @@ export function decisionRuleFormula({
   treatmentEffectType
 }: {
   type?: DecisionRule['type']
-  direction?: DecisionRule['direction']
+  direction?: Direction
   margin?: string | number
   threshold?: string | number
   treatmentEffectType?: TreatmentEffectType | 'meanDifference'

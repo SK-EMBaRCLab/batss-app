@@ -18,10 +18,11 @@ export const FIELD_LABELS = {
   N: 'Maximum sample size',
   R: 'Number of simulated trials',
 
-  decisionRuleType: 'Decision rule type',
-  direction: 'Direction',
-  margin: 'Superiority margin',
-  threshold: 'Decision threshold'
+  // Each rule's fields. The cutoff is stored as `threshold`.
+  superiorityMargin: 'Superiority margin',
+  superiorityThreshold: 'Superiority cutoff',
+  futilityMargin: 'Futility margin',
+  futilityThreshold: 'Futility cutoff'
 } as const
 
 export type LabelledField = keyof typeof FIELD_LABELS

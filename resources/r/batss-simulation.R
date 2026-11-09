@@ -44,9 +44,13 @@ varY <- switch(
   stop("Unsupported outcome distribution")
 )
 
-rule <- input$decisionRules[[1]]
-
-b <- rule$threshold
+# A design has a superiority rule, a futility rule, or one of each
+# (checked in the main process before R runs). A missing rule is NULL.
+find_rule <- function(type) {
+  Find(function(rule) identical(rule$type, type), input$decisionRules)
+}
+superiority <- find_rule("superiority")
+futility <- find_rule("futility")
 
 if (input$outcomeType == "binary") {
   varControl <- list(y = list(size = 1))
@@ -54,15 +58,23 @@ if (input$outcomeType == "binary") {
     logit(input$probability),
     log(input$treatmentEffect)
   )
-  delta.eff <- log(rule$margin)
+  # Odds ratio margins are compared on the log scale, like beta[2]
+  to_delta <- function(margin) log(margin)
 } else if (input$outcomeType == "continuous") {
   varControl <- list(y = list(sd = input$sd))
   beta <- c(
     input$meanOutcome,
     input$meanDiff
   )
-  delta.eff <- rule$margin
+  to_delta <- function(margin) margin
 }
+
+# Each rule's margin on the model's scale. A missing rule gets the other
+# rule's delta: BATSS ignores it (with one rule it uses that rule's delta
+# for both), and it keeps delta.eff and delta.fut identical so BATSS
+# takes its one-delta path rather than being handed a NULL.
+delta.eff <- to_delta(if (is.null(superiority)) futility$margin else superiority$margin)
+delta.fut <- to_delta(if (is.null(futility)) superiority$margin else futility$margin)
 
 trials <- batss.glm(
   model = y ~ group,
@@ -77,10 +89,14 @@ trials <- batss.glm(
   alternative = input$alternative,
   beta = beta,
   which = 2,
-  eff.arm = eff.arm.simple,
-  eff.arm.control = list(b = b),
+  # Superiority: stop if P(effect beyond margin) > cutoff
+  eff.arm = if (is.null(superiority)) NULL else eff.arm.simple,
+  eff.arm.control = if (is.null(superiority)) NULL else list(b = superiority$threshold),
   delta.eff = delta.eff,
-  fut.arm = NULL,
+  # Futility: stop if P(effect beyond margin) < cutoff
+  fut.arm = if (is.null(futility)) NULL else fut.arm.simple,
+  fut.arm.control = if (is.null(futility)) NULL else list(b = futility$threshold),
+  delta.fut = delta.fut,
   N = input$N,
   interim = list(
     recruited = list(
@@ -152,10 +168,12 @@ df <- rbind(
   )
 )
 
+# BATSS's groupExperimental codes: 1 stopped for efficacy, 2 stopped for
+# futility, 0 neither. Must match SIMULATION_OUTCOMES in design-rules.ts.
 df$Outcome <- factor(
   df$Outcome,
-  levels = c(0, 1),
-  labels = c("Inconclusive", "Experimental Superior")
+  levels = c(1, 2, 0),
+  labels = c("Experimental Superior", "Futility", "Inconclusive")
 )
 
 # Reshape to frontend table:

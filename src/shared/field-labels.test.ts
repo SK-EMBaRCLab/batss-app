@@ -55,7 +55,7 @@ describe('checkSimulationRunInput messages', () => {
     m0: 60,
     m: 12,
     R: 10,
-    decisionRules: [{ type: 'superiority', direction: 'greater', margin: 0, threshold: 0.95 }]
+    decisionRules: [{ type: 'superiority', margin: 0, threshold: 0.95 }]
   }
 
   test('accepts a valid input', () => {

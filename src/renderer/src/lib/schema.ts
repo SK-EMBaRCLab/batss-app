@@ -2,13 +2,12 @@ import {
   anyNumber,
   CORE_PERCENTS,
   CROSS_FIELD_RULES,
-  DECISION_RULE_TYPES,
-  DIRECTIONS,
+  DECISION_RULE_FIELDS,
   NUMBER_FIELDS,
   TREATMENT_EFFECT_TYPES
 } from '@shared/design-rules'
 import { FIELD_LABELS as L } from '@shared/field-labels'
-import { DecisionRule, DesignInput } from '@shared/simulation-types'
+import { DecisionRule, DesignInput, OutcomeType } from '@shared/simulation-types'
 import * as v from 'valibot'
 
 // The simulation form's check. Each field's rules (and the rules between
@@ -37,18 +36,23 @@ const typed = (rules: v.GenericSchema<number>) => v.pipe(fromText, rules)
 /**
  * Decision rules
  */
-const decisionRuleSchema = v.object({
-  type: v.pipe(
-    v.picklist(DECISION_RULE_TYPES, 'Select a decision rule type.'),
-    v.check((t) => t === 'superiority', 'Only superiority rules are currently supported.')
-  ),
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const ruleOfType = <T extends keyof typeof DECISION_RULE_FIELDS>(type: T) =>
+  v.object({
+    type: v.literal(type),
 
-  direction: v.picklist(DIRECTIONS, 'Select greater than or less than.'),
+    // A direction from an older design isn't listed, so it's dropped: it
+    // now follows the sign of the treatment effect (shared/effect-direction.ts)
+    margin: typed(DECISION_RULE_FIELDS[type].margin),
 
-  margin: typed(NUMBER_FIELDS.margin),
+    threshold: typed(DECISION_RULE_FIELDS[type].threshold)
+  })
 
-  threshold: typed(NUMBER_FIELDS.threshold)
-})
+const decisionRuleSchema = v.variant(
+  'type',
+  [ruleOfType('superiority'), ruleOfType('futility')],
+  'Select a decision rule type.'
+)
 
 const commonDesignFields = {
   N: typed(NUMBER_FIELDS.N),
@@ -59,9 +63,15 @@ const commonDesignFields = {
 
   R: typed(NUMBER_FIELDS.R),
 
+  // A superiority rule, a futility rule, or one of each
   decisionRules: v.pipe(
     v.array(decisionRuleSchema),
-    v.minLength(1, 'Add at least one decision rule.')
+    v.minLength(1, 'Add at least one decision rule.'),
+    v.maxLength(2, 'A design can have at most two decision rules.'),
+    v.check(
+      (rules) => CROSS_FIELD_RULES.oneRulePerType.holds(rules),
+      CROSS_FIELD_RULES.oneRulePerType.message
+    )
   ),
 
   corePercent: v.optional(v.picklist(CORE_PERCENTS, 'Select a core usage percentage.'))
@@ -107,14 +117,52 @@ const ordinalDesignSchema = v.object({
   ...commonDesignFields
 })
 
-const { burnInBelowMaximum, interimFitsAfterBurnIn, oddsRatioMargin } = CROSS_FIELD_RULES
+const { burnInBelowMaximum, interimFitsAfterBurnIn, oddsRatioMargin, cutoffsDoNotOverlap } =
+  CROSS_FIELD_RULES
+
+type DesignOutput = v.InferOutput<typeof designVariants>
+type RuleOutput = DesignOutput['decisionRules'][number]
+
+const designVariants = v.variant(
+  'outcomeType',
+  [binaryDesignSchema, continuousDesignSchema, ordinalDesignSchema],
+  'Please select an outcome type.'
+)
+
+const ruleAt = (data: DesignOutput, index: number): RuleOutput | undefined =>
+  data.decisionRules[index]
+
+// A design has at most two rules, so each check shown under a rule's own
+// field is added for both places the rule can be
+
+// Under the margin of the rule it's about
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const marginCheckAt = (index: 0 | 1) =>
+  v.forward(
+    v.check(
+      (data: DesignOutput) => {
+        const rule = ruleAt(data, index)
+        return data.outcomeType !== 'binary' || !rule || oddsRatioMargin.holds(rule)
+      },
+      (issue) => oddsRatioMargin.message(ruleAt(issue.input, index)!)
+    ),
+    ['decisionRules', index, 'margin']
+  )
+
+// Under the futility rule's cutoff
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const cutoffCheckAt = (index: 0 | 1) =>
+  v.forward(
+    v.check(
+      (data: DesignOutput) =>
+        ruleAt(data, index)?.type !== 'futility' || cutoffsDoNotOverlap.holds(data.decisionRules),
+      cutoffsDoNotOverlap.message
+    ),
+    ['decisionRules', index, 'threshold']
+  )
 
 export const designSchema = v.pipe(
-  v.variant(
-    'outcomeType',
-    [binaryDesignSchema, continuousDesignSchema, ordinalDesignSchema],
-    'Please select an outcome type.'
-  ),
+  designVariants,
   /**
    * Cross-field validation, each shown under one field
    */
@@ -128,20 +176,26 @@ export const designSchema = v.pipe(
     ['m']
   ),
 
-  v.forward(
-    v.check(
-      (data) => data.outcomeType !== 'binary' || oddsRatioMargin.holds(data.decisionRules),
-      oddsRatioMargin.message
-    ),
-    ['decisionRules', 0, 'margin']
-  )
+  marginCheckAt(0),
+  marginCheckAt(1),
+  cutoffCheckAt(0),
+  cutoffCheckAt(1)
 )
 
-export const defaultDecisionRule: DecisionRule = {
-  type: 'superiority',
-  direction: 'greater',
-  margin: 1,
-  threshold: 0.95
+/**
+ * A new rule's values. The margin is "no effect" on the outcome's scale
+ * (an odds ratio of 1, a mean difference of 0); the cutoffs are the
+ * common 0.95 for superiority and 0.05 for futility.
+ */
+export function defaultDecisionRule(
+  type: DecisionRule['type'],
+  outcomeType: OutcomeType | undefined
+): DecisionRule {
+  return {
+    type,
+    margin: outcomeType === 'continuous' ? 0 : 1,
+    threshold: type === 'superiority' ? 0.95 : 0.05
+  }
 }
 
 export const initialDesignInput: DesignInput = {
@@ -163,7 +217,8 @@ export const initialDesignInput: DesignInput = {
 
   R: 10,
 
-  decisionRules: [defaultDecisionRule],
+  // Added with the decision rules step's buttons; at least one is needed
+  decisionRules: [],
 
   corePercent: 75
 }

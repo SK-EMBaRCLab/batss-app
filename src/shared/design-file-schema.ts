@@ -16,15 +16,17 @@ import * as v from 'valibot'
 import {
   CORE_PERCENTS,
   DECISION_RULE_TYPES,
-  DIRECTIONS,
   OUTCOME_TYPES,
+  SIMULATION_OUTCOMES,
   TREATMENT_EFFECT_TYPES
 } from './design-rules'
 import type { SimulationRunResult, StudyDesign } from './simulation-types'
 
+// Older files also store a direction. It's no longer used (the direction
+// follows the sign of the treatment effect), so it isn't listed and
+// v.object drops it on load.
 const decisionRuleFileSchema = v.object({
   type: v.picklist(DECISION_RULE_TYPES),
-  direction: v.picklist(DIRECTIONS),
   margin: v.number(),
   threshold: v.number()
 })
@@ -53,14 +55,14 @@ const designInputFileSchema = v.object({
 })
 
 const summaryRowFileSchema = v.object({
-  Outcome: v.union([v.literal('Experimental Superior'), v.literal('Inconclusive')]),
+  Outcome: v.picklist(SIMULATION_OUTCOMES),
   'Null Effect': v.optional(v.number()),
   'Target Effect': v.optional(v.number())
 })
 
 const chartRowFileSchema = v.object({
   Scenario: v.union([v.literal('Null Effect'), v.literal('Target Effect')]),
-  Outcome: v.union([v.literal('Experimental Superior'), v.literal('Inconclusive')]),
+  Outcome: v.picklist(SIMULATION_OUTCOMES),
   Proportion: v.number()
 })
 

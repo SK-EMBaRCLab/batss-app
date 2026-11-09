@@ -23,11 +23,7 @@ export function DecisionRuleHelp(): ReactElement {
         </ul>
       </HelpSection>
 
-      <div className="space-y-2">
-        <h4 className="font-medium text-primary">
-          Futility <span className="font-normal">(under development)</span>
-        </h4>
-
+      <HelpSection title="Futility">
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
             A futility rule stops a study early if the probability of eventually demonstrating
@@ -38,32 +34,47 @@ export function DecisionRuleHelp(): ReactElement {
             that continuing the trial is unlikely to change the trial conclusion.
           </li>
         </ul>
-      </div>
+      </HelpSection>
 
-      <HelpSection title={FIELD_LABELS.direction}>
+      <HelpSection title={FIELD_LABELS.superiorityMargin}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
-            Indicates whether a larger or smaller treatment effect is considered beneficial. Use{' '}
-            <strong>Greater than (&gt;)</strong> when higher values are better and{' '}
-            <strong>Less than (&lt;)</strong> when lower values are better.
+            The minimum treatment difference that is clinically meaningful. Trials typically
+            evaluate if there is any treatment benefit by using a superiority margin that denotes a
+            null effect (i.e. 0 for mean difference or other absolute scales and 1 for odds
+            ratio/relative risk or other ratio/relative scales). Alternatively, the minimal
+            clinically important difference could be used as the superiority margin, however, it
+            will be more difficult to declare superiority under this design choice.
           </li>
         </ul>
       </HelpSection>
 
-      <HelpSection title={FIELD_LABELS.margin}>
+      <HelpSection title={FIELD_LABELS.superiorityThreshold}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
-            The minimum treatment difference that is clinically meaningful (i.e., 0 or the minimal
-            clinically important difference).
+            The probability required for the superiority rule to be triggered. Common values include
+            0.90, 0.95, 0.975, and 0.99. Increasing this cutoff makes it more difficult to declare
+            superiority.
           </li>
         </ul>
       </HelpSection>
 
-      <HelpSection title={FIELD_LABELS.threshold}>
+      <HelpSection title={FIELD_LABELS.futilityMargin}>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
-            The probability required for a rule to be triggered. Common values include 0.90, 0.95,
-            0.975, and 0.99.
+            The treatment difference used to define a lack of meaningful benefit. Trials may use a
+            futility margin that represents a null effect (i.e. 0 for absolute scales and 1 for
+            ratio scales). The minimal clinically important difference may also be used as the
+            futility margin and would generally make it easier to declare futility.
+          </li>
+        </ul>
+      </HelpSection>
+
+      <HelpSection title={FIELD_LABELS.futilityThreshold}>
+        <ul className="list-disc space-y-2 pl-5 leading-relaxed">
+          <li>
+            The probability required for the futility rule to be triggered. Common values include
+            0.05, 0.10, and 0.20. Increasing this cutoff makes it easier to declare futility.
           </li>
         </ul>
       </HelpSection>

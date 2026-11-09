@@ -6,7 +6,8 @@ import { designSchema } from './schema'
 // What the form accepts and the message shown under each field. The form
 // gets numbers as typed text, so most values here are strings.
 
-const RULE = { type: 'superiority', direction: 'greater', margin: '1', threshold: '0.95' }
+const RULE = { type: 'superiority', margin: '1', threshold: '0.95' }
+const FUTILITY = { type: 'futility', margin: '1', threshold: '0.05' }
 
 const BINARY = {
   outcomeType: 'binary',
@@ -102,18 +103,49 @@ describe('designSchema (the simulation form)', () => {
       'R: Number of simulated trials must be at most 100,000.'
     ],
     [
-      'a futility rule',
-      { decisionRules: [{ ...RULE, type: 'futility' }] },
-      'decisionRules.0.type: Only superiority rules are currently supported.'
+      'a superiority cutoff above 1',
+      { decisionRules: [{ ...RULE, threshold: '1.2' }] },
+      'decisionRules.0.threshold: Superiority cutoff must be at most 1.'
     ],
     [
-      'a threshold above 1',
-      { decisionRules: [{ ...RULE, threshold: '1.2' }] },
-      'decisionRules.0.threshold: Decision threshold must be at most 1.'
+      'a negative futility cutoff',
+      { decisionRules: [{ ...FUTILITY, threshold: '-0.1' }] },
+      'decisionRules.0.threshold: Futility cutoff must be at least 0.'
     ],
-    ['no decision rule', { decisionRules: [] }, 'decisionRules: Add at least one decision rule.']
+    [
+      'an unknown rule type',
+      { decisionRules: [{ ...RULE, type: 'harm' }] },
+      'decisionRules.0.type: Select a decision rule type.'
+    ],
+    ['no decision rule', { decisionRules: [] }, 'decisionRules: Add at least one decision rule.'],
+    [
+      'two superiority rules',
+      { decisionRules: [RULE, RULE] },
+      'decisionRules: A design can have only one superiority rule and one futility rule.'
+    ]
   ])('rejects %s', (_label, change, problem) => {
     expect(problems({ ...BINARY, ...change })).toEqual([problem])
+  })
+
+  test.each([
+    ['a futility rule on its own', [FUTILITY]],
+    ['a superiority and a futility rule', [RULE, FUTILITY]],
+    ['the futility rule first', [FUTILITY, RULE]]
+  ])('accepts %s', (_label, decisionRules) => {
+    expect(problems({ ...BINARY, decisionRules })).toEqual([])
+  })
+
+  test('rejects more than two rules', () => {
+    expect(problems({ ...BINARY, decisionRules: [RULE, FUTILITY, FUTILITY] })).toContain(
+      'decisionRules: A design can have at most two decision rules.'
+    )
+  })
+
+  test('drops the direction older designs stored on a rule', () => {
+    const decisionRules = [{ ...RULE, direction: 'less' }]
+    const result = v.safeParse(designSchema, { ...BINARY, decisionRules })
+    expect(result.success).toBe(true)
+    if (result.success) expect(result.output.decisionRules[0]).not.toHaveProperty('direction')
   })
 
   test('rejects a negative standard deviation', () => {
@@ -143,8 +175,48 @@ describe('designSchema (the simulation form)', () => {
       ])
     })
 
-    test('a mean difference allows a superiority margin of 0', () => {
+    test('an odds ratio needs a futility margin above 0, shown under that rule', () => {
+      const decisionRules = [RULE, { ...FUTILITY, margin: '0' }]
+      expect(problems({ ...BINARY, decisionRules })).toEqual([
+        'decisionRules.1.margin: Futility margin must be greater than 0 for an odds ratio.'
+      ])
+    })
+
+    test('a mean difference allows a margin of 0', () => {
       expect(problems(CONTINUOUS)).toEqual([])
+      const decisionRules = [
+        { ...RULE, margin: '0' },
+        { ...FUTILITY, margin: '0' }
+      ]
+      expect(problems({ ...CONTINUOUS, decisionRules })).toEqual([])
+    })
+
+    test('a mean difference allows negative margins', () => {
+      const decisionRules = [
+        { ...RULE, margin: '-1' },
+        { ...FUTILITY, margin: '-0.5' }
+      ]
+      expect(problems({ ...CONTINUOUS, meanDiff: '-3', decisionRules })).toEqual([])
+    })
+
+    describe('with the same margin, the futility cutoff must be below the superiority cutoff', () => {
+      const overlap =
+        'Futility cutoff must be less than the superiority cutoff when both rules use the same margin.'
+
+      test.each(['0.95', '0.97'])('a futility cutoff of %s is shown under it', (threshold) => {
+        const decisionRules = [RULE, { ...FUTILITY, threshold }]
+        expect(problems({ ...BINARY, decisionRules })).toEqual([
+          `decisionRules.1.threshold: ${overlap}`
+        ])
+        expect(problems({ ...BINARY, decisionRules: decisionRules.toReversed() })).toEqual([
+          `decisionRules.0.threshold: ${overlap}`
+        ])
+      })
+
+      test('applies only when the margins are the same', () => {
+        const decisionRules = [RULE, { ...FUTILITY, margin: '1.2', threshold: '0.97' }]
+        expect(problems({ ...BINARY, decisionRules })).toEqual([])
+      })
     })
   })
 })

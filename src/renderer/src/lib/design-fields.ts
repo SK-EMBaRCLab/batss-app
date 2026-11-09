@@ -1,3 +1,4 @@
+import { effectDirection } from '@shared/effect-direction'
 import { FIELD_LABELS } from '@shared/field-labels'
 import type { DecisionRule, DesignInput } from '@shared/simulation-types'
 
@@ -18,7 +19,6 @@ import { decisionRuleFormula } from '@/lib/utils'
  */
 type LooseDecisionRule = {
   type?: DecisionRule['type']
-  direction?: DecisionRule['direction']
   margin?: string | number
   threshold?: string | number
 }
@@ -135,12 +135,18 @@ export function decisionRuleSummary(input: DesignSnapshot): string {
   const rule = input.decisionRules?.[0]
   if (!rule) return ''
 
+  const direction = effectDirection(input)
+
   if (input.outcomeType === 'binary') {
-    return decisionRuleFormula({ ...rule, treatmentEffectType: input.treatmentEffectType })
+    return decisionRuleFormula({
+      ...rule,
+      direction,
+      treatmentEffectType: input.treatmentEffectType
+    })
   }
 
   if (input.outcomeType === 'continuous') {
-    return decisionRuleFormula({ ...rule, treatmentEffectType: 'meanDifference' })
+    return decisionRuleFormula({ ...rule, direction, treatmentEffectType: 'meanDifference' })
   }
 
   return ''

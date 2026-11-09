@@ -5,6 +5,7 @@ import path from 'path'
 
 import { resolveCoreCount } from '../../shared/cores'
 import { parseSimulationRunResult } from '../../shared/design-file-schema'
+import { effectDirection } from '../../shared/effect-direction'
 import { describeBusy } from '../../shared/engine-types'
 import { withReference } from '../../shared/error-reference'
 import { normaliseTimeoutMinutes } from '../../shared/settings-types'
@@ -143,7 +144,9 @@ export class SimulationService {
     this.activeRun = { controller }
     const startedAt = Date.now()
 
-    const alternative = input.decisionRules[0]?.direction ?? 'greater'
+    // BATSS's `alternative` follows the sign of beta[2], the treatment
+    // effect (log odds ratio or mean difference); no effect counts as greater
+    const alternative = effectDirection(input)
 
     let family = ''
     let link = ''

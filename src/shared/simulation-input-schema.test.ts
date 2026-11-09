@@ -5,7 +5,8 @@ import { checkSimulationRunInput } from './simulation-input-schema'
 // The main process's own check before a run reaches R. Values arrive as
 // numbers here (the form has already turned typed text into numbers).
 
-const RULE = { type: 'superiority', direction: 'greater', margin: 1, threshold: 0.95 }
+const RULE = { type: 'superiority', margin: 1, threshold: 0.95 }
+const FUTILITY = { type: 'futility', margin: 1, threshold: 0.05 }
 
 const BINARY = {
   outcomeType: 'binary',
@@ -45,6 +46,26 @@ describe('checkSimulationRunInput', () => {
     expect(problem(CONTINUOUS)).toBeNull()
   })
 
+  test.each([
+    ['a futility rule on its own', [FUTILITY]],
+    ['a superiority and a futility rule', [RULE, FUTILITY]],
+    [
+      'the same cutoffs with different margins',
+      [RULE, { ...FUTILITY, margin: 1.2, threshold: 0.97 }]
+    ]
+  ])('accepts %s', (_label, decisionRules) => {
+    expect(problem({ ...BINARY, decisionRules })).toBeNull()
+  })
+
+  test('drops the direction an older caller sends on a rule', () => {
+    const checked = checkSimulationRunInput({
+      ...BINARY,
+      decisionRules: [{ ...RULE, direction: 'less' }]
+    })
+    expect(checked.success).toBe(true)
+    if (checked.success) expect(checked.input.decisionRules[0]).not.toHaveProperty('direction')
+  })
+
   test('starts every message the same way', () => {
     const checked = checkSimulationRunInput({ ...BINARY, R: 0 })
     expect(checked.success).toBe(false)
@@ -82,12 +103,36 @@ describe('checkSimulationRunInput', () => {
     ],
     ['too large a sample', { N: 100_001 }, 'Maximum sample size must be at most 100,000.'],
     [
-      'a futility rule',
-      { decisionRules: [{ ...RULE, type: 'futility' }] },
-      'Only superiority decision rules are supported.'
+      'an unknown rule type',
+      { decisionRules: [{ ...RULE, type: 'harm' }] },
+      'Decision rules must be superiority or futility rules.'
     ],
-    ['two decision rules', { decisionRules: [RULE, RULE] }, 'Only one decision rule is supported.'],
+    [
+      'two superiority rules',
+      { decisionRules: [RULE, RULE] },
+      'A design can have only one superiority rule and one futility rule.'
+    ],
+    [
+      'three decision rules',
+      { decisionRules: [RULE, FUTILITY, FUTILITY] },
+      'A design can have at most two decision rules.'
+    ],
     ['no decision rule', { decisionRules: [] }, 'A decision rule is required.'],
+    [
+      'a futility cutoff above 1',
+      { decisionRules: [{ ...FUTILITY, threshold: 1.5 }] },
+      'Futility cutoff must be at most 1.'
+    ],
+    [
+      'a futility cutoff at the superiority cutoff with the same margin',
+      { decisionRules: [RULE, { ...FUTILITY, threshold: 0.95 }] },
+      'Futility cutoff must be less than the superiority cutoff when both rules use the same margin.'
+    ],
+    [
+      'an odds ratio futility margin of 0',
+      { decisionRules: [RULE, { ...FUTILITY, margin: 0 }] },
+      'Futility margin must be greater than 0 for an odds ratio.'
+    ],
     ['an unknown CPU share', { corePercent: 33 }, 'Core usage must be 25, 50, 75 or 100%.'],
     [
       'an odds ratio margin of 0',
@@ -111,9 +156,17 @@ describe('checkSimulationRunInput', () => {
     expect(problem({ ...BINARY, m: 155 })).toBeNull()
   })
 
-  test('rejects a negative superiority margin', () => {
-    expect(problem({ ...CONTINUOUS, decisionRules: [{ ...RULE, margin: -1 }] })).toBe(
-      'Superiority margin must be at least 0.'
+  test('accepts negative margins for a mean difference', () => {
+    const decisionRules = [
+      { ...RULE, margin: -1 },
+      { ...FUTILITY, margin: -0.5 }
+    ]
+    expect(problem({ ...CONTINUOUS, meanDiff: -3, decisionRules })).toBeNull()
+  })
+
+  test('rejects a negative odds ratio margin', () => {
+    expect(problem({ ...BINARY, decisionRules: [{ ...RULE, margin: -1 }] })).toBe(
+      'Superiority margin must be greater than 0 for an odds ratio.'
     )
   })
 

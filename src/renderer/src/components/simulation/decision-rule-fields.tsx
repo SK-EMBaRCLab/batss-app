@@ -1,27 +1,15 @@
-import { FIELD_LABELS } from '@shared/field-labels'
+import { DECISION_RULE_LABELS } from '@shared/design-rules'
 import type { DecisionRule } from '@shared/simulation-types'
 import { type ReactElement, useId } from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-
-import { useFormLocked } from './form-locked'
 
 type DecisionRuleFieldsProps = {
-  type: DecisionRule['type'] | undefined
-  direction: DecisionRule['direction'] | undefined
+  type: DecisionRule['type']
   margin: string | number | undefined
   threshold: string | number | undefined
 
-  onTypeChange: (type: DecisionRule['type']) => void
-  onDirectionChange: (direction: DecisionRule['direction']) => void
   onMarginChange: (margin: string) => void
   onThresholdChange: (threshold: string) => void
 
@@ -31,71 +19,21 @@ type DecisionRuleFieldsProps = {
 
 export function DecisionRuleFields({
   type,
-  direction,
   margin,
   threshold,
-  onTypeChange,
-  onDirectionChange,
   onMarginChange,
   onThresholdChange,
   marginErrors,
   thresholdErrors
 }: DecisionRuleFieldsProps): ReactElement {
-  const locked = useFormLocked()
   const id = useId()
+  const labels = DECISION_RULE_LABELS[type]
+
   return (
     <div className="@container">
       <div className="grid gap-5 @md:grid-cols-2">
-        <Field>
-          <FieldLabel id={`${id}-type`}>{FIELD_LABELS.decisionRuleType}</FieldLabel>
-
-          <Select
-            disabled={locked}
-            value={type ?? ''}
-            onValueChange={(value) => {
-              if (value === 'superiority' || value === 'futility') {
-                onTypeChange(value)
-              }
-            }}
-          >
-            <SelectTrigger aria-labelledby={`${id}-type`}>
-              <SelectValue placeholder="Select rule type" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="superiority">Superiority</SelectItem>
-              <SelectItem value="futility" disabled>
-                Futility (under development)
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-
-        <Field>
-          <FieldLabel id={`${id}-direction`}>{FIELD_LABELS.direction}</FieldLabel>
-
-          <Select
-            disabled={locked}
-            value={direction ?? ''}
-            onValueChange={(value) => {
-              if (value === 'greater' || value === 'less') {
-                onDirectionChange(value)
-              }
-            }}
-          >
-            <SelectTrigger aria-labelledby={`${id}-direction`}>
-              <SelectValue placeholder="Select direction" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="greater">Greater than</SelectItem>
-              <SelectItem value="less">Less than</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-
         <Field data-invalid={marginErrors !== undefined}>
-          <FieldLabel htmlFor={`${id}-margin`}>{FIELD_LABELS.margin} (SM)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-margin`}>{labels.margin}</FieldLabel>
 
           <Input
             id={`${id}-margin`}
@@ -109,12 +47,14 @@ export function DecisionRuleFields({
         </Field>
 
         <Field data-invalid={thresholdErrors !== undefined}>
-          <FieldLabel htmlFor={`${id}-threshold`}>{FIELD_LABELS.threshold} (DT)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-threshold`}>{labels.threshold}</FieldLabel>
 
           <Input
             id={`${id}-threshold`}
             type="number"
             step="0.01"
+            min="0"
+            max="1"
             value={threshold ?? ''}
             onChange={(event) => onThresholdChange(event.target.value)}
           />
