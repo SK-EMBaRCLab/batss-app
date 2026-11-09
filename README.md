@@ -53,7 +53,7 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
 
 BATSS Studio is a desktop application for designing and simulating **two-arm Bayesian adaptive clinical trials**, built around the [BATSS](https://batss-dev.github.io/BATSS/) R package (**B**ayesian **A**daptive **T**rial **S**imulator **S**oftware) and [INLA](https://www.r-inla.org/) (Integrated Nested Laplace Approximation) for fast Bayesian inference.
 
-Rather than hand-writing simulation scripts in R, BATSS Studio walks you through a guided wizard to configure a trial design — outcome type (binary or continuous), treatment effect assumptions, sample size and interim analysis schedule, and a decision rule — then runs the simulation locally using your machine's R installation. Results are presented as interactive tables and charts: simulated trial outcome probabilities under the null and target-effect scenarios, and sample size distributions across simulated trials.
+Rather than hand-writing simulation scripts in R, BATSS Studio walks you through a guided wizard to configure a trial design — outcome type (binary or continuous), treatment effect assumptions, sample size and interim analysis schedule, and superiority and futility decision rules — then runs the simulation locally using your machine's R installation. Results are presented as interactive tables and charts: simulated trial outcome probabilities under the null and target-effect scenarios, and sample size distributions across simulated trials.
 
 Every design and its accumulated simulation runs are saved to a single `.design` file, so you can revisit, compare, and re-run a design without losing prior results. A batch-processing mode lets you run many designs from a CSV in one pass.
 
@@ -63,7 +63,7 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 ## Features
 
-- 🧙 **Guided design wizard** — step through outcome type, treatment effect, sample size, and decision rule configuration with inline guidance at every step
+- 🧙 **Guided design wizard** — step through outcome type, treatment effect, sample size, and superiority and futility decision rule configuration with inline guidance at every step
 - 🧮 **Local BATSS/INLA simulation** — runs entirely on your machine via your local R installation; no data leaves your computer
 - 📊 **Interactive results** — sortable/filterable simulation history table, outcome probability charts, and sample size distribution summaries
 - 📁 **Batch processing** — upload a CSV of design variations and run them sequentially, with per-row results saved back into your study design
@@ -249,7 +249,7 @@ batss-app/
 ## How It Works
 
 1. **Runtime bootstrap** — on launch, BATSS Studio searches common install locations for `Rscript` (including the Windows registry, since the CRAN installer doesn't add R to `PATH` by default), checks whether `BATSS`, `INLA`, `fmesher`, and `jsonlite` are installed in an app-private R library, and installs anything missing before the app becomes usable.
-2. **Design the trial** — the simulation wizard collects the outcome type, treatment effect assumptions, sample size/interim schedule, and a decision rule, validating inputs at every step.
+2. **Design the trial** — the simulation wizard collects the outcome type, treatment effect assumptions, sample size/interim schedule, and superiority and futility decision rules, validating inputs at every step.
 3. **Run the simulation** — BATSS Studio serializes the design to JSON and runs `resources/r/batss-simulation.R` via your local `Rscript`, streaming live log output back to the UI. Results are read back from a temporary file rather than parsed from console output, so nothing from R/INLA's own logging can corrupt them.
 4. **Review results** — each run is appended to the open `.design` file with its own results (outcome probability tables/charts, sample size distributions), so you can compare runs against each other over time.
 5. **Batch mode** — for exploring many design variations at once, upload a CSV (see the in-app template) and BATSS Studio validates and runs each row sequentially, saving every result into the same design.
