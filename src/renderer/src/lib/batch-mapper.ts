@@ -13,18 +13,28 @@ function formatIssues(issues: v.BaseIssue<unknown>[]): string[] {
   })
 }
 
+// Each rule's two columns. A rule with either cell filled in is part of
+// the design, so one filled in halfway is reported rather than dropped;
+// with both empty, the design has no rule of that type.
+const RULE_COLUMNS = [
+  { type: 'superiority', margin: 'superiorityMargin', threshold: 'superiorityCutoff' },
+  { type: 'futility', margin: 'futilityMargin', threshold: 'futilityCutoff' }
+] as const
+
+function decisionRulesFrom(
+  row: BatchCsvRow
+): { type: string; margin: string | undefined; threshold: string | undefined }[] {
+  return RULE_COLUMNS.flatMap(({ type, margin, threshold }) => {
+    const rule = { type, margin: cell(row[margin]), threshold: cell(row[threshold]) }
+    return rule.margin === undefined && rule.threshold === undefined ? [] : [rule]
+  })
+}
+
 export function buildBatchValidations(rows: BatchCsvRow[]): BatchRowValidation[] {
   return rows.map((row, rowIndex) => {
     const outcomeType = row.outcomeType?.trim()
 
-    const decisionRules = [
-      {
-        type: cell(row.decisionRuleType),
-        direction: cell(row.decisionRuleDirection),
-        margin: cell(row.decisionRuleMargin),
-        threshold: cell(row.decisionRuleThreshold)
-      }
-    ]
+    const decisionRules = decisionRulesFrom(row)
 
     const common = {
       N: cell(row.N),
@@ -86,60 +96,50 @@ export function buildBatchValidations(rows: BatchCsvRow[]): BatchRowValidation[]
   })
 }
 
+const TEMPLATE_HEADERS = [
+  'outcomeType',
+  'N',
+  'm0',
+  'm',
+  'R',
+  'probability',
+  'treatmentEffectType',
+  'treatmentEffect',
+  'meanOutcome',
+  'sd',
+  'meanDiff',
+  ...RULE_COLUMNS.flatMap(({ margin, threshold }) => [margin, threshold])
+] as const
+
+type TemplateRow = Partial<Record<(typeof TEMPLATE_HEADERS)[number], string>>
+
+const SAMPLE_SIZE = { N: '216', m0: '60', m: '12', R: '10' }
+const BINARY = { outcomeType: 'binary', probability: '0.3', treatmentEffectType: 'oddsRatio' }
+const SUPERIORITY_OR = { superiorityMargin: '1', superiorityCutoff: '0.95' }
+const FUTILITY_OR = { futilityMargin: '1', futilityCutoff: '0.05' }
+
+// A superiority rule, a futility rule, or one of each; leave both of a
+// rule's cells empty to leave it out
+const TEMPLATE_ROWS: TemplateRow[] = [
+  { ...BINARY, ...SAMPLE_SIZE, treatmentEffect: '1.5', ...SUPERIORITY_OR },
+  { ...BINARY, ...SAMPLE_SIZE, treatmentEffect: '1.5', ...FUTILITY_OR },
+  { ...BINARY, ...SAMPLE_SIZE, treatmentEffect: '1.5', ...SUPERIORITY_OR, ...FUTILITY_OR },
+  {
+    outcomeType: 'continuous',
+    ...SAMPLE_SIZE,
+    meanOutcome: '10',
+    sd: '2.5',
+    meanDiff: '3',
+    superiorityMargin: '0',
+    superiorityCutoff: '0.95',
+    futilityMargin: '0',
+    futilityCutoff: '0.05'
+  }
+]
+
 export function buildTemplateCsv(): string {
-  const headers = [
-    'outcomeType',
-    'N',
-    'm0',
-    'm',
-    'R',
-    'probability',
-    'treatmentEffectType',
-    'treatmentEffect',
-    'meanOutcome',
-    'sd',
-    'meanDiff',
-    'decisionRuleType',
-    'decisionRuleDirection',
-    'decisionRuleMargin',
-    'decisionRuleThreshold'
-  ]
-
-  const binaryExample = [
-    'binary',
-    '216',
-    '60',
-    '12',
-    '10',
-    '0.3',
-    'oddsRatio',
-    '1.5',
-    '',
-    '',
-    '',
-    'superiority',
-    'greater',
-    '1',
-    '0.95'
-  ]
-
-  const continuousExample = [
-    'continuous',
-    '216',
-    '60',
-    '12',
-    '10',
-    '',
-    '',
-    '',
-    '10',
-    '2.5',
-    '3',
-    'superiority',
-    'greater',
-    '0',
-    '0.95'
-  ]
-
-  return [headers, binaryExample, continuousExample].map((row) => row.join(',')).join('\n')
+  return [
+    TEMPLATE_HEADERS.join(','),
+    ...TEMPLATE_ROWS.map((row) => TEMPLATE_HEADERS.map((header) => row[header] ?? '').join(','))
+  ].join('\n')
 }
