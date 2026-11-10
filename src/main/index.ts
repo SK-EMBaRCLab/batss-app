@@ -13,6 +13,7 @@ import {
   registerDesignFilesIPC
 } from './ipc/design-files.ipc'
 import { registerEngineIPC } from './ipc/engine.ipc'
+import { registerFilesIPC } from './ipc/files.ipc'
 import { registerRuntimeIPC } from './ipc/runtime.ipc'
 import { registerSettingsIPC } from './ipc/settings.ipc'
 import { registerSimulationIPC } from './ipc/simulation.ipc'
@@ -278,6 +279,8 @@ if (!isRelaunching) {
     registerSettingsIPC()
 
     registerDesignFilesIPC()
+
+    registerFilesIPC()
 
     registerBatchIPC()
 

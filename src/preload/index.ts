@@ -70,6 +70,12 @@ const design = {
     ipcRenderer.invoke(IPC.design.showInFolder, filePath)
 }
 
+const files = {
+  // Asks where to save, suggesting fileName; false if the user cancelled
+  saveExport: (fileName: string, bytes: Uint8Array): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.files.saveExport, fileName, bytes)
+}
+
 const simulation = {
   runSimulation: (input: SimulationRunInput): Promise<SimulationRunResult> =>
     ipcRenderer.invoke(IPC.simulation.run, input),
@@ -150,6 +156,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('app', app)
     contextBridge.exposeInMainWorld('runtime', runtime)
     contextBridge.exposeInMainWorld('design', design)
+    contextBridge.exposeInMainWorld('files', files)
     contextBridge.exposeInMainWorld('simulation', simulation)
     contextBridge.exposeInMainWorld('theme', theme)
     contextBridge.exposeInMainWorld('settings', settings)
@@ -166,6 +173,7 @@ declare global {
     app: typeof app
     runtime: typeof runtime
     design: typeof design
+    files: typeof files
     simulation: typeof simulation
     theme: typeof theme
     settings: typeof settings

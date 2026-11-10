@@ -33,6 +33,10 @@ export const IPC = {
     confirmStopRun: 'design:confirm-stop-run',
     showInFolder: 'design:show-in-folder'
   },
+  files: {
+    // Save a file the app made, after asking where (see files.ipc.ts)
+    saveExport: 'files:save-export'
+  },
   simulation: {
     run: 'simulation:run',
     cancel: 'simulation:cancel',

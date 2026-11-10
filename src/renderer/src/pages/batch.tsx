@@ -6,9 +6,11 @@ import { LogViewer } from '@/components/common/log-viewer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { toast } from '@/components/ui/toast'
 import { useBatchCsv } from '@/hooks/use-batch-csv'
 import { buildTemplateCsv } from '@/lib/batch-mapper'
-import { downloadCsv } from '@/lib/csv'
+import { saveCsv } from '@/lib/csv'
+import { requestFailed } from '@/lib/error-reference'
 import { STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
 import { useBatch } from '@/stores/batch'
 import { useEngine } from '@/stores/engine'
@@ -41,6 +43,19 @@ export default function Batch(): ReactElement {
     done: !isRunning
   })
 
+  const saveTemplate = async (): Promise<void> => {
+    try {
+      await saveCsv('batch-template.csv', buildTemplateCsv())
+    } catch (error) {
+      const failure = requestFailed(error, 'batch template', 'Try again.')
+      toast.add({
+        type: 'error',
+        title: "Couldn't save the template",
+        description: failure.message
+      })
+    }
+  }
+
   const handleRun = async (): Promise<void> => {
     if (validInputs.length === 0) return
     await start(validInputs)
@@ -65,10 +80,7 @@ export default function Batch(): ReactElement {
               <input type="file" accept=".csv" className="sr-only" onChange={handleFile} />
             </Button>
 
-            <Button
-              variant="ghost"
-              onClick={() => downloadCsv('batch-template.csv', buildTemplateCsv())}
-            >
+            <Button variant="ghost" onClick={() => void saveTemplate()}>
               <Download className="mr-2 h-4 w-4" />
               Download CSV template
             </Button>

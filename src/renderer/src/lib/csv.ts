@@ -1,6 +1,8 @@
 import type { BatchCsvRow } from '@shared/batch-types'
 import Papa from 'papaparse'
 
+import { saveExport } from './download'
+
 export type ParsedCsv = {
   headers: string[]
   rows: BatchCsvRow[]
@@ -31,14 +33,7 @@ export function parseCsvFile(file: File): Promise<ParsedCsv> {
   })
 }
 
-export function downloadCsv(filename: string, content: string): void {
-  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-
-  URL.revokeObjectURL(url)
+/** Asks where to save `content` as a CSV, suggesting `filename`. False if cancelled. */
+export function saveCsv(filename: string, content: string): Promise<boolean> {
+  return saveExport(filename, new Blob([content], { type: 'text/csv;charset=utf-8;' }))
 }

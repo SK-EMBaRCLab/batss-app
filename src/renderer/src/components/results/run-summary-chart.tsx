@@ -1,4 +1,4 @@
-import { toPng } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 import { ImageDown, Minus, MoreHorizontal } from 'lucide-react'
 import { type ReactElement, useRef, useState } from 'react'
 
@@ -15,8 +15,10 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toast } from '@/components/ui/toast'
+import { runExportFileName, saveExport } from '@/lib/download'
+import { requestFailed } from '@/lib/error-reference'
 import { hasSuperiorOutcome } from '@/lib/results-labels'
-import { useSelectedEntry } from '@/stores/design'
+import { useDesign, useSelectedEntry } from '@/stores/design'
 
 import { ResultsBarChart } from './bar-chart'
 
@@ -27,9 +29,10 @@ export function RunSummaryChart(): ReactElement | null {
   const chartRef = useRef<HTMLDivElement>(null)
 
   const selectedEntry = useSelectedEntry()
+  const designName = useDesign((state) => state.design?.name ?? '')
 
   const download = async (): Promise<void> => {
-    if (!chartRef.current) return
+    if (!chartRef.current || !selectedEntry) return
 
     // The card's own background, so a dark-mode export isn't light text on
     // white
@@ -37,18 +40,19 @@ export function RunSummaryChart(): ReactElement | null {
     const backgroundColor = getComputedStyle(card).backgroundColor
 
     try {
-      const dataUrl = await toPng(chartRef.current, {
+      const image = await toBlob(chartRef.current, {
         pixelRatio: 2, // higher resolution
         backgroundColor
       })
 
-      const link = document.createElement('a')
-      link.download = 'results-chart.png'
-      link.href = dataUrl
-      link.click()
+      if (!image) throw new Error('The chart could not be drawn as an image')
+      await saveExport(
+        runExportFileName(designName, 'chart', selectedEntry.createdAt, 'png'),
+        image
+      )
     } catch (error) {
-      console.error('Chart export failed:', error)
-      toast.add({ type: 'error', title: "Couldn't export the chart" })
+      const failure = requestFailed(error, 'chart export', 'Try again.')
+      toast.add({ type: 'error', title: "Couldn't export the chart", description: failure.message })
     }
   }
 
