@@ -116,6 +116,10 @@ export interface SimulationResultEntry {
   createdAt: string
   input: SimulationRunInput
   result: SimulationRunResult
+  // Given by the user to tell runs apart, e.g. "Baseline for the
+  // protocol". Optional: runs have neither until someone adds them.
+  name?: string
+  notes?: string
 }
 
 export type DesignInput = {

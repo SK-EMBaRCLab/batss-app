@@ -1,3 +1,4 @@
+import { MAX_RUN_NAME_LENGTH, MAX_RUN_NOTES_LENGTH } from '@shared/design-rules'
 import type { DesignInput, SimulationResultEntry, StudyDesign } from '@shared/simulation-types'
 import { useMemo } from 'react'
 import { create } from 'zustand'
@@ -50,6 +51,10 @@ interface DesignState {
   appendResult: (entry: Omit<SimulationResultEntry, 'id'>) => void
   updateInput: (input: DesignInput) => void
   selectResult: (id: string) => void
+  // Sets a run's name and/or notes; empty text clears them
+  editResult: (id: string, changes: { name?: string; notes?: string }) => void
+  // Removes runs from the design (gone for good once it's saved)
+  deleteResults: (ids: string[]) => void
   // Stops comparing: the run list shows every run again
   showAllResults: () => void
   // Opens the file manager at the saved design file
@@ -170,6 +175,51 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     selectResult: (id) => set({ selectedResultId: id }),
+
+    editResult: (id, changes) => {
+      // Trimmed and capped as the file allows; empty means none
+      const clean = (text: string, max: number): string | undefined =>
+        text.trim().slice(0, max) || undefined
+
+      set((state) => {
+        if (!state.design) return state
+        const results = state.design.results.map((entry) => {
+          if (entry.id !== id) return entry
+          const next = { ...entry }
+          if (changes.name !== undefined) next.name = clean(changes.name, MAX_RUN_NAME_LENGTH)
+          if (changes.notes !== undefined) next.notes = clean(changes.notes, MAX_RUN_NOTES_LENGTH)
+          return next
+        })
+        return { design: { ...state.design, results } }
+      })
+      setDirty(true)
+    },
+
+    deleteResults: (ids) => {
+      if (ids.length === 0) return
+      const gone = new Set(ids)
+
+      set((state) => {
+        if (!state.design) return state
+        const results = state.design.results.filter((entry) => !gone.has(entry.id))
+
+        // The run being viewed, unless it went: then the newest left
+        const selectedResultId =
+          state.selectedResultId && !gone.has(state.selectedResultId)
+            ? state.selectedResultId
+            : (results.at(-1)?.id ?? null)
+
+        // A comparison keeps its remaining runs, and ends below two
+        const compared = state.selectedResults?.filter((id) => !gone.has(id)) ?? []
+
+        return {
+          design: { ...state.design, results },
+          selectedResultId,
+          selectedResults: compared.length > 1 ? compared : null
+        }
+      })
+      setDirty(true)
+    },
     showAllResults: () => set({ selectedResults: null }),
 
     showInFolder: async () => {

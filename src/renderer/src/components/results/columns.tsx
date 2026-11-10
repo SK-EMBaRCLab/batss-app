@@ -46,6 +46,8 @@ function outcomeScopedField(key: OutcomeScopedColumnId): {
  */
 export function searchText(entry: SimulationResultEntry): string {
   return [
+    entry.name,
+    entry.notes,
     formatRunDate(entry.createdAt),
     runStatusLabel(entry.result.status),
     formatRunDuration(entry.result.durationMs),

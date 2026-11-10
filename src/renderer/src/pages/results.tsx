@@ -3,8 +3,8 @@ import { type ReactElement } from 'react'
 
 import { ResultsEmpty } from '@/components/results/results-empty'
 import { RunDesignParameters } from '@/components/results/run-design-params'
+import { RunDetailsHeader } from '@/components/results/run-details-header'
 import { RunError } from '@/components/results/run-error'
-import { RunHeader } from '@/components/results/run-header'
 import { RunOutcomeSummary } from '@/components/results/run-outcome-summary'
 import { RunSampleSizeSummary } from '@/components/results/run-samplesize-summary'
 import { RunSummaryChart } from '@/components/results/run-summary-chart'
@@ -34,7 +34,7 @@ export default function Results(): ReactElement {
             <Table />
             Open runs table
           </Button>
-          <RunHeader />
+          <RunDetailsHeader />
 
           <RunDesignParameters />
 

@@ -14,6 +14,10 @@ export const MAX_SAMPLE_SIZE = 100_000
 export const MAX_SIMULATED_TRIALS = 100_000
 export const MAX_BATCH_ROWS = 500
 
+// A run's own name and notes (see SimulationResultEntry)
+export const MAX_RUN_NAME_LENGTH = 100
+export const MAX_RUN_NOTES_LENGTH = 2000
+
 // Allowed values. Some can be stored and picked in the form but can't be
 // run yet (ordinal outcomes, risk difference and ratio);
 // the form and the run check each say which they accept.

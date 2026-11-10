@@ -9,6 +9,8 @@ export function EditableInPlaceInput({
   name,
   title,
   hint,
+  emptyLabel,
+  maxLength,
   onRename,
   className
 }: {
@@ -16,6 +18,10 @@ export function EditableInPlaceInput({
   title: string
   // Extra line under the tooltip's title, e.g. where the design is saved
   hint?: string
+  // Shown while there's no name. Given, the name can be cleared (an
+  // empty name is passed on); without it, an empty name is ignored
+  emptyLabel?: string
+  maxLength?: number
   onRename: (name: string) => void
   className?: string
 }): ReactElement {
@@ -29,7 +35,7 @@ export function EditableInPlaceInput({
 
   const commit = (): void => {
     const trimmed = draft.trim()
-    if (trimmed && trimmed !== name) {
+    if ((trimmed || emptyLabel !== undefined) && trimmed !== name) {
       onRename(trimmed)
     }
     setIsEditing(false)
@@ -49,6 +55,7 @@ export function EditableInPlaceInput({
       <Input
         ref={focusAndSelectOnMount}
         value={draft}
+        maxLength={maxLength}
         onChange={(event) => setDraft(event.target.value)}
         aria-label={title}
         onBlur={commit}
@@ -69,11 +76,11 @@ export function EditableInPlaceInput({
             type="button"
             onClick={startEditing}
             className={cn(
-              'group/rename flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
+              'group/rename flex max-w-56 items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
               className
             )}
           >
-            <span className="max-w-56 truncate">{name}</span>
+            <span className="min-w-0 truncate">{name || emptyLabel}</span>
             <Pencil className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/rename:opacity-100" />
           </button>
         }

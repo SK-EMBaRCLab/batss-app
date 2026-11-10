@@ -16,6 +16,8 @@ import * as v from 'valibot'
 import {
   CORE_PERCENTS,
   DECISION_RULE_TYPES,
+  MAX_RUN_NAME_LENGTH,
+  MAX_RUN_NOTES_LENGTH,
   OUTCOME_TYPES,
   SCENARIO_OF,
   SIMULATION_OUTCOMES,
@@ -112,11 +114,19 @@ export function parseSimulationRunResult(data: unknown): SimulationRunResult | n
   return output
 }
 
+// A run's name or notes. One that isn't text, or is far too long, is
+// dropped rather than rejecting the whole file, like corePercent above.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const runText = (max: number) =>
+  v.fallback(v.optional(v.pipe(v.string(), v.maxLength(max))), undefined)
+
 const simulationResultEntryFileSchema = v.object({
   id: v.string(),
   createdAt: v.string(),
   input: designInputFileSchema,
-  result: simulationRunResultFileSchema
+  result: simulationRunResultFileSchema,
+  name: runText(MAX_RUN_NAME_LENGTH),
+  notes: runText(MAX_RUN_NOTES_LENGTH)
 })
 
 const studyDesignFileSchema = v.object({

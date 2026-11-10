@@ -67,6 +67,29 @@ describe('parseStudyDesignFile', () => {
     }
   })
 
+  test("loads a run's name and notes, and drops ones that aren't valid", () => {
+    const entry = {
+      id: 'run-1',
+      createdAt: '2026-10-26T12:05:00.000Z',
+      input: INPUT,
+      result: { status: 'error', message: 'R failed' }
+    }
+    const results = [
+      { ...entry, name: 'Baseline', notes: 'For the protocol' },
+      { ...entry, id: 'run-2', name: 42, notes: 'x'.repeat(5000) },
+      { ...entry, id: 'run-3' }
+    ]
+    const parsed = parseStudyDesignFile(designFile({ results }))
+    expect(parsed.success).toBe(true)
+    if (parsed.success) {
+      const [named, invalid, plain] = parsed.data.results
+      expect(named).toMatchObject({ name: 'Baseline', notes: 'For the protocol' })
+      expect(invalid.name).toBeUndefined()
+      expect(invalid.notes).toBeUndefined()
+      expect(plain).not.toHaveProperty('name')
+    }
+  })
+
   test('ignores keys added by a newer version of the app', () => {
     const parsed = parseStudyDesignFile(designFile({ addedLater: true }))
     expect(parsed.success).toBe(true)

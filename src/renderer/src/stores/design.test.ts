@@ -1,4 +1,4 @@
-import type { StudyDesign } from '@shared/simulation-types'
+import type { SimulationResultEntry, StudyDesign } from '@shared/simulation-types'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { toast } from '@/components/ui/toast'
@@ -77,5 +77,101 @@ describe('saveDesign', () => {
         description: expect.stringContaining(reference)
       })
     )
+  })
+})
+
+/** A finished run, as the design keeps it. */
+function run(id: string): SimulationResultEntry {
+  return {
+    id,
+    createdAt: '2026-11-10T15:05:00.000Z',
+    input: {
+      outcomeType: 'continuous',
+      meanOutcome: 10,
+      sd: 2.5,
+      meanDiff: 3,
+      N: 216,
+      m0: 60,
+      m: 12,
+      R: 10,
+      decisionRules: [{ type: 'superiority', margin: 0, threshold: 0.95 }]
+    },
+    result: { status: 'error', message: 'R stopped' }
+  }
+}
+
+const ids = (): string[] => useDesign.getState().design!.results.map((entry) => entry.id)
+
+describe('editResult', () => {
+  test("sets a run's name and notes, trimmed, and marks the design changed", () => {
+    useDesign.setState({ design: { ...DESIGN, results: [run('a'), run('b')] }, isDirty: false })
+
+    useDesign.getState().editResult('b', { name: '  Baseline  ', notes: 'For the protocol' })
+
+    const [a, b] = useDesign.getState().design!.results
+    expect(b).toMatchObject({ name: 'Baseline', notes: 'For the protocol' })
+    expect(a.name).toBeUndefined()
+    expect(useDesign.getState().isDirty).toBe(true)
+  })
+
+  test('empty text clears a name, and leaves what was not given alone', () => {
+    useDesign.setState({
+      design: { ...DESIGN, results: [{ ...run('a'), name: 'Old', notes: 'Kept' }] }
+    })
+
+    useDesign.getState().editResult('a', { name: '   ' })
+
+    expect(useDesign.getState().design!.results[0]).toMatchObject({
+      name: undefined,
+      notes: 'Kept'
+    })
+  })
+})
+
+describe('deleteResults', () => {
+  test('removes the runs, and shows the newest left if the one viewed went', () => {
+    useDesign.setState({
+      design: { ...DESIGN, results: [run('a'), run('b'), run('c')] },
+      selectedResultId: 'c',
+      isDirty: false
+    })
+
+    useDesign.getState().deleteResults(['c'])
+
+    expect(ids()).toEqual(['a', 'b'])
+    expect(useDesign.getState()).toMatchObject({ selectedResultId: 'b', isDirty: true })
+  })
+
+  test('keeps the run being viewed when it stays', () => {
+    useDesign.setState({
+      design: { ...DESIGN, results: [run('a'), run('b')] },
+      selectedResultId: 'a'
+    })
+
+    useDesign.getState().deleteResults(['b'])
+
+    expect(useDesign.getState().selectedResultId).toBe('a')
+  })
+
+  test('a comparison keeps its remaining runs, and ends below two', () => {
+    useDesign.setState({
+      design: { ...DESIGN, results: [run('a'), run('b'), run('c'), run('d')] },
+      selectedResults: ['a', 'b', 'c']
+    })
+
+    useDesign.getState().deleteResults(['a'])
+    expect(useDesign.getState().selectedResults).toEqual(['b', 'c'])
+
+    useDesign.getState().deleteResults(['b'])
+    expect(useDesign.getState().selectedResults).toBeNull()
+  })
+
+  test('deleting every run leaves none selected', () => {
+    useDesign.setState({ design: { ...DESIGN, results: [run('a')] }, selectedResultId: 'a' })
+
+    useDesign.getState().deleteResults(['a'])
+
+    expect(useDesign.getState()).toMatchObject({ selectedResultId: null })
+    expect(ids()).toEqual([])
   })
 })
