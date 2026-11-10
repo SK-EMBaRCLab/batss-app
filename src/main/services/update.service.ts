@@ -7,6 +7,9 @@ import { downloadDiskImage, findDiskImage, openDiskImage, type ReleaseInfo } fro
 
 type Listener = (state: UpdateState) => void
 
+export const DEV_BUILD_MESSAGE =
+  'Updates are checked in the installed app, not in development builds.'
+
 /**
  * Wraps electron-updater. A silent check runs once automatically on
  * launch (see check(true) in the renderer's update store) so users
@@ -134,7 +137,14 @@ class UpdateService {
     this.set({ status: 'checking', message: 'Checking for updates…', silent })
 
     try {
-      await autoUpdater.checkForUpdates()
+      // null when electron-updater skipped the check: it only checks a
+      // packaged app, so not in development (npm run dev, or the Docker
+      // container). It then sends no events at all, so without this the
+      // state stayed on 'checking', and Settings' button disabled, for good.
+      const result = await autoUpdater.checkForUpdates()
+      if (result === null) {
+        this.set({ status: 'idle', message: DEV_BUILD_MESSAGE, silent })
+      }
     } catch (error) {
       // Belt-and-suspenders: checkForUpdates() rejecting is usually
       // also reported via the 'error' event above, but config-level

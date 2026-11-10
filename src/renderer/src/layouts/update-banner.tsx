@@ -29,6 +29,11 @@ export function UpdateBanner(): ReactElement | null {
     if (status === 'not-available' && !silent) {
       toast.add({ type: 'success', description: message || "You're up to date." })
     }
+    // A check that couldn't run (a development build): says why, rather
+    // than reporting the app up to date
+    if (status === 'idle' && message && !silent) {
+      toast.add({ type: 'info', description: message })
+    }
   }, [status, message, silent])
 
   if (status === 'available') {
