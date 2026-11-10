@@ -149,7 +149,9 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
               formula={preview.formula}
               type={preview.type}
               stale={isStale}
-              onMarginChange={(margin) => marginField.onChange(String(margin))}
+              // The chart isn't a form control, so the read-only fieldset
+              // doesn't stop it: no dragging while a run is in progress
+              onMarginChange={locked ? undefined : (margin) => marginField.onChange(String(margin))}
             />
           )}
 
@@ -157,6 +159,8 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
             type={ruleType}
             margin={marginField.input}
             threshold={thresholdField.input}
+            marginProps={marginField.props}
+            thresholdProps={thresholdField.props}
             onMarginChange={(margin) => {
               marginField.onChange(margin)
             }}

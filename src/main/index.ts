@@ -313,7 +313,11 @@ if (!isRelaunching) {
   // detached in its own process group (see RManager.runProcess), so without
   // this a running simulation would outlive the app. Forced straight away:
   // the app won't be around for the usual grace period after a cancel.
-  app.on('before-quit', () => {
+  // On will-quit, not before-quit: before-quit fires before the window's
+  // "unsaved changes" prompt, so choosing Cancel there would keep the app
+  // open with its run already killed. will-quit only fires once every
+  // window has closed and the quit is certain.
+  app.on('will-quit', () => {
     batchService.cancel()
     simulationService.cancel()
     rManager.killAll()

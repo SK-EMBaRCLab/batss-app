@@ -48,7 +48,13 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
                   }
                 }}
               >
-                <SelectTrigger aria-labelledby={labelId}>
+                <SelectTrigger
+                  aria-labelledby={labelId}
+                  // formisch's focus and blur: mark the choice touched, so
+                  // its error shows once used (see step-errors.ts)
+                  onFocus={field.props.onFocus}
+                  onBlur={field.props.onBlur}
+                >
                   <SelectValue placeholder="Select outcome type" className="capitalize" />
                 </SelectTrigger>
 

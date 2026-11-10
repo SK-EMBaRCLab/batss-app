@@ -132,9 +132,20 @@ export function NotifySetting(): ReactElement {
 
   useEffect(() => {
     let cancelled = false
-    window.settings.getNotifyOnRunFinish().then((value) => {
-      if (!cancelled) setEnabled(value)
-    })
+    window.settings
+      .getNotifyOnRunFinish()
+      .then((value) => {
+        if (!cancelled) setEnabled(value)
+      })
+      .catch((error) => {
+        // Otherwise the checkbox would stay disabled for good. Shows the
+        // setting's default (on, as in settings.ipc.ts); changing it saves
+        // as usual.
+        console.error('Loading the notification setting failed:', error)
+        if (cancelled) return
+        setEnabled(true)
+        toast.add({ type: 'error', title: "Couldn't load the notification setting" })
+      })
     return () => {
       cancelled = true
     }

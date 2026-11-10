@@ -62,7 +62,13 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                     }
                   }}
                 >
-                  <SelectTrigger aria-labelledby={labelId}>
+                  <SelectTrigger
+                    aria-labelledby={labelId}
+                    // formisch's focus and blur: mark the choice touched, so
+                    // its error shows once used (see step-errors.ts)
+                    onFocus={field.props.onFocus}
+                    onBlur={field.props.onBlur}
+                  >
                     <SelectValue placeholder="Select effect type">
                       {selectedTreatmentEffect?.label}
                     </SelectValue>

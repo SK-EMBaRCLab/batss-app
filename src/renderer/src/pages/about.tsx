@@ -1,5 +1,4 @@
-import { type ReactElement } from 'react'
-import { useEffect } from 'react'
+import { type ReactElement, useEffect } from 'react'
 
 import { AboutCredits } from '@/components/about/about-credits'
 import { AboutDisclaimer } from '@/components/about/about-disclaimer'
@@ -15,7 +14,7 @@ export default function About(): ReactElement {
   }, [loadAppVersion])
 
   return (
-    <div className="overflow-y-auto p-6 lg:p-16 grid gap-8 justify-center text-center">
+    <div className="grid h-full justify-center gap-8 overflow-y-auto p-6 text-center lg:p-16">
       <AboutHeader />
       <AboutDisclaimer />
       <AboutCredits />

@@ -1,3 +1,4 @@
+import type { FieldElementProps } from '@formisch/react'
 import { DECISION_RULE_LABELS } from '@shared/design-rules'
 import type { DecisionRule } from '@shared/simulation-types'
 import { type ReactElement, useId } from 'react'
@@ -10,6 +11,11 @@ type DecisionRuleFieldsProps = {
   margin: string | number | undefined
   threshold: string | number | undefined
 
+  // formisch's props for each input (name, ref, focus and blur), which mark
+  // it touched and validate it when it loses focus, as NumericField does
+  marginProps: FieldElementProps
+  thresholdProps: FieldElementProps
+
   onMarginChange: (margin: string) => void
   onThresholdChange: (threshold: string) => void
 
@@ -21,6 +27,8 @@ export function DecisionRuleFields({
   type,
   margin,
   threshold,
+  marginProps,
+  thresholdProps,
   onMarginChange,
   onThresholdChange,
   marginErrors,
@@ -36,6 +44,7 @@ export function DecisionRuleFields({
           <FieldLabel htmlFor={`${id}-margin`}>{labels.margin}</FieldLabel>
 
           <Input
+            {...marginProps}
             id={`${id}-margin`}
             type="number"
             step="0.01"
@@ -50,6 +59,7 @@ export function DecisionRuleFields({
           <FieldLabel htmlFor={`${id}-threshold`}>{labels.threshold}</FieldLabel>
 
           <Input
+            {...thresholdProps}
             id={`${id}-threshold`}
             type="number"
             step="0.01"

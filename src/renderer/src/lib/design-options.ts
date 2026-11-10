@@ -35,7 +35,7 @@ export const treatmentEffects = [
     symbol: 'RR',
     enabled: false,
     description:
-      'Compares the probability of experiencing the event between treatment and control groups. An risk ratio of 1 indicates no effect of treatment on the event probability; values above 1 increase event probability, and values below 1 decrease them'
+      'Compares the probability of experiencing the event between treatment and control groups. A risk ratio of 1 indicates no effect of treatment on the event probability; values above 1 increase event probability, and values below 1 decrease them'
   }
 ] as const
 
