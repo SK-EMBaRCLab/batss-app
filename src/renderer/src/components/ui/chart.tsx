@@ -217,7 +217,8 @@ function ChartTooltipContent({
                     )}
                     <div
                       className={cn(
-                        'flex flex-1 justify-between leading-none',
+                        // gap-4: keeps a long label (e.g. Inconclusive) off its value
+                        'flex flex-1 justify-between gap-4 leading-none',
                         nestLabel ? 'items-end' : 'items-center'
                       )}
                     >

@@ -47,11 +47,10 @@ export function ResultsBarChart({
     )
   }))
 
-  // Only the outcomes this run produced, so a design without a futility
-  // rule doesn't show an empty Futility entry in the legend
-  const outcomes = SIMULATION_OUTCOMES.filter((outcome) =>
+  // The outcomes this run produced, so a design without a futility rule
+  // has no empty Futility entry in the legend or tooltip
+  const produced = (outcome: SimulationOutcome): boolean =>
     data.some((row) => row.Outcome === outcome)
-  )
 
   // Only when trials could stop for superiority, the bar the targets are for
   const referenceLines = showRefLines && hasSuperiorOutcome(data)
@@ -120,12 +119,19 @@ export function ResultsBarChart({
           </>
         )}
 
-        {outcomes.map((outcome) => (
+        {/* Every outcome's bar, always, even one this run didn't produce
+            (it's 0 high, and kept out of the legend and tooltip). Recharts
+            stacks bars in the order they're added to the chart, not the
+            order written here: leaving one out would add it last, on top
+            of the stack, when switching to a run that has it. */}
+        {SIMULATION_OUTCOMES.map((outcome) => (
           <Bar
             key={outcome}
             dataKey={OUTCOME_KEYS[outcome]}
             stackId="a"
             fill={`var(--color-${OUTCOME_KEYS[outcome]})`}
+            legendType={produced(outcome) ? 'rect' : 'none'}
+            tooltipType={produced(outcome) ? undefined : 'none'}
           />
         ))}
       </BarChart>
