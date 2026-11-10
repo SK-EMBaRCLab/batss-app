@@ -1,4 +1,12 @@
-import { dialog, shell } from 'electron'
+import {
+  BrowserWindow,
+  dialog,
+  type IpcMainInvokeEvent,
+  type MessageBoxOptions,
+  type OpenDialogOptions,
+  type SaveDialogOptions,
+  shell
+} from 'electron'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -12,6 +20,31 @@ import { OUTPUT_PATH_KEY } from '../settings.constants'
 import { handle, on } from './trusted-ipc'
 
 const DESIGN_FILE_EXTENSION = 'design'
+
+// Dialogs belong to the window that asked: a sheet attached to it on
+// macOS, and kept in front of it on Windows, rather than a free-floating
+// panel that can open behind it
+type Owner = BrowserWindow | null
+
+const ownerOf = (event: IpcMainInvokeEvent): Owner => BrowserWindow.fromWebContents(event.sender)
+
+const showMessageBox = (
+  owner: Owner,
+  options: MessageBoxOptions
+): ReturnType<typeof dialog.showMessageBox> =>
+  owner ? dialog.showMessageBox(owner, options) : dialog.showMessageBox(options)
+
+const showSaveDialog = (
+  owner: Owner,
+  options: SaveDialogOptions
+): ReturnType<typeof dialog.showSaveDialog> =>
+  owner ? dialog.showSaveDialog(owner, options) : dialog.showSaveDialog(options)
+
+const showOpenDialog = (
+  owner: Owner,
+  options: OpenDialogOptions
+): ReturnType<typeof dialog.showOpenDialog> =>
+  owner ? dialog.showOpenDialog(owner, options) : dialog.showOpenDialog(options)
 
 function sanitizeFileName(name: string): string {
   const withoutControlChars = Array.from(name)
@@ -61,13 +94,17 @@ function designFileText(data: unknown): { design: StudyDesign; text: string } {
   return { design: checked.data, text }
 }
 
-async function saveViaDialog(data: StudyDesign, text: string): Promise<SaveResultResponse> {
+async function saveViaDialog(
+  owner: Owner,
+  data: StudyDesign,
+  text: string
+): Promise<SaveResultResponse> {
   const designName = data.name || 'Untitled Design'
   const fileName = `${sanitizeFileName(designName)}.${DESIGN_FILE_EXTENSION}`
 
   const defaultPath = path.join(settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()), fileName)
 
-  const { canceled, filePath } = await dialog.showSaveDialog({
+  const { canceled, filePath } = await showSaveDialog(owner, {
     defaultPath,
     filters: [{ name: 'BATSS Studio Study Design', extensions: [DESIGN_FILE_EXTENSION] }]
   })
@@ -95,12 +132,12 @@ export function registerDesignFilesIPC(): void {
     designHasUnsavedChanges = dirty === true
   })
 
-  handle(IPC.design.canLeave, async () => {
+  handle(IPC.design.canLeave, async (event) => {
     if (!designHasUnsavedChanges) {
       return true
     }
 
-    const result = await dialog.showMessageBox({
+    const result = await showMessageBox(ownerOf(event), {
       type: 'warning',
       title: 'Unsaved Design',
       message: 'Your design has unsaved changes.',
@@ -122,11 +159,11 @@ export function registerDesignFilesIPC(): void {
     }
   })
 
-  handle(IPC.design.confirmStopRun, async (_, data: unknown) => {
+  handle(IPC.design.confirmStopRun, async (event, data: unknown) => {
     // Only two valid values; never put an unchecked value in dialog text
     const kind: Exclude<EngineBusy, 'idle'> = data === 'batch' ? 'batch' : 'simulation'
 
-    const result = await dialog.showMessageBox({
+    const result = await showMessageBox(ownerOf(event), {
       type: 'warning',
       title: kind === 'batch' ? 'Batch Running' : 'Simulation Running',
       message: `A ${kind} is still running.`,
@@ -144,11 +181,11 @@ export function registerDesignFilesIPC(): void {
 
   handle(
     IPC.design.saveResult,
-    async (_, data: unknown, knownPath?: unknown): Promise<SaveResultResponse> => {
+    async (event, data: unknown, knownPath?: unknown): Promise<SaveResultResponse> => {
       const { design, text } = designFileText(data)
 
       if (typeof knownPath !== 'string' || !userChosenPaths.has(path.resolve(knownPath))) {
-        return saveViaDialog(design, text)
+        return saveViaDialog(ownerOf(event), design, text)
       }
       try {
         await fs.writeFile(knownPath, text, 'utf8')
@@ -157,7 +194,7 @@ export function registerDesignFilesIPC(): void {
       } catch {
         // Remembered path is gone (moved/deleted outside the app) —
         // fall back to the picker instead of failing with no recovery.
-        return saveViaDialog(design, text)
+        return saveViaDialog(ownerOf(event), design, text)
       }
     }
   )
@@ -181,8 +218,9 @@ export function registerDesignFilesIPC(): void {
     return true
   })
 
-  handle(IPC.design.loadResult, async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
+  handle(IPC.design.loadResult, async (event) => {
+    const owner = ownerOf(event)
+    const { canceled, filePaths } = await showOpenDialog(owner, {
       // Electron 43+ defaults to Downloads; start where designs are saved.
       defaultPath: settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath()),
       filters: [
@@ -203,7 +241,7 @@ export function registerDesignFilesIPC(): void {
     let text: string
     try {
       if ((await fs.stat(filePath)).size > MAX_DESIGN_FILE_BYTES) {
-        await dialog.showMessageBox({
+        await showMessageBox(owner, {
           type: 'error',
           title: 'Invalid Design File',
           message: 'This file could not be opened.',
@@ -213,7 +251,7 @@ export function registerDesignFilesIPC(): void {
       }
       text = await fs.readFile(filePath, 'utf8')
     } catch {
-      await dialog.showMessageBox({
+      await showMessageBox(owner, {
         type: 'error',
         title: 'Invalid Design File',
         message: 'This file could not be opened.',
@@ -228,7 +266,7 @@ export function registerDesignFilesIPC(): void {
     try {
       parsed = JSON.parse(text)
     } catch {
-      await dialog.showMessageBox({
+      await showMessageBox(owner, {
         type: 'error',
         title: 'Invalid Design File',
         message: 'This file could not be opened.',
@@ -241,7 +279,7 @@ export function registerDesignFilesIPC(): void {
     const validation = parseStudyDesignFile(parsed)
 
     if (!validation.success) {
-      await dialog.showMessageBox({
+      await showMessageBox(owner, {
         type: 'error',
         title: 'Invalid Design File',
         message: "This file doesn't match the expected BATSS Studio design format.",

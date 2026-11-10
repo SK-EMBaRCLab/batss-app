@@ -1,5 +1,5 @@
 import { RManager } from './r-manager'
-import { PACKAGE_REPOS, REQUIRED_R_PACKAGES } from './r-packages'
+import { CRAN_REPO, PACKAGE_REPOS, REQUIRED_R_PACKAGES } from './r-packages'
 import { RuntimeReporter } from './reporter'
 import type { RuntimePackage } from './types'
 
@@ -26,10 +26,9 @@ export class PackageManager {
   ) {}
 
   private getRepositories(pkg: string): string[] {
-    const defaultRepo = 'https://cloud.r-project.org'
     const extraRepo = PACKAGE_REPOS[pkg]
 
-    return extraRepo ? [defaultRepo, extraRepo] : [defaultRepo]
+    return extraRepo ? [CRAN_REPO, extraRepo] : [CRAN_REPO]
   }
 
   private logStatus(status: RuntimePackage[]): void {
@@ -48,7 +47,7 @@ export class PackageManager {
 
   async getStatus(): Promise<RuntimePackage[]> {
     const packageRepoMap = REQUIRED_R_PACKAGES.map((pkg) => {
-      const repo = PACKAGE_REPOS[pkg] ?? 'https://cloud.r-project.org'
+      const repo = PACKAGE_REPOS[pkg] ?? CRAN_REPO
 
       return `${pkg}=${repo}`
     }).join(';')

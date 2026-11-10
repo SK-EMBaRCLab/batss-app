@@ -5,6 +5,9 @@
 // See: https://www.r-inla.org/download-install
 export const INLA_REPO = 'https://inla.r-inla-download.org/R/stable'
 
+// CRAN, where every other package comes from (Posit's global mirror)
+export const CRAN_REPO = 'https://cloud.r-project.org'
+
 export const R_PACKAGES = {
   // Installed in order.
   //   fmesher — CRAN-only package INLA depends on since v23.08.18.
@@ -23,7 +26,7 @@ export const R_PACKAGES = {
 export const REQUIRED_R_PACKAGES = [...R_PACKAGES.ordered] as const
 
 // Packages that must come from a repo other than the default CRAN
-// mirror. Anything not listed here installs from cloud.r-project.org.
+// mirror. Anything not listed here installs from CRAN_REPO.
 export const PACKAGE_REPOS: Record<string, string> = {
   INLA: INLA_REPO
 }
