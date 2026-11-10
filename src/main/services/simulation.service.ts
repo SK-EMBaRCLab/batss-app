@@ -15,6 +15,7 @@ import { OutputListener, rManager } from '../runtime/r-manager'
 import { SIMULATION_TIMEOUT_MINUTES_KEY } from '../settings.constants'
 import { engineService } from './engine.service'
 import { recordError } from './error-log.service'
+import { outcomeModel } from './outcome-model'
 import { settingsService } from './settings.service'
 
 const BATSS_INPUT_ENV = 'BATSS_STUDIO_INPUT'
@@ -121,6 +122,14 @@ export class SimulationService {
     input: SimulationRunInput,
     onOutput?: OutputListener
   ): Promise<SimulationRunResult> {
+    // Before anything starts, so nothing needs undoing. The run check
+    // only lets binary and continuous outcomes through, so this is a
+    // safety net for a type added without a model.
+    const model = outcomeModel(input.outcomeType)
+    if (!model) {
+      return { status: 'error', message: 'Only binary and continuous outcomes can be run.' }
+    }
+
     const controller = new AbortController()
     this.activeRun = { controller }
     const startedAt = Date.now()
@@ -128,33 +137,6 @@ export class SimulationService {
     // BATSS's `alternative` follows the sign of beta[2], the treatment
     // effect (log odds ratio or mean difference); no effect counts as greater
     const alternative = effectDirection(input)
-
-    let family = ''
-    let link = ''
-    let varY = ''
-
-    switch (input.outcomeType) {
-      case 'binary':
-        family = 'binomial'
-        link = 'logit'
-        varY = 'rbinom'
-        break
-      case 'continuous':
-        family = 'gaussian'
-        link = 'identity'
-        varY = 'rnorm'
-        break
-      case 'ordinal':
-        family = 'binomial'
-        link = 'logit'
-        varY = 'rbinom'
-        break
-      default:
-        family = 'binomial'
-        link = 'logit'
-        varY = 'rbinom'
-        break
-    }
 
     const cores = resolveCores(input.corePercent, input.R)
     // Created inside the try so a failure here (e.g. disk full) still ends
@@ -171,9 +153,7 @@ export class SimulationService {
           [BATSS_INPUT_ENV]: JSON.stringify({
             ...input,
             alternative,
-            family,
-            link,
-            varY,
+            ...model,
             cores
           }),
           [BATSS_OUTPUT_ENV]: outputPath

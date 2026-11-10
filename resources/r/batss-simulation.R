@@ -19,8 +19,6 @@ Sys.setenv(
 library(BATSS)
 library(INLA)
 
-Sys.setenv(R_LIBS_USER = Sys.getenv("R_LIBS_USER"))
-
 # Belt-and-suspenders alongside the env vars above: constrains
 # GMRFLib's own outer/inner thread pool (see the main project
 # discussion for what these control) to 1 thread per worker process, on
@@ -67,6 +65,9 @@ if (input$outcomeType == "binary") {
     input$meanDiff
   )
   to_delta <- function(margin) margin
+} else {
+  # The main process only sends binary and continuous outcomes
+  stop("Unsupported outcome type: ", input$outcomeType)
 }
 
 # Each rule's margin on the model's scale. A missing rule gets the other
@@ -107,11 +108,9 @@ trials <- batss.glm(
   R = input$R,
   extended = 1,
   computation = "parallel",
-  # Resolved from the "% of cores" advanced setting in the Electron
-  # main process (which is the only side that knows the real core
-  # count); 3 mirrors BATSS's own built-in default as a fallback for
-  # older callers that don't send it.
-  mc.cores = if (!is.null(input$cores)) input$cores else 3
+  # Resolved from the "% of cores" advanced setting in the Electron main
+  # process, the only side that knows the real core count
+  mc.cores = input$cores
 )
 
 summary1 <- summary(trials)
