@@ -12,8 +12,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail
+  SidebarMenuItem
 } from '@/components/ui/sidebar'
 import { navigationItems } from '@/config/navigation'
 import { useNavigation } from '@/stores/navigation'
@@ -29,7 +28,7 @@ export function AppSidebar(): ReactElement {
   ]
 
   return (
-    <Sidebar collapsible="icon" variant="floating">
+    <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -77,7 +76,6 @@ export function AppSidebar(): ReactElement {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarRail />
     </Sidebar>
   )
 }
