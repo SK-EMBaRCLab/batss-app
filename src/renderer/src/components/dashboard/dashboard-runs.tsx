@@ -1,7 +1,7 @@
 import { type ReactElement, useMemo } from 'react'
 
 import { RunStatusIcon } from '@/components/common/run-status-icon'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Item,
@@ -48,13 +48,10 @@ export function DashboardRecentRuns({
       <CardContent>
         <ItemGroup>
           {recentRuns.map((entry) => (
-            <Item
-              key={entry.id}
-              variant="outline"
-              size="sm"
-              className="cursor-pointer"
-              onClick={() => openResult(entry.id)}
-            >
+            // A full-size button over the item, as in the Results page's run
+            // list: one focusable control per run, named for it, rather than
+            // a click on a box the keyboard can't reach
+            <Item key={entry.id} variant="outline" size="sm" className="relative hover:bg-muted/50">
               <ItemMedia>
                 <RunStatusIcon status={entry.result.status} />
               </ItemMedia>
@@ -67,10 +64,17 @@ export function DashboardRecentRuns({
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <Button variant="ghost" size="sm">
+                {/* Looks like a button; the whole item is the button */}
+                <span aria-hidden className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
                   View
-                </Button>
+                </span>
               </ItemActions>
+              <button
+                type="button"
+                aria-label={`View the run from ${new Date(entry.createdAt).toLocaleString()}, ${runStatusLabel(entry.result.status)}`}
+                onClick={() => openResult(entry.id)}
+                className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
             </Item>
           ))}
         </ItemGroup>

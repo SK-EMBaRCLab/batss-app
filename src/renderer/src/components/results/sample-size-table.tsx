@@ -1,6 +1,6 @@
 import { SCENARIO_OF } from '@shared/design-rules'
 import { SampleSizeData, SampleSizeScenario } from '@shared/simulation-types'
-import { type ReactElement, useMemo, useState } from 'react'
+import { type ReactElement, useId, useMemo, useState } from 'react'
 
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -121,6 +121,7 @@ function ScenarioTable({
 
 export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }): ReactElement {
   const [quantile, setQuantile] = useState(0.5)
+  const labelId = useId()
   const h0Stats = useMemo(
     () => calculateScenarioStats(sampleSize.H0, quantile),
     [sampleSize.H0, quantile]
@@ -136,7 +137,7 @@ export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }):
       <div className="mx-auto w-full max-w-md space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="slider-quantile" className="text-sm font-medium">
+            <Label id={labelId} className="text-sm font-medium">
               Quantile
             </Label>
             <p className="text-xs text-muted-foreground">Select the quantile to display</p>
@@ -146,7 +147,8 @@ export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }):
         </div>
 
         <Slider
-          id="slider-quantile"
+          // The thumb's name (see CoreUsageField)
+          aria-labelledby={labelId}
           value={quantile}
           onValueChange={(value) => setQuantile(value as number)}
           min={0}

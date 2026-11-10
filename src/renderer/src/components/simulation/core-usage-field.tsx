@@ -1,7 +1,7 @@
 import { Field as FormischField, useField } from '@formisch/react'
 import { DEFAULT_CORE_PERCENT, resolveCoreCount } from '@shared/cores'
 import { CORE_PERCENTS } from '@shared/design-rules'
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement, useEffect, useId, useState } from 'react'
 
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
@@ -21,6 +21,10 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
   const locked = useFormLocked()
   const replicates = useField(form, { path: ['R'] })
   const [cpuCount, setCpuCount] = useState<number | null>(null)
+  // The slider's name: Base UI passes the root's aria-labelledby on to the
+  // thumb, the part that's focused (a label's htmlFor would point at the
+  // root, which isn't)
+  const labelId = useId()
 
   useEffect(() => {
     window.app.cpuCount().then(setCpuCount)
@@ -38,7 +42,7 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
           <div className="max-w-md space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="slider-core-usage" className="text-sm font-medium">
+                <Label id={labelId} className="text-sm font-medium">
                   CPU usage
                 </Label>
                 <p className="text-xs text-muted-foreground">
@@ -56,7 +60,7 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
             </div>
 
             <Slider
-              id="slider-core-usage"
+              aria-labelledby={labelId}
               disabled={locked}
               value={percent}
               onValueChange={(value) => field.onChange(value as (typeof CORE_PERCENTS)[number])}

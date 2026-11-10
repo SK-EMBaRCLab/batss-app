@@ -108,6 +108,7 @@ export function UpdateBanner(): ReactElement | null {
           <Button
             size="sm"
             variant="outline"
+            nativeButton={false}
             render={<a href={RELEASES_URL} target="_blank" rel="noreferrer" />}
           >
             View releases on GitHub

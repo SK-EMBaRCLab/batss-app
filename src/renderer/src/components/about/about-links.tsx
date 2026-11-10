@@ -15,6 +15,7 @@ export function AboutLinks(): ReactElement {
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={<a href={REPO_URL} target="_blank" rel="noreferrer" />}
         >
           <FolderGit2 />
@@ -24,6 +25,7 @@ export function AboutLinks(): ReactElement {
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={<a href={`${REPO_URL}/issues/new`} target="_blank" rel="noreferrer" />}
         >
           <Bug />
@@ -33,6 +35,7 @@ export function AboutLinks(): ReactElement {
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={<a href={LAB_URL} target="_blank" rel="noreferrer" />}
         >
           <Globe />
@@ -42,6 +45,7 @@ export function AboutLinks(): ReactElement {
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={<a href={DSI_URL} target="_blank" rel="noreferrer" />}
         >
           <HeartHandshake />

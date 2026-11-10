@@ -154,12 +154,18 @@ export function RunProgressPanel(): ReactElement | null {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={collapsed ? 'Expand' : 'Collapse'}
+          aria-label={collapsed ? 'Expand run progress' : 'Collapse run progress'}
+          aria-expanded={!collapsed}
           onClick={() => setCollapsed(!collapsed)}
         >
           {collapsed ? <ChevronUp /> : <ChevronDown />}
         </Button>
-        <Button variant="ghost" size="icon-sm" aria-label="Close" onClick={() => setClosed(true)}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Close run progress"
+          onClick={() => setClosed(true)}
+        >
           <X />
         </Button>
       </div>

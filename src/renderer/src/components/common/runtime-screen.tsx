@@ -129,6 +129,7 @@ export function RuntimeScreen(): ReactElement {
 
               <Button
                 variant="outline"
+                nativeButton={false}
                 render={<a href="https://www.r-project.org/" target="_blank" rel="noreferrer" />}
               >
                 <ExternalLink className="mr-2 size-4" />

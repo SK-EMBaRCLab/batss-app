@@ -149,7 +149,18 @@ export function DataTable<TData extends DataTableRow>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => selectRow(row)}
-                  className="group hover:cursor-pointer"
+                  // Reachable and openable from the keyboard too, as on the
+                  // batch page. Only the row's own key presses: Space on its
+                  // checkbox still just ticks it.
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget) return
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      selectRow(row)
+                    }
+                  }}
+                  className="group outline-none hover:cursor-pointer focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
