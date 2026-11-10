@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.1.0...v6.2.0) (2026-11-10)
+
+
+### Features
+
+* **results:** export a run as an R script ([b8c9e52](https://github.com/SK-EMBaRCLab/batss-app/commit/b8c9e52abf50fe595cfed0e920d4ff7110f666d0))
+
+
+### Bug Fixes
+
+* **results:** say an exported R script gives the same results as the app ([726d250](https://github.com/SK-EMBaRCLab/batss-app/commit/726d250ddbab1bac1da5ba1f6488038506933270))
+
 ## [6.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.0.1...v6.1.0) (2026-11-10)
 
 
