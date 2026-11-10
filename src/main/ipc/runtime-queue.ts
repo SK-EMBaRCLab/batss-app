@@ -10,6 +10,18 @@ type RuntimeTask = { kind: 'check' | 'update'; promise: Promise<RuntimeResult> }
 // running check's result instead, so the update silently never happened).
 let current: RuntimeTask | null = null
 
+/**
+ * Whether an update is running or waiting to. It reinstalls packages a
+ * simulation would have loaded (on Windows their files are locked while
+ * loaded), so runs aren't started meanwhile.
+ */
+export const PACKAGES_UPDATING_MESSAGE =
+  'R packages are being updated. Try again when the update has finished.'
+
+export function isUpdatingPackages(): boolean {
+  return current?.kind === 'update'
+}
+
 export function runExclusive(
   kind: RuntimeTask['kind'],
   start: () => Promise<RuntimeResult>

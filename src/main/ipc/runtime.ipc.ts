@@ -4,6 +4,7 @@ import { IPC } from '../../shared/ipc-channels'
 import { bootstrapRuntime, updateRuntime } from '../runtime/bootstrap'
 import { RuntimeReporter } from '../runtime/reporter'
 import type { RuntimeResult, RuntimeUpdate } from '../runtime/types'
+import { engineService } from '../services/engine.service'
 import { runExclusive } from './runtime-queue'
 import { batchedLogSender, safeSend } from './safe-send'
 import { handle } from './trusted-ipc'
@@ -36,7 +37,18 @@ export function registerRuntimeIPC(): void {
       : []
 
     return runExclusive('update', () =>
-      withReporter(event, (reporter) => updateRuntime(packages, reporter))
+      withReporter(event, async (reporter) => {
+        // Checked when the update actually starts (it may have waited for a
+        // check): a run has BATSS and INLA loaded, and reinstalling them
+        // under it fails on Windows and can break it elsewhere
+        if (engineService.get().busy !== 'idle') {
+          const message =
+            'Finish or cancel the running simulation or batch before updating R packages.'
+          reporter.error(message)
+          throw new Error(message)
+        }
+        return updateRuntime(packages, reporter)
+      })
     )
   })
 }

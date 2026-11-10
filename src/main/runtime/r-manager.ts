@@ -389,11 +389,11 @@ export class RManager {
       }
 
       const consume = (
-        chunk: Buffer,
+        chunk: string,
         stream: 'stdout' | 'stderr',
         tailRef: { value: string }
       ): void => {
-        tailRef.value += chunk.toString()
+        tailRef.value += chunk
         const lines = tailRef.value.split('\n')
         // Last element may be an incomplete line — keep it buffered
         // until more data (or process close) completes it, unless it has
@@ -412,13 +412,20 @@ export class RManager {
       const stdoutTailRef = { value: '' }
       const stderrTailRef = { value: '' }
 
-      child.stdout.on('data', (chunk: Buffer) => {
-        stdoutBuffer = appendCapped(stdoutBuffer, chunk.toString(), captureLimit)
+      // Decoded as UTF-8 by the stream, which holds back a character split
+      // across two chunks until the rest arrives. Decoding each chunk on
+      // its own would turn it into two replacement characters (e.g. an
+      // accented letter in a file path or username).
+      child.stdout.setEncoding('utf8')
+      child.stderr.setEncoding('utf8')
+
+      child.stdout.on('data', (chunk: string) => {
+        stdoutBuffer = appendCapped(stdoutBuffer, chunk, captureLimit)
         consume(chunk, 'stdout', stdoutTailRef)
       })
 
-      child.stderr.on('data', (chunk: Buffer) => {
-        stderrBuffer = appendCapped(stderrBuffer, chunk.toString(), captureLimit)
+      child.stderr.on('data', (chunk: string) => {
+        stderrBuffer = appendCapped(stderrBuffer, chunk, captureLimit)
         consume(chunk, 'stderr', stderrTailRef)
       })
 

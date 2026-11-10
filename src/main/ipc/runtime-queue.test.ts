@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import type { RuntimeResult } from '../runtime/types'
-import { runExclusive } from './runtime-queue'
+import { isUpdatingPackages, runExclusive } from './runtime-queue'
 
 const RESULT: RuntimeResult = { ready: true, r: true, packages: [] }
 
@@ -77,5 +77,28 @@ describe('runExclusive', () => {
 
     later.finish()
     await done
+  })
+})
+
+describe('isUpdatingPackages', () => {
+  test('is true while an update runs or waits to, and not during a check', async () => {
+    const check = controlledRun()
+    const update = controlledRun()
+
+    const checkDone = runExclusive('check', check.start)
+    expect(isUpdatingPackages()).toBe(false)
+
+    const updateDone = runExclusive('update', update.start)
+    expect(isUpdatingPackages()).toBe(true)
+
+    check.finish()
+    await checkDone
+    await settle()
+    expect(isUpdatingPackages()).toBe(true)
+
+    update.finish()
+    await updateDone
+    await settle()
+    expect(isUpdatingPackages()).toBe(false)
   })
 })
