@@ -69,6 +69,11 @@ export function RunsHistory(): ReactElement | null {
             const isSelected = entry.id === selectedEntry?.id
             const createdAt = formatRunDate(entry.createdAt)
             const duration = formatRunDuration(entry.result.durationMs)
+            // Known by its name if it has one, else by its date
+            const title = entry.name ?? createdAt
+            const details = [entry.name && createdAt, runStatusLabel(entry.result.status), duration]
+              .filter(Boolean)
+              .join(' · ')
             return (
               // A div with a full-size button laid over it, rather than the
               // Item rendered as a <button>: Item's parts are divs and a <p>,
@@ -85,16 +90,13 @@ export function RunsHistory(): ReactElement | null {
                   <RunStatusIcon status={entry.result.status} />
                 </ItemMedia>
                 <ItemContent>
-                  <ItemTitle>{createdAt}</ItemTitle>
-                  <ItemDescription>
-                    {runStatusLabel(entry.result.status)}
-                    {duration && ` · ${duration}`}
-                  </ItemDescription>
+                  <ItemTitle className="min-w-0 truncate">{title}</ItemTitle>
+                  <ItemDescription>{details}</ItemDescription>
                 </ItemContent>
                 <ItemActions>{Icon ? <Icon aria-hidden /> : null}</ItemActions>
                 <button
                   type="button"
-                  aria-label={`${createdAt}, ${runStatusLabel(entry.result.status)}`}
+                  aria-label={`${title}, ${details}`}
                   aria-current={isSelected ? 'true' : undefined}
                   ref={isSelected ? selectedButton : undefined}
                   onClick={() => selectResult(entry.id)}

@@ -1,14 +1,16 @@
 import { useDebouncedCallback } from '@tanstack/react-pacer/debouncer'
 import { type ReactTable } from '@tanstack/react-table'
-import { FileChartColumn, Search, X } from 'lucide-react'
+import { FileChartColumn, Search, Trash2, X } from 'lucide-react'
 import { Dispatch, type ReactElement, SetStateAction, useEffect, useState } from 'react'
 
+import { ConfirmDeleteRuns } from '@/components/results/confirm-delete-runs'
 import { type DataTableFeatures } from '@/components/results/data-table-features'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { outcomeTypes } from '@/lib/design-options'
 import { useDesign } from '@/stores/design'
+import { useEngine } from '@/stores/engine'
 import { DataTableRow } from '@/types/data-table-types'
 
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
@@ -26,6 +28,10 @@ export function DataTableToolbar<TData extends DataTableRow>({
   setGlobalFilter
 }: DataTableToolbarProps<TData>): ReactElement {
   const openResults = useDesign((state) => state.openResults)
+  const deleteResults = useDesign((state) => state.deleteResults)
+  // Not while a run or batch is adding results
+  const busy = useEngine((state) => state.busy) !== 'idle'
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const isFiltered = table.state.columnFilters.length > 0
   const selected = table.getSelectedRowModel().rows
   const resultCount = table.getFilteredRowModel().rows.length
@@ -34,6 +40,12 @@ export function DataTableToolbar<TData extends DataTableRow>({
     if (selected.length === 0) return
 
     openResults(selected.map((row) => row.original.id))
+  }
+
+  function deleteSelected(): void {
+    deleteResults(selected.map((row) => row.original.id))
+    // The ticks are kept by row position, which now points at other runs
+    table.resetRowSelection()
   }
 
   return (
@@ -69,6 +81,18 @@ export function DataTableToolbar<TData extends DataTableRow>({
         )}
       </div>
       <div className="flex items-center gap-2">
+        {selected.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            className="h-8"
+            disabled={busy}
+            onClick={() => setConfirmingDelete(true)}
+          >
+            <Trash2 />
+            Delete ({selected.length})
+          </Button>
+        )}
         <Button
           variant="default"
           size="sm"
@@ -81,6 +105,13 @@ export function DataTableToolbar<TData extends DataTableRow>({
         </Button>
         <DataTableViewOptions table={table} />
       </div>
+
+      <ConfirmDeleteRuns
+        count={selected.length}
+        open={confirmingDelete}
+        onOpenChange={setConfirmingDelete}
+        onConfirm={deleteSelected}
+      />
     </div>
   )
 }

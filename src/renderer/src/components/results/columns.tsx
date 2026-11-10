@@ -119,6 +119,25 @@ export const columns = columnHelper.columns([
     },
     cell: ({ getValue }) => formatRunDate(getValue())
   }),
+  // After Created At, which stays in view: a run without a name is
+  // known by its date. Hovering a name shows the run's notes
+  columnHelper.accessor((entry) => entry.name ?? '', {
+    id: 'name',
+    meta: {
+      label: 'Name'
+    },
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Name" />
+    },
+    cell: ({ row, getValue }) =>
+      getValue() ? (
+        <span className="block max-w-48 truncate" title={row.original.notes ?? getValue()}>
+          {getValue()}
+        </span>
+      ) : (
+        <EmptyCell />
+      )
+  }),
   columnHelper.accessor('result.durationMs', {
     id: 'duration',
     meta: {

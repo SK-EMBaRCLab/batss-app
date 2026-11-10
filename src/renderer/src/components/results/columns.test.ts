@@ -32,4 +32,10 @@ describe('searchText', () => {
     expect(text).toContain('2m 3s')
     expect(text).toContain('0.3')
   })
+
+  test("holds the run's name and notes", () => {
+    const text = searchText({ ...ENTRY, name: 'Low burn-in', notes: 'For the grant' })
+    expect(text).toContain('Low burn-in')
+    expect(text).toContain('For the grant')
+  })
 })
