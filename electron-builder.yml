@@ -25,6 +25,8 @@ win:
   executableName: batss-studio
   icon: build/icon.ico
 nsis:
+  # Removes Albatross (the app's name before 6.0) after installing
+  include: build/installer.nsh
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
@@ -58,6 +60,14 @@ linux:
     - deb
   maintainer: Arlene Jiang <arlene.jiang@sickkids.ca>
   category: Utility
+# The package was called albatross before 6.0. dpkg treats a renamed package
+# as a different one, so without these BATSS Studio installed next to
+# Albatross and the old app kept offering the update. Replaces and
+# Conflicts together make dpkg remove albatross while installing this.
+deb:
+  fpm:
+    - --replaces=albatross
+    - --conflicts=albatross
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false

@@ -22,6 +22,7 @@ import { registerUpdateIPC } from './ipc/update.ipc'
 import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
 import { migrateLegacyDataFolder, pinAppIdentity } from './services/filesystem/app-paths'
+import { offerToRemoveLegacyMacApp } from './services/legacy-mac-app'
 import { settingsService } from './services/settings.service'
 import { simulationService } from './services/simulation.service'
 
@@ -147,6 +148,8 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
+    // Once the window is up, so the question has a window to belong to
+    if (mainWindow) void offerToRemoveLegacyMacApp(mainWindow)
   })
 
   let saveBoundsTimer: NodeJS.Timeout | null = null
