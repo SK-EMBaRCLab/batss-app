@@ -14,6 +14,20 @@ type UpdateStore = UpdateState & {
   advance: () => Promise<void>
 }
 
+// Every optional field, unset. Main sends each state whole, so applying
+// one starts from these: a merge would keep the last state's version,
+// progress or error (e.g. an old error alongside "checking").
+// (satisfies: a field added to UpdateState must be listed here too)
+const CLEARED = {
+  version: undefined,
+  progress: undefined,
+  error: undefined,
+  silent: undefined,
+  manual: undefined
+} satisfies Record<Exclude<keyof UpdateState, 'status' | 'message'>, undefined>
+
+const replacing = (state: UpdateState): UpdateState => ({ ...CLEARED, ...state })
+
 export const useUpdate = create<UpdateStore>((set, get) => ({
   status: 'idle',
   message: '',
@@ -26,12 +40,18 @@ export const useUpdate = create<UpdateStore>((set, get) => ({
     // Subscribed on its own line: inside `import.meta.hot?.dispose(...)`
     // it would be skipped in production builds, where import.meta.hot is
     // undefined, and the window would never hear about updates
-    const unsubscribe = window.update.onStatus((state) => set(state))
+    let receivedPush = false
+    const unsubscribe = window.update.onStatus((state) => {
+      receivedPush = true
+      set(replacing(state))
+    })
     // Dev only: a hot-reloaded store would otherwise leave this listener behind
     import.meta.hot?.dispose(unsubscribe)
 
+    // The state when the window opened. Asked for after subscribing, so no
+    // push is missed, but only used if none has arrived: it may be older
     const current = await window.update.get()
-    set(current)
+    if (!receivedPush) set(replacing(current))
 
     // Runs once per launch so users learn about a new release without
     // a trip to Settings. Stays silent unless there's actually an
