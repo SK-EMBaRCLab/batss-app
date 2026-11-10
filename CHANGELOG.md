@@ -1,5 +1,25 @@
 # Changelog
 
+## [6.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.0.0...v6.0.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **a11y:** name the sliders, open runs from the keyboard, and fix link buttons ([7467402](https://github.com/SK-EMBaRCLab/batss-app/commit/7467402a005e7efdf0171ba1b34d48317a4f9fd2))
+* **errors:** give failed saves an error reference ([ad23d19](https://github.com/SK-EMBaRCLab/batss-app/commit/ad23d19cea25a2e5170168fef5283ca92909f12b))
+* **export:** save charts and the batch template through the app's own Save dialog ([e3c928b](https://github.com/SK-EMBaRCLab/batss-app/commit/e3c928be48feb04697117d250445f3441c7b40c5))
+* keep runs alive when a quit is cancelled, and other small fixes ([1f88ab2](https://github.com/SK-EMBaRCLab/batss-app/commit/1f88ab2fefcad30933afdaf3dee378106f7140f5))
+* **packaging:** remove Albatross when installing BATSS Studio ([e9e396c](https://github.com/SK-EMBaRCLab/batss-app/commit/e9e396cd62ccad1a664db1fd1f6a93b5d34ec229))
+* **results:** drop the BATSS version label ([0a74a1f](https://github.com/SK-EMBaRCLab/batss-app/commit/0a74a1fd97752a9ee44097822f9bf7258524176c))
+* **results:** keep the bar order when switching results, and space the tooltip ([79a013a](https://github.com/SK-EMBaRCLab/batss-app/commit/79a013a80a310c7f0ed5d8988653ffb087e3a9f2))
+* **results:** search the runs table as shown, and add the control probability column ([994f8e6](https://github.com/SK-EMBaRCLab/batss-app/commit/994f8e6611ab57972a7fe3443ac76bcba3065a4e))
+* **results:** show every run unless comparing, and keep the viewed run in view ([0abe37c](https://github.com/SK-EMBaRCLab/batss-app/commit/0abe37cc150e947214de29fde290c354e0f716f1))
+* **results:** type summary rows as possibly missing a scenario ([cf48aca](https://github.com/SK-EMBaRCLab/batss-app/commit/cf48aca23c1a1a3a422114dc8adefd21e19fff0e))
+* **runtime:** decode R output as UTF-8, and keep package updates and runs apart ([21d37ce](https://github.com/SK-EMBaRCLab/batss-app/commit/21d37ced0828ed88799767538f6b2dcaced69320))
+* **simulation:** fail clearly on an unsupported outcome type ([ae88c49](https://github.com/SK-EMBaRCLab/batss-app/commit/ae88c495eb5a45c58dc1b329aaaba65e99c6dbdb))
+* **updates:** don't stay on "Checking for updates" in development builds ([4a2e51d](https://github.com/SK-EMBaRCLab/batss-app/commit/4a2e51dc4073757f5e7a4236000605cc6cf8155f))
+* **updates:** replace the update state instead of merging it ([a1a53e3](https://github.com/SK-EMBaRCLab/batss-app/commit/a1a53e3bee6a4ee3ac46802228778191d6139148))
+
 ## [6.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.9.0...v6.0.0) (2026-11-10)
 
 
