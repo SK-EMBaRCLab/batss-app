@@ -5,8 +5,11 @@ import type { DecisionRule, SimulationOutcome } from '@shared/simulation-types'
  * rule chart, so a rule's shading matches its outcome's bar.
  */
 export const OUTCOME_COLOURS = {
-  'Experimental Superior': 'var(--chart-2)',
-  Futility: 'var(--chart-1)',
+  // Green
+  'Experimental Superior': 'var(--chart-3)',
+  // Light yellow, a paler --chart-2
+  Futility: 'oklch(0.89 0.12 92)',
+  // Grey
   Inconclusive: 'oklch(0.62 0 0)'
 } as const satisfies Record<SimulationOutcome, string>
 

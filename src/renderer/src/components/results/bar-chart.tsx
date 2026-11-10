@@ -1,7 +1,15 @@
-import { SIMULATION_OUTCOMES, SIMULATION_SCENARIOS } from '@shared/design-rules'
+import { SIMULATION_SCENARIOS } from '@shared/design-rules'
 import { SimulationChartRow, type SimulationOutcome } from '@shared/simulation-types'
 import { type ReactElement } from 'react'
-import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ReferenceLine,
+  type TooltipContentProps,
+  XAxis,
+  YAxis
+} from 'recharts'
 
 import {
   ChartConfig,
@@ -14,19 +22,34 @@ import {
 import { OUTCOME_COLOURS } from '@/lib/outcome-colours'
 import { hasSuperiorOutcome, POWER_TARGET, TYPE_I_ERROR_TARGET } from '@/lib/results-labels'
 
-// Each outcome's bar, in the order they're stacked
+// Each outcome's bar
 const OUTCOME_KEYS = {
   'Experimental Superior': 'superior',
   Futility: 'futility',
   Inconclusive: 'inconclusive'
 } as const satisfies Record<SimulationOutcome, string>
 
+// Stacked from the bottom up: superiority at the bottom, futility on
+// top. The legend lists them in this order
+const STACK_ORDER = [
+  'Experimental Superior',
+  'Inconclusive',
+  'Futility'
+] as const satisfies readonly SimulationOutcome[]
+
 const chartConfig = Object.fromEntries(
-  SIMULATION_OUTCOMES.map((outcome) => [
+  STACK_ORDER.map((outcome) => [
     OUTCOME_KEYS[outcome],
     { label: outcome, color: OUTCOME_COLOURS[outcome] }
   ])
 ) satisfies ChartConfig
+
+// The outcomes listed as they're stacked, read from the top down.
+// Recharts hands the tooltip the bars bottom first, and its itemSorter
+// only applies to its own tooltip, not this one
+function TopDownTooltipContent({ active, label, payload }: TooltipContentProps): ReactElement {
+  return <ChartTooltipContent active={active} label={label} payload={[...payload].reverse()} />
+}
 
 const percent = (share: number): string => `${Math.round(share * 100)}%`
 
@@ -40,7 +63,7 @@ export function ResultsBarChart({
   const chartData = SIMULATION_SCENARIOS.map((scenario) => ({
     scenario,
     ...Object.fromEntries(
-      SIMULATION_OUTCOMES.map((outcome) => [
+      STACK_ORDER.map((outcome) => [
         OUTCOME_KEYS[outcome],
         data.find((x) => x.Scenario === scenario && x.Outcome === outcome)?.Proportion ?? 0
       ])
@@ -86,7 +109,7 @@ export function ResultsBarChart({
           }}
         />
 
-        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartTooltip content={TopDownTooltipContent} />
 
         <ChartLegend content={<ChartLegendContent />} />
 
@@ -104,15 +127,17 @@ export function ResultsBarChart({
                 fontSize: 12
               }}
             />
+            {/* The text colour: green, the old colour, is now the
+                superior bar's */}
             <ReferenceLine
               y={POWER_TARGET}
-              stroke="var(--chart-3)"
+              stroke="var(--foreground)"
               strokeWidth={2}
               strokeDasharray="6 3"
               label={{
                 value: `Power Target (${percent(POWER_TARGET)})`,
                 position: 'right',
-                fill: 'var(--chart-3)',
+                fill: 'var(--foreground)',
                 fontSize: 12
               }}
             />
@@ -124,7 +149,7 @@ export function ResultsBarChart({
             stacks bars in the order they're added to the chart, not the
             order written here: leaving one out would add it last, on top
             of the stack, when switching to a run that has it. */}
-        {SIMULATION_OUTCOMES.map((outcome) => (
+        {STACK_ORDER.map((outcome) => (
           <Bar
             key={outcome}
             dataKey={OUTCOME_KEYS[outcome]}
