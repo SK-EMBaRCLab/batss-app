@@ -57,12 +57,13 @@ describe('listenToLog', () => {
     ipc.renderer.removeAllListeners()
   })
 
-  test('hands over a batch of log lines one line at a time', () => {
+  test('hands over each batch of log lines whole, as main sent it', () => {
     const callback = vi.fn()
     listenToLog('simulation:log', callback)
 
     fromMain('simulation:log', ['Loading BATSS', 'Running 1000 trials'])
+    fromMain('simulation:log', ['Results'])
 
-    expect(callback.mock.calls).toEqual([['Loading BATSS'], ['Running 1000 trials']])
+    expect(callback.mock.calls).toEqual([[['Loading BATSS', 'Running 1000 trials']], [['Results']]])
   })
 })

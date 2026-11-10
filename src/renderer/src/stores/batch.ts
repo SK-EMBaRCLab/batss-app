@@ -68,10 +68,6 @@ export const useBatch = create<BatchState>((set) => ({
         )
 
         const unsubscribeUpdate = window.batch.onUpdate((update: BatchUpdate) => {
-          // Apply the previous row's last log lines first, so a late stage
-          // marker can't override the new row's 'init' below
-          teardownLog.flush()
-
           // Set by BatchService just before each row runs — as opposed to the
           // identical completed=0 update sent once up front for "Starting
           // batch of N run(s)"
@@ -96,10 +92,6 @@ export const useBatch = create<BatchState>((set) => ({
         })
 
         const unsubscribeRow = window.batch.onRowDone((entry: BatchRunEntry) => {
-          // Same for the row that just finished: its last lines (e.g. the
-          // "Results" marker) must land before the stage is cleared below
-          teardownLog.flush()
-
           set((state) => ({
             entries: [...state.entries, entry],
             // Brief gap until the next row's onUpdate re-arms this — avoids

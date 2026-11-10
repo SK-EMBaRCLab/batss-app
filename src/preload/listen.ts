@@ -13,7 +13,11 @@ export function listen<T>(channel: string, callback: (payload: T) => void): () =
   }
 }
 
-/** Like listen(), for R's log: main sends lines in batches (see batchedLogSender). */
-export function listenToLog(channel: string, callback: (line: string) => void): () => void {
-  return listen<string[]>(channel, (lines) => lines.forEach((line) => callback(line)))
+/**
+ * Like listen(), for R's log. Main already sends lines in batches (see
+ * batchedLogSender), so each batch is passed on whole: splitting it here
+ * only for the renderer to batch the lines again cost a second timer.
+ */
+export function listenToLog(channel: string, callback: (lines: string[]) => void): () => void {
+  return listen<string[]>(channel, callback)
 }

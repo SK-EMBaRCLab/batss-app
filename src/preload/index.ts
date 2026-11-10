@@ -45,7 +45,7 @@ const runtime = {
 
   onUpdate: (callback: (update: RuntimeUpdate) => void) => listen(IPC.runtime.update, callback),
 
-  onLog: (callback: (line: string) => void) => listenToLog(IPC.runtime.log, callback)
+  onLog: (callback: (lines: string[]) => void) => listenToLog(IPC.runtime.log, callback)
 }
 
 const design = {
@@ -76,7 +76,7 @@ const simulation = {
 
   cancelSimulation: (): Promise<boolean> => ipcRenderer.invoke(IPC.simulation.cancel),
 
-  onLog: (callback: (line: string) => void) => listenToLog(IPC.simulation.log, callback)
+  onLog: (callback: (lines: string[]) => void) => listenToLog(IPC.simulation.log, callback)
 }
 
 const theme = {
@@ -123,7 +123,7 @@ const batch = {
 
   onRowDone: (callback: (entry: BatchRunEntry) => void) => listen(IPC.batch.rowDone, callback),
 
-  onLog: (callback: (line: string) => void) => listenToLog(IPC.batch.log, callback)
+  onLog: (callback: (lines: string[]) => void) => listenToLog(IPC.batch.log, callback)
 }
 
 const engine = {
