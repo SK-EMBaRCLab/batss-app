@@ -17,7 +17,9 @@ import {
   CORE_PERCENTS,
   DECISION_RULE_TYPES,
   OUTCOME_TYPES,
+  SCENARIO_OF,
   SIMULATION_OUTCOMES,
+  SIMULATION_SCENARIOS,
   TREATMENT_EFFECT_TYPES
 } from './design-rules'
 import type { SimulationRunResult, StudyDesign } from './simulation-types'
@@ -56,12 +58,13 @@ const designInputFileSchema = v.object({
 
 const summaryRowFileSchema = v.object({
   Outcome: v.picklist(SIMULATION_OUTCOMES),
-  'Null Effect': v.optional(v.number()),
-  'Target Effect': v.optional(v.number())
+  // Each scenario's proportion, missing when no trial ended this way
+  [SCENARIO_OF.H0]: v.optional(v.number()),
+  [SCENARIO_OF.H1]: v.optional(v.number())
 })
 
 const chartRowFileSchema = v.object({
-  Scenario: v.union([v.literal('Null Effect'), v.literal('Target Effect')]),
+  Scenario: v.picklist(SIMULATION_SCENARIOS),
   Outcome: v.picklist(SIMULATION_OUTCOMES),
   Proportion: v.number()
 })

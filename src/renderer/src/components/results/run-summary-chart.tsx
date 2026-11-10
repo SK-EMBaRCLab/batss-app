@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toast } from '@/components/ui/toast'
+import { hasSuperiorOutcome } from '@/lib/results-labels'
 import { useSelectedEntry } from '@/stores/design'
 
 import { ResultsBarChart } from './bar-chart'
@@ -82,19 +83,25 @@ export function RunSummaryChart(): ReactElement | null {
                   Export Chart
                 </DropdownMenuItem>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
-                <DropdownMenuCheckboxItem
-                  checked={options.reference}
-                  onCheckedChange={(checked) =>
-                    setOptions({ ...options, reference: checked === true })
-                  }
-                >
-                  <Minus />
-                  Reference Line
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuGroup>
+              {/* The lines are targets for the Experimental Superior bar,
+                  so there's nothing to toggle without a superiority rule */}
+              {hasSuperiorOutcome(result.chart) && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Chart Options</DropdownMenuLabel>
+                    <DropdownMenuCheckboxItem
+                      checked={options.reference}
+                      onCheckedChange={(checked) =>
+                        setOptions({ ...options, reference: checked === true })
+                      }
+                    >
+                      <Minus />
+                      Reference Line
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuGroup>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -3,6 +3,7 @@ import type {
   DECISION_RULE_TYPES,
   OUTCOME_TYPES,
   SIMULATION_OUTCOMES,
+  SIMULATION_SCENARIOS,
   TREATMENT_EFFECT_TYPES
 } from './design-rules'
 
@@ -12,6 +13,7 @@ export type OutcomeType = (typeof OUTCOME_TYPES)[number]
 export type TreatmentEffectType = (typeof TREATMENT_EFFECT_TYPES)[number]
 export type CorePercent = (typeof CORE_PERCENTS)[number]
 export type SimulationOutcome = (typeof SIMULATION_OUTCOMES)[number]
+export type SimulationScenario = (typeof SIMULATION_SCENARIOS)[number]
 
 type SimulationRunCommon = {
   N: number
@@ -70,16 +72,14 @@ export type DecisionRule = {
   threshold: number
 }
 
-export interface SimulationSummaryRow {
+// Each scenario's proportion. Left out by batss-simulation.R when no
+// simulated trial in that scenario ended this way, which reads as 0.
+export type SimulationSummaryRow = {
   Outcome: SimulationOutcome
-  // Left out by batss-simulation.R when no simulated trial in that
-  // scenario ended this way, which reads as 0
-  'Null Effect'?: number
-  'Target Effect'?: number
-}
+} & Partial<Record<SimulationScenario, number>>
 
 export interface SimulationChartRow {
-  Scenario: 'Null Effect' | 'Target Effect'
+  Scenario: SimulationScenario
   Outcome: SimulationOutcome
   Proportion: number
 }

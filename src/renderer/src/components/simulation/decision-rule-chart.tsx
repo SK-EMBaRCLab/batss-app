@@ -4,6 +4,7 @@ import { type ReactElement, useMemo, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart'
+import { OUTCOME_COLOURS, RULE_OUTCOME } from '@/lib/outcome-colours'
 
 type DecisionChartProps = {
   rule: DecisionRule
@@ -51,10 +52,6 @@ function getChartType(type: OutcomeType | undefined): {
 
 // Short names for the margin line's label
 const MARGIN_ABBREVIATIONS = { superiority: 'SM', futility: 'FM' } as const
-
-// The shaded probability's colour, matching the outcome's bar in the
-// results: yellow for Experimental Superior, blue for Futility
-const REGION_COLOURS = { superiority: 'var(--chart-2)', futility: 'var(--chart-1)' } as const
 
 export function DecisionChart({
   rule,
@@ -200,12 +197,13 @@ export function DecisionChart({
           strokeWidth={2}
         />
 
-        {/* ONLY the decision side is shaded */}
+        {/* ONLY the decision side is shaded, in the colour of the outcome
+            the rule stops the trial with, as in the results bar chart */}
         <Area
           type="monotone"
           dataKey="decisionRegion"
           stroke="none"
-          fill={REGION_COLOURS[rule.type]}
+          fill={OUTCOME_COLOURS[RULE_OUTCOME[rule.type]]}
           fillOpacity={0.55}
         />
 

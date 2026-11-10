@@ -1,3 +1,4 @@
+import { DEFAULT_CORE_PERCENT } from '@shared/cores'
 import {
   anyNumber,
   CORE_PERCENTS,
@@ -220,5 +221,5 @@ export const initialDesignInput: DesignInput = {
   // Added with the decision rules step's buttons; at least one is needed
   decisionRules: [],
 
-  corePercent: 75
+  corePercent: DEFAULT_CORE_PERCENT
 }

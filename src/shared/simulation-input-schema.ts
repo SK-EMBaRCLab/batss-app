@@ -34,6 +34,9 @@ const decisionRuleSchema = v.variant(
   'Decision rules must be superiority or futility rules.'
 )
 
+// "25, 50, 75 or 100", from the allowed values
+const allowedCorePercents = `${CORE_PERCENTS.slice(0, -1).join(', ')} or ${CORE_PERCENTS.at(-1)}`
+
 const commonFields = {
   N: NUMBER_FIELDS.N,
   m0: NUMBER_FIELDS.m0,
@@ -47,7 +50,7 @@ const commonFields = {
     v.check((rules) => oneRulePerType.holds(rules), oneRulePerType.message),
     v.check((rules) => cutoffsDoNotOverlap.holds(rules), cutoffsDoNotOverlap.message)
   ),
-  corePercent: v.optional(v.picklist(CORE_PERCENTS, 'Core usage must be 25, 50, 75 or 100%.'))
+  corePercent: v.optional(v.picklist(CORE_PERCENTS, `Core usage must be ${allowedCorePercents}%.`))
 }
 
 const binaryInputSchema = v.pipe(

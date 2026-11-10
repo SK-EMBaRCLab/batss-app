@@ -60,9 +60,10 @@ export function CoreUsageField({ form }: { form: SimulationFormStore }): ReactEl
               disabled={locked}
               value={percent}
               onValueChange={(value) => field.onChange(value as (typeof CORE_PERCENTS)[number])}
-              min={25}
-              max={100}
-              step={25}
+              min={CORE_PERCENTS[0]}
+              max={CORE_PERCENTS[CORE_PERCENTS.length - 1]}
+              // The allowed values are evenly spaced
+              step={CORE_PERCENTS[1] - CORE_PERCENTS[0]}
             />
 
             <div className="flex justify-between text-xs text-muted-foreground">

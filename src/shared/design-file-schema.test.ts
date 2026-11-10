@@ -143,3 +143,32 @@ describe('parseSimulationRunResult', () => {
     expect(parseSimulationRunResult('not json')).toBeNull()
   })
 })
+
+describe('scenarios', () => {
+  test('a result row holds a value for each simulated scenario only', () => {
+    const result = {
+      status: 'success',
+      package: '1.2.1',
+      table: [{ Outcome: 'Inconclusive', 'Null Effect': 0.4, 'Target Effect': 0.2, Other: 1 }],
+      chart: [{ Scenario: 'Target Effect', Outcome: 'Inconclusive', Proportion: 0.2 }],
+      sampleSize: { H0: { control: [], experimental: [] }, H1: { control: [], experimental: [] } }
+    }
+    const parsed = parseSimulationRunResult(result)
+    expect(parsed?.status === 'success' && parsed.table[0]).toEqual({
+      Outcome: 'Inconclusive',
+      'Null Effect': 0.4,
+      'Target Effect': 0.2
+    })
+  })
+
+  test('rejects a chart row for a scenario BATSS does not simulate', () => {
+    const result = {
+      status: 'success',
+      package: '1.2.1',
+      table: [],
+      chart: [{ Scenario: 'Other Effect', Outcome: 'Inconclusive', Proportion: 1 }],
+      sampleSize: { H0: { control: [], experimental: [] }, H1: { control: [], experimental: [] } }
+    }
+    expect(parseSimulationRunResult(result)).toBeNull()
+  })
+})

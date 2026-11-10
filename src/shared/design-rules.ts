@@ -25,6 +25,13 @@ export const CORE_PERCENTS = [25, 50, 75, 100] as const
 // How a simulated trial ended, as batss-simulation.R labels BATSS's
 // groupExperimental codes 1, 2 and 0
 export const SIMULATION_OUTCOMES = ['Experimental Superior', 'Futility', 'Inconclusive'] as const
+// The two scenarios BATSS simulates, as batss-simulation.R names them:
+// H0 with no treatment effect, H1 with the target effect
+export const SIMULATION_SCENARIOS = ['Null Effect', 'Target Effect'] as const
+export const SCENARIO_OF = { H0: 'Null Effect', H1: 'Target Effect' } as const satisfies Record<
+  'H0' | 'H1',
+  (typeof SIMULATION_SCENARIOS)[number]
+>
 
 const finiteNumber = (label: string): v.GenericSchema<number> =>
   v.pipe(v.number(`${label} must be a number.`), v.finite(`${label} must be a finite number.`))

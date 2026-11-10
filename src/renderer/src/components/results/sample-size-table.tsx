@@ -1,3 +1,4 @@
+import { SCENARIO_OF } from '@shared/design-rules'
 import { SampleSizeData, SampleSizeScenario } from '@shared/simulation-types'
 import { type ReactElement, useMemo, useState } from 'react'
 
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { SCENARIO_LABELS } from '@/lib/results-labels'
 
 type SampleSizeStats = {
   mean: number
@@ -158,9 +160,9 @@ export function SampleSizeTable({ sampleSize }: { sampleSize: SampleSizeData }):
           <span>1</span>
         </div>
       </div>
-      <ScenarioTable title="Null Effect Scenario" stats={h0Stats} quantile={quantile} />
+      <ScenarioTable title={SCENARIO_LABELS[SCENARIO_OF.H0]} stats={h0Stats} quantile={quantile} />
       <Separator className="h-0.5" />
-      <ScenarioTable title="Target Treatment Effect Scenario" stats={h1Stats} quantile={quantile} />
+      <ScenarioTable title={SCENARIO_LABELS[SCENARIO_OF.H1]} stats={h1Stats} quantile={quantile} />
     </div>
   )
 }

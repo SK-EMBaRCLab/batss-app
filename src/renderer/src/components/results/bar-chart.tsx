@@ -1,4 +1,4 @@
-import { SIMULATION_OUTCOMES } from '@shared/design-rules'
+import { SIMULATION_OUTCOMES, SIMULATION_SCENARIOS } from '@shared/design-rules'
 import { SimulationChartRow, type SimulationOutcome } from '@shared/simulation-types'
 import { type ReactElement } from 'react'
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
@@ -11,6 +11,8 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart'
+import { OUTCOME_COLOURS } from '@/lib/outcome-colours'
+import { hasSuperiorOutcome, POWER_TARGET, TYPE_I_ERROR_TARGET } from '@/lib/results-labels'
 
 // Each outcome's bar, in the order they're stacked
 const OUTCOME_KEYS = {
@@ -19,20 +21,14 @@ const OUTCOME_KEYS = {
   Inconclusive: 'inconclusive'
 } as const satisfies Record<SimulationOutcome, string>
 
-const chartConfig = {
-  superior: {
-    label: 'Experimental Superior',
-    color: 'var(--chart-2)'
-  },
-  futility: {
-    label: 'Futility',
-    color: 'var(--chart-1)'
-  },
-  inconclusive: {
-    label: 'Inconclusive',
-    color: 'oklch(0.62 0 0)'
-  }
-} satisfies ChartConfig
+const chartConfig = Object.fromEntries(
+  SIMULATION_OUTCOMES.map((outcome) => [
+    OUTCOME_KEYS[outcome],
+    { label: outcome, color: OUTCOME_COLOURS[outcome] }
+  ])
+) satisfies ChartConfig
+
+const percent = (share: number): string => `${Math.round(share * 100)}%`
 
 export function ResultsBarChart({
   data,
@@ -41,7 +37,7 @@ export function ResultsBarChart({
   data: SimulationChartRow[]
   showRefLines: boolean
 }): ReactElement {
-  const chartData = ['Null Effect', 'Target Effect'].map((scenario) => ({
+  const chartData = SIMULATION_SCENARIOS.map((scenario) => ({
     scenario,
     ...Object.fromEntries(
       SIMULATION_OUTCOMES.map((outcome) => [
@@ -57,13 +53,17 @@ export function ResultsBarChart({
     data.some((row) => row.Outcome === outcome)
   )
 
+  // Only when trials could stop for superiority, the bar the targets are for
+  const referenceLines = showRefLines && hasSuperiorOutcome(data)
+
   return (
     <ChartContainer config={chartConfig} className="min-h-87.5 w-full">
       <BarChart
         data={chartData}
         margin={{
           top: 20,
-          right: 160,
+          // Room on the right for the reference lines' labels
+          right: referenceLines ? 160 : 20,
           left: 20,
           bottom: 20
         }}
@@ -91,27 +91,27 @@ export function ResultsBarChart({
 
         <ChartLegend content={<ChartLegendContent />} />
 
-        {showRefLines && (
+        {referenceLines && (
           <>
             <ReferenceLine
-              y={0.05}
+              y={TYPE_I_ERROR_TARGET}
               stroke="var(--destructive)"
               strokeWidth={2}
               strokeDasharray="6 3"
               label={{
-                value: 'Type I Error Target (5%)',
+                value: `Type I Error Target (${percent(TYPE_I_ERROR_TARGET)})`,
                 position: 'right',
                 fill: 'var(--destructive)',
                 fontSize: 12
               }}
             />
             <ReferenceLine
-              y={0.8}
+              y={POWER_TARGET}
               stroke="var(--chart-3)"
               strokeWidth={2}
               strokeDasharray="6 3"
               label={{
-                value: 'Power Target (80%)',
+                value: `Power Target (${percent(POWER_TARGET)})`,
                 position: 'right',
                 fill: 'var(--chart-3)',
                 fontSize: 12

@@ -155,6 +155,8 @@ if (!is.null(scenario_error)) {
   quit(save = "no", status = 0)
 }
 
+# Scenario names must match SIMULATION_SCENARIOS in design-rules.ts:
+# H0 is the null effect, H1 the target effect
 df <- rbind(
   data.frame(
     Scenario = "Null Effect",

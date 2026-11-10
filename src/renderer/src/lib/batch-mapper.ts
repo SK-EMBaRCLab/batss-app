@@ -2,7 +2,7 @@ import type { BatchCsvRow, BatchRowValidation } from '@shared/batch-types'
 import { checkSimulationRunInput } from '@shared/simulation-input-schema'
 import * as v from 'valibot'
 
-import { designSchema } from './schema'
+import { designSchema, initialDesignInput } from './schema'
 
 const cell = (value: string | undefined): string | undefined => value?.trim() || undefined
 
@@ -113,7 +113,13 @@ const TEMPLATE_HEADERS = [
 
 type TemplateRow = Partial<Record<(typeof TEMPLATE_HEADERS)[number], string>>
 
-const SAMPLE_SIZE = { N: '216', m0: '60', m: '12', R: '10' }
+// The same sample sizes a new design starts with
+const SAMPLE_SIZE = {
+  N: String(initialDesignInput.N),
+  m0: String(initialDesignInput.m0),
+  m: String(initialDesignInput.m),
+  R: String(initialDesignInput.R)
+}
 const BINARY = { outcomeType: 'binary', probability: '0.3', treatmentEffectType: 'oddsRatio' }
 const SUPERIORITY_OR = { superiorityMargin: '1', superiorityCutoff: '0.95' }
 const FUTILITY_OR = { futilityMargin: '1', futilityCutoff: '0.05' }
