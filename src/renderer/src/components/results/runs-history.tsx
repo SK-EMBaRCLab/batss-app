@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/item'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { outcomeTypes } from '@/lib/design-options'
+import { formatRunDate, formatRunDuration } from '@/lib/run-format'
 import { runStatusLabel } from '@/lib/run-status'
-import { cn, formatDurationLabel } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { useDesign, useSelectedEntry } from '@/stores/design'
 
 export function RunsHistory(): ReactElement | null {
@@ -66,7 +67,8 @@ export function RunsHistory(): ReactElement | null {
           {[...list].reverse().map((entry) => {
             const Icon = outcomeTypes.find((type) => type.value === entry.input.outcomeType)?.icon
             const isSelected = entry.id === selectedEntry?.id
-            const createdAt = new Date(entry.createdAt).toLocaleString()
+            const createdAt = formatRunDate(entry.createdAt)
+            const duration = formatRunDuration(entry.result.durationMs)
             return (
               // A div with a full-size button laid over it, rather than the
               // Item rendered as a <button>: Item's parts are divs and a <p>,
@@ -86,8 +88,7 @@ export function RunsHistory(): ReactElement | null {
                   <ItemTitle>{createdAt}</ItemTitle>
                   <ItemDescription>
                     {runStatusLabel(entry.result.status)}
-                    {entry.result.durationMs != null &&
-                      ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
+                    {duration && ` · ${duration}`}
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions>{Icon ? <Icon aria-hidden /> : null}</ItemActions>

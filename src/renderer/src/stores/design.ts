@@ -8,10 +8,9 @@ import { requestFailed } from '@/lib/error-reference'
 import { useEngine } from './engine'
 import { useNavigation } from './navigation'
 
+// Chromium always has crypto.randomUUID, so there's no fallback
 function makeId(): string {
-  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  return crypto.randomUUID()
 }
 
 // Runs write their results into the design that started them, so

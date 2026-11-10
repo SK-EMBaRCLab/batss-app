@@ -1,9 +1,8 @@
+import type { SettingSaveResult } from '@shared/settings-types'
 import { useEffect, useState } from 'react'
 
 import { toast } from '@/components/ui/toast'
 import { logFailure, requestFailed } from '@/lib/error-reference'
-
-type SaveResult = { saved: boolean; error?: string }
 
 /**
  * An edit-then-Save setting backed by the main process: loads the stored
@@ -17,7 +16,7 @@ export function useSavedSetting({
   savedMessage
 }: {
   load: () => Promise<string>
-  save: (value: string) => Promise<SaveResult>
+  save: (value: string) => Promise<SettingSaveResult>
   savedMessage: string
 }): {
   value: string

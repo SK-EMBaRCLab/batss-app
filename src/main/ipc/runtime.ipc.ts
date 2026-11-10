@@ -18,7 +18,7 @@ function withReporter(
   const send = safeSend(event.sender)
   const log = batchedLogSender(send, IPC.runtime.log)
   const reporter = new RuntimeReporter(
-    (update: RuntimeUpdate) => send(IPC.runtime.update, update),
+    (update: RuntimeUpdate) => send(IPC.runtime.progress, update),
     log.push
   )
   return run(reporter).finally(log.flush)

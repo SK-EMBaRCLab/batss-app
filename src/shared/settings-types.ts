@@ -1,8 +1,6 @@
-// Small shared response shape for settings writes that can fail
-// validation (e.g. a typed output path that doesn't exist on disk).
-export type SetOutputPathResult = { saved: boolean; error?: string }
-
-export type SetSimulationTimeoutResult = { saved: boolean; error?: string }
+// What saving a setting that can fail validation returns (e.g. a typed
+// output path that doesn't exist on disk): the reason, if it wasn't saved
+export type SettingSaveResult = { saved: boolean; error?: string }
 
 // Shared between the Settings page (input bounds) and the main-process
 // IPC handler (validation) so the two never drift apart. A run is

@@ -6,9 +6,10 @@ import { TechnicalDetails } from '@/components/common/technical-details'
 import { Progress } from '@/components/ui/progress'
 import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds'
 import type { DurationEstimate } from '@/lib/duration-estimate'
+import { formatRunDuration } from '@/lib/run-format'
 import { type RunStage, STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
 import { runTitle } from '@/lib/run-status'
-import { formatDuration, formatDurationLabel } from '@/lib/utils'
+import { formatDuration } from '@/lib/utils'
 
 import { RunSteps } from './run-steps'
 
@@ -67,7 +68,7 @@ export function SimulationStatus({
       <p className="text-xs text-muted-foreground">
         {done
           ? lastResult?.durationMs != null
-            ? `Took ${formatDurationLabel(lastResult.durationMs / 1000)}`
+            ? `Took ${formatRunDuration(lastResult.durationMs)}`
             : null
           : `Elapsed: ${formatDuration(elapsed)}`}
       </p>

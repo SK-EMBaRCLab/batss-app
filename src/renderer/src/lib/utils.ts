@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]): string {
 
 // Stopwatch-style M:SS/H:MM:SS, for a live, ticking "Elapsed" counter
 // next to a label that already says what it is. As a bare value (e.g.
-// a table cell with nothing else around it), 0:39 reads ambiguously —
-// use formatDurationLabel below for those spots instead.
+// a table cell with nothing else around it), 0:39 reads ambiguously:
+// use formatRunDuration (lib/run-format.ts) for those spots instead.
 export function formatDuration(seconds: number): string {
   const totalSeconds = Math.floor(seconds)
 
@@ -24,9 +24,6 @@ export function formatDuration(seconds: number): string {
 
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
-
-// Shared with the main process (run-finished notifications)
-export { formatDurationLabel } from '@shared/duration'
 
 export function formatShortcut(binding: string): string {
   const isMac = navigator.userAgent.includes('Mac')

@@ -1,10 +1,9 @@
+import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '@shared/runtime-types'
 import { create } from 'zustand'
 
 import { createErrorReference, logError, withReference } from '@/lib/error-reference'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { toError } from '@/lib/utils'
-
-import type { RuntimePackage, RuntimeStatus, RuntimeUpdate } from '../../../shared/runtime-types'
 
 type RuntimeState = {
   status: RuntimeStatus

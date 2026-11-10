@@ -10,6 +10,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { formatRunDate } from '@/lib/run-format'
 import { runStatusLabel } from '@/lib/run-status'
 import { useDesign } from '@/stores/design'
 
@@ -50,7 +51,7 @@ export function DashboardStats(): ReactElement | null {
         </ItemMedia>
         <ItemContent>
           <ItemDescription>Last Run</ItemDescription>
-          <ItemTitle>{latestRun ? new Date(latestRun.createdAt).toLocaleString() : '—'}</ItemTitle>
+          <ItemTitle>{latestRun ? formatRunDate(latestRun.createdAt) : '—'}</ItemTitle>
         </ItemContent>
       </Item>
     </ItemGroup>

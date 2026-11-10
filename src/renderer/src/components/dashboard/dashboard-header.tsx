@@ -3,6 +3,7 @@ import { type ReactElement } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { formatDate } from '@/lib/run-format'
 import { useDesign } from '@/stores/design'
 
 export function DashboardHeader(): ReactElement | null {
@@ -18,9 +19,7 @@ export function DashboardHeader(): ReactElement | null {
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-semibold">{design.name}</h1>
-        <p className="text-muted-foreground mt-1">
-          Created {new Date(design.createdAt).toLocaleDateString()}
-        </p>
+        <p className="text-muted-foreground mt-1">Created {formatDate(design.createdAt)}</p>
       </div>
 
       <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import type { OutcomeType } from '@shared/simulation-types'
+import type { OutcomeType, TreatmentEffectType } from '@shared/simulation-types'
 import { ChartSpline, CircleDot, ListOrdered, type LucideIcon } from 'lucide-react'
 
 export const outcomeTypes: Array<{
@@ -40,7 +40,13 @@ export const treatmentEffects = [
     description:
       'Compares the probability of experiencing the event between treatment and control groups. A risk ratio of 1 indicates no effect of treatment on the event probability; values above 1 increase event probability, and values below 1 decrease them'
   }
-] as const
+] as const satisfies readonly {
+  value: TreatmentEffectType
+  label: string
+  symbol: string
+  enabled: boolean
+  description: string
+}[]
 
 export function getTreatmentEffectLabel(
   value: (typeof treatmentEffects)[number]['value'] | undefined

@@ -1,6 +1,5 @@
+import type { UpdateState } from '@shared/update-types'
 import { create } from 'zustand'
-
-import type { UpdateState } from '../../../shared/update-types'
 
 type UpdateStore = UpdateState & {
   initialized: boolean

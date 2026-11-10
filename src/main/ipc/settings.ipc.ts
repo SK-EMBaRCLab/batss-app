@@ -3,7 +3,7 @@ import { existsSync, statSync } from 'fs'
 import path from 'path'
 
 import { IPC } from '../../shared/ipc-channels'
-import type { SetOutputPathResult, SetSimulationTimeoutResult } from '../../shared/settings-types'
+import type { SettingSaveResult } from '../../shared/settings-types'
 import {
   MAX_SIMULATION_TIMEOUT_MINUTES,
   MIN_SIMULATION_TIMEOUT_MINUTES,
@@ -30,7 +30,7 @@ export function registerSettingsIPC(): void {
     return settingsService.get(OUTPUT_PATH_KEY, getWorkspacePath())
   })
 
-  handle(IPC.settings.setOutputPath, (_event, outputPath: unknown): SetOutputPathResult => {
+  handle(IPC.settings.setOutputPath, (_event, outputPath: unknown): SettingSaveResult => {
     const trimmed = typeof outputPath === 'string' ? outputPath.trim() : ''
 
     if (!trimmed) {
@@ -69,25 +69,22 @@ export function registerSettingsIPC(): void {
     )
   })
 
-  handle(
-    IPC.settings.setSimulationTimeoutMinutes,
-    (_event, minutes: number): SetSimulationTimeoutResult => {
-      if (!Number.isFinite(minutes) || !Number.isInteger(minutes)) {
-        return { saved: false, error: 'Enter a whole number of minutes.' }
-      }
-
-      if (minutes < MIN_SIMULATION_TIMEOUT_MINUTES || minutes > MAX_SIMULATION_TIMEOUT_MINUTES) {
-        return {
-          saved: false,
-          error: `Enter a value between ${MIN_SIMULATION_TIMEOUT_MINUTES} and ${MAX_SIMULATION_TIMEOUT_MINUTES} minutes.`
-        }
-      }
-
-      settingsService.set(SIMULATION_TIMEOUT_MINUTES_KEY, minutes)
-
-      return { saved: true }
+  handle(IPC.settings.setSimulationTimeoutMinutes, (_event, minutes: number): SettingSaveResult => {
+    if (!Number.isFinite(minutes) || !Number.isInteger(minutes)) {
+      return { saved: false, error: 'Enter a whole number of minutes.' }
     }
-  )
+
+    if (minutes < MIN_SIMULATION_TIMEOUT_MINUTES || minutes > MAX_SIMULATION_TIMEOUT_MINUTES) {
+      return {
+        saved: false,
+        error: `Enter a value between ${MIN_SIMULATION_TIMEOUT_MINUTES} and ${MAX_SIMULATION_TIMEOUT_MINUTES} minutes.`
+      }
+    }
+
+    settingsService.set(SIMULATION_TIMEOUT_MINUTES_KEY, minutes)
+
+    return { saved: true }
+  })
 
   handle(IPC.settings.getNotifyOnRunFinish, () => {
     return settingsService.get(NOTIFY_ON_RUN_FINISH_KEY, true)

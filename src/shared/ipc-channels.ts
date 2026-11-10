@@ -19,6 +19,8 @@ export const IPC = {
   runtime: {
     check: 'runtime:check',
     update: 'runtime:update',
+    // Progress of a check or update, pushed to the window that asked
+    progress: 'runtime:progress',
     log: 'runtime:log'
   },
   design: {

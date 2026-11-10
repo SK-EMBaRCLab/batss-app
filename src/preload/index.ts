@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-import type { AppearanceState, IconAppearance } from '../shared/appearance-types'
+import type { AppearanceState, IconAppearance, ThemeSource } from '../shared/appearance-types'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
 import type {
   EngineBusy,
@@ -10,7 +10,7 @@ import type {
 } from '../shared/engine-types'
 import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
-import type { SetOutputPathResult, SetSimulationTimeoutResult } from '../shared/settings-types'
+import type { SettingSaveResult } from '../shared/settings-types'
 import type {
   SaveResultResponse,
   SimulationRunInput,
@@ -43,7 +43,7 @@ const runtime = {
   update: (packageNames: string[]): Promise<RuntimeResult> =>
     ipcRenderer.invoke(IPC.runtime.update, packageNames),
 
-  onUpdate: (callback: (update: RuntimeUpdate) => void) => listen(IPC.runtime.update, callback),
+  onUpdate: (callback: (update: RuntimeUpdate) => void) => listen(IPC.runtime.progress, callback),
 
   onLog: (callback: (lines: string[]) => void) => listenToLog(IPC.runtime.log, callback)
 }
@@ -82,8 +82,7 @@ const simulation = {
 const theme = {
   get: (): Promise<AppearanceState> => ipcRenderer.invoke(IPC.theme.get),
 
-  set: (theme: 'system' | 'light' | 'dark'): Promise<AppearanceState> =>
-    ipcRenderer.invoke(IPC.theme.set, theme),
+  set: (theme: ThemeSource): Promise<AppearanceState> => ipcRenderer.invoke(IPC.theme.set, theme),
 
   setIconAppearance: (choice: IconAppearance): Promise<AppearanceState> =>
     ipcRenderer.invoke(IPC.theme.setIconAppearance, choice),
@@ -94,7 +93,7 @@ const theme = {
 const settings = {
   getOutputPath: (): Promise<string> => ipcRenderer.invoke(IPC.settings.getOutputPath),
 
-  setOutputPath: (outputPath: string): Promise<SetOutputPathResult> =>
+  setOutputPath: (outputPath: string): Promise<SettingSaveResult> =>
     ipcRenderer.invoke(IPC.settings.setOutputPath, outputPath),
 
   selectOutputDirectory: (): Promise<string | null> =>
@@ -103,7 +102,7 @@ const settings = {
   getSimulationTimeoutMinutes: (): Promise<number> =>
     ipcRenderer.invoke(IPC.settings.getSimulationTimeoutMinutes),
 
-  setSimulationTimeoutMinutes: (minutes: number): Promise<SetSimulationTimeoutResult> =>
+  setSimulationTimeoutMinutes: (minutes: number): Promise<SettingSaveResult> =>
     ipcRenderer.invoke(IPC.settings.setSimulationTimeoutMinutes, minutes),
 
   getNotifyOnRunFinish: (): Promise<boolean> =>

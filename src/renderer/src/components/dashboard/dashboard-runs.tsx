@@ -12,8 +12,8 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
+import { formatRunDate, formatRunDuration } from '@/lib/run-format'
 import { runResultDetail, runStatusLabel } from '@/lib/run-status'
-import { formatDurationLabel } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 
 type DashboardRecentRunsProps = {
@@ -56,11 +56,11 @@ export function DashboardRecentRuns({
                 <RunStatusIcon status={entry.result.status} />
               </ItemMedia>
               <ItemContent>
-                <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
+                <ItemTitle>{formatRunDate(entry.createdAt)}</ItemTitle>
                 <ItemDescription>
                   {runResultDetail(entry.result) ?? runStatusLabel(entry.result.status)}
-                  {entry.result.durationMs != null &&
-                    ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
+                  {formatRunDuration(entry.result.durationMs) &&
+                    ` · ${formatRunDuration(entry.result.durationMs)}`}
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
@@ -71,7 +71,7 @@ export function DashboardRecentRuns({
               </ItemActions>
               <button
                 type="button"
-                aria-label={`View the run from ${new Date(entry.createdAt).toLocaleString()}, ${runStatusLabel(entry.result.status)}`}
+                aria-label={`View the run from ${formatRunDate(entry.createdAt)}, ${runStatusLabel(entry.result.status)}`}
                 onClick={() => openResult(entry.id)}
                 className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />

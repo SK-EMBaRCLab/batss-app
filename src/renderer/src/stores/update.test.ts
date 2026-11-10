@@ -1,6 +1,6 @@
+import type { UpdateState } from '@shared/update-types'
 import { afterEach, expect, test, vi } from 'vitest'
 
-import type { UpdateState } from '../../../shared/update-types'
 import { useUpdate } from './update'
 
 test('update messages from the main process reach the store', async () => {

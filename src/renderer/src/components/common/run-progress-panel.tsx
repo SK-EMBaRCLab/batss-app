@@ -8,9 +8,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { batchOutcome, type RunOutcome, useActiveRunPercent } from '@/hooks/use-active-run-progress'
 import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds'
 import { usePersistentBoolean } from '@/hooks/use-persistent-boolean'
+import { formatRunDuration } from '@/lib/run-format'
 import { STAGE_LABEL } from '@/lib/run-progress'
 import { runTitle } from '@/lib/run-status'
-import { cn, formatDuration, formatDurationLabel } from '@/lib/utils'
+import { cn, formatDuration } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useEngine } from '@/stores/engine'
 import { useNavigation } from '@/stores/navigation'
@@ -120,7 +121,7 @@ export function RunProgressPanel(): ReactElement | null {
   } else if (isBatch) {
     detail = `${completed} of ${total} runs finished`
   } else if (outcome === 'success' && lastResult?.durationMs != null) {
-    detail = `Took ${formatDurationLabel(lastResult.durationMs / 1000)}`
+    detail = `Took ${formatRunDuration(lastResult.durationMs)}`
   } else if (outcome === 'error') {
     detail = 'See the Simulation page for details.'
   } else {

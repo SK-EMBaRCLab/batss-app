@@ -18,9 +18,9 @@ import {
 } from '@/components/ui/table'
 import { buildBatchValidations, buildTemplateCsv } from '@/lib/batch-mapper'
 import { downloadCsv, parseCsvFile } from '@/lib/csv'
+import { formatRunDuration } from '@/lib/run-format'
 import { STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
 import { runResultDetail, runStatusLabel } from '@/lib/run-status'
-import { formatDurationLabel } from '@/lib/utils'
 import { useBatch } from '@/stores/batch'
 import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
@@ -271,11 +271,7 @@ export default function Batch(): ReactElement {
                           {runStatusLabel(entry.result.status)}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        {entry.result.durationMs != null
-                          ? formatDurationLabel(entry.result.durationMs / 1000)
-                          : '—'}
-                      </TableCell>
+                      <TableCell>{formatRunDuration(entry.result.durationMs) ?? '—'}</TableCell>
                       <TableCell>{runResultDetail(entry.result)}</TableCell>
                     </TableRow>
                   )

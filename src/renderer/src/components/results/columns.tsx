@@ -5,7 +5,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import { fieldsFor } from '@/lib/design-fields'
-import { formatDurationLabel } from '@/lib/utils'
+import { formatRunDate, formatRunDuration } from '@/lib/run-format'
 
 import { EmptyCell } from '../table/empty-cell'
 import { renderCellValue } from '../table/render-cell-value'
@@ -97,16 +97,7 @@ export const columns = columnHelper.columns([
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Created At" />
     },
-    cell: ({ getValue }) => {
-      const value = getValue()
-      const date = new Date(value)
-
-      // The user's own locale, like every other date in the app
-      return date.toLocaleString(undefined, {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      })
-    }
+    cell: ({ getValue }) => formatRunDate(getValue())
   }),
   columnHelper.accessor('result.durationMs', {
     id: 'duration',
@@ -116,14 +107,7 @@ export const columns = columnHelper.columns([
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Duration" />
     },
-    cell: ({ getValue }) => {
-      const durationMs = getValue()
-      return durationMs == null ? (
-        <EmptyCell state="not-applicable" />
-      ) : (
-        formatDurationLabel(durationMs / 1000)
-      )
-    }
+    cell: ({ getValue }) => formatRunDuration(getValue()) ?? <EmptyCell state="not-applicable" />
   }),
   columnHelper.accessor('input.outcomeType', {
     id: 'outcomeType',
