@@ -24,9 +24,9 @@ export function runStatusLabel(status: RunStatus): string {
   return RUN_STATUS[status].label
 }
 
-/** One-line detail for a finished run: the BATSS version, or why it didn't succeed. */
-export function runResultDetail(result: SimulationRunResult): string {
-  return result.status === 'success' ? `BATSS v${result.package}` : result.message
+/** Why a finished run didn't succeed, or null if it did. */
+export function runResultDetail(result: SimulationRunResult): string | null {
+  return result.status === 'success' ? null : result.message
 }
 
 /**

@@ -12,7 +12,7 @@ import {
   ItemMedia,
   ItemTitle
 } from '@/components/ui/item'
-import { runResultDetail } from '@/lib/run-status'
+import { runResultDetail, runStatusLabel } from '@/lib/run-status'
 import { formatDurationLabel } from '@/lib/utils'
 import { useDesign } from '@/stores/design'
 
@@ -61,7 +61,7 @@ export function DashboardRecentRuns({
               <ItemContent>
                 <ItemTitle>{new Date(entry.createdAt).toLocaleString()}</ItemTitle>
                 <ItemDescription>
-                  {runResultDetail(entry.result)}
+                  {runResultDetail(entry.result) ?? runStatusLabel(entry.result.status)}
                   {entry.result.durationMs != null &&
                     ` · ${formatDurationLabel(entry.result.durationMs / 1000)}`}
                 </ItemDescription>
