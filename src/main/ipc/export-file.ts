@@ -1,12 +1,15 @@
 // Checks a request to save an exported file (a chart image, the batch
-// template). Kept free of Electron imports so it can be tested on its
+// template, a run's R script). Kept free of Electron imports so it can be tested on its
 // own. Only the file types the app exports, with a plain name and a
 // sensible size, get as far as the Save dialog.
 import path from 'path'
 
+// Each type's extensions for the Save dialog's filter: R scripts are
+// usually .R, and some file pickers match the case
 export const EXPORT_TYPES = {
-  png: { name: 'PNG image' },
-  csv: { name: 'CSV file' }
+  png: { name: 'PNG image', extensions: ['png'] },
+  csv: { name: 'CSV file', extensions: ['csv'] },
+  r: { name: 'R script', extensions: ['R', 'r'] }
 } as const
 
 export type ExportExtension = keyof typeof EXPORT_TYPES

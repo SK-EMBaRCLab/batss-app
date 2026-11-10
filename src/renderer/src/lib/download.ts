@@ -1,4 +1,5 @@
-// Saving a file the app made (a chart image, the batch template). The
+// Saving a file the app made (a chart image, the batch template, a run's
+// R script). The
 // main process asks where, with the name filled in (see files.ipc.ts),
 // rather than the browser's download, which can ignore the name.
 

@@ -1,6 +1,7 @@
 // How batss-simulation.R models each outcome type: the GLM family and
-// link, and the R function that simulates each patient's outcome.
-import type { OutcomeType } from '../../shared/simulation-types'
+// link, and the R function that simulates each patient's outcome. Shared
+// so a run exported as an R script (r-script.ts) models it the same way.
+import type { OutcomeType } from './simulation-types'
 
 export type OutcomeModel = {
   family: 'binomial' | 'gaussian'

@@ -12,6 +12,9 @@ describe('checkExportRequest', () => {
       bytes: BYTES
     })
     expect(checkExportRequest('batch-template.csv', BYTES)?.extension).toBe('csv')
+    expect(checkExportRequest('My trial – R script – 2026-11-10 15.05.R', BYTES)?.extension).toBe(
+      'r'
+    )
   })
 
   test('keeps only the name, never a folder', () => {

@@ -1,6 +1,7 @@
 import { MAX_RUN_NAME_LENGTH, MAX_RUN_NOTES_LENGTH } from '@shared/design-rules'
+import { runRScript } from '@shared/r-script'
 import type { SimulationResultEntry } from '@shared/simulation-types'
-import { Trash2 } from 'lucide-react'
+import { FileCode, Trash2 } from 'lucide-react'
 import { type ReactElement, useId, useState } from 'react'
 
 import { EditableInPlaceInput } from '@/components/common/editable-inplace-input'
@@ -8,17 +9,21 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/toast'
+import { runExportFileName, saveExport } from '@/lib/download'
+import { requestFailed } from '@/lib/error-reference'
 import { formatRunDate, formatRunDuration } from '@/lib/run-format'
 import { runStatusLabel } from '@/lib/run-status'
 import { useDesign, useSelectedEntry } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
+import { useRuntime } from '@/stores/runtime'
 
 import { ConfirmDeleteRuns } from './confirm-delete-runs'
 
 // The notes' character count shows once this close to the limit
 const NOTES_COUNT_FROM = 200
 
-/** The run being viewed: its name, notes, and Delete. */
+/** The run being viewed: its name, notes, R script export and Delete. */
 export function RunDetailsHeader(): ReactElement | null {
   const entry = useSelectedEntry()
   if (!entry) return null
@@ -30,6 +35,8 @@ export function RunDetailsHeader(): ReactElement | null {
 function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   const editResult = useDesign((state) => state.editResult)
   const deleteResults = useDesign((state) => state.deleteResults)
+  const designName = useDesign((state) => state.design?.name ?? '')
+  const appVersion = useRuntime((state) => state.appVersion)
   // Not while a run or batch is adding results
   const busy = useEngine((state) => state.busy) !== 'idle'
 
@@ -47,6 +54,25 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   // on every key, so the design isn't marked changed by each one
   const saveNotes = (): void => {
     if (notes.trim() !== (entry.notes ?? '')) editResult(entry.id, { notes })
+  }
+
+  // Any run, failed ones too: the script is a way to look into an
+  // error in R itself
+  const exportRScript = async (): Promise<void> => {
+    try {
+      const script = runRScript(entry, { designName, appVersion })
+      await saveExport(
+        runExportFileName(designName, 'R script', entry.createdAt, 'R'),
+        new Blob([script], { type: 'text/plain;charset=utf-8' })
+      )
+    } catch (error) {
+      const failure = requestFailed(error, 'R script export', 'Try again.')
+      toast.add({
+        type: 'error',
+        title: "Couldn't export the R script",
+        description: failure.message
+      })
+    }
   }
 
   return (
@@ -67,15 +93,21 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
             <p className="text-sm text-muted-foreground">{details}</p>
           </div>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={busy}
-            onClick={() => setConfirming(true)}
-          >
-            <Trash2 />
-            Delete run
-          </Button>
+          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => void exportRScript()}>
+              <FileCode />
+              Export R script
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={busy}
+              onClick={() => setConfirming(true)}
+            >
+              <Trash2 />
+              Delete run
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">

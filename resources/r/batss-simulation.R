@@ -19,6 +19,9 @@ Sys.setenv(
 library(BATSS)
 library(INLA)
 
+# A run exported as an R script (src/shared/r-script.ts) builds the same
+# batss.glm() call as this file: a change here needs the same change there.
+
 # Belt-and-suspenders alongside the env vars above: constrains
 # GMRFLib's own outer/inner thread pool (see the main project
 # discussion for what these control) to 1 thread per worker process, on

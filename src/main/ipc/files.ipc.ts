@@ -1,4 +1,5 @@
-// Saving a file the app made (a chart image, the batch template). The
+// Saving a file the app made (a chart image, the batch template, a run's
+// R script). The
 // renderer used to hand these to the browser's download, which picks its
 // own name and place: with no Downloads folder (e.g. the Docker dev
 // container) Chromium asked where to save with the name "download". Here
@@ -25,9 +26,10 @@ export function registerFilesIPC(): void {
       const request = checkExportRequest(fileName, bytes)
       if (!request) throw new Error("This file can't be saved.")
 
+      const { name, extensions } = EXPORT_TYPES[request.extension]
       const options: SaveDialogOptions = {
         defaultPath: path.join(startFolder(), request.fileName),
-        filters: [{ name: EXPORT_TYPES[request.extension].name, extensions: [request.extension] }]
+        filters: [{ name, extensions: [...extensions] }]
       }
       // Attached to the window that asked (a sheet on macOS)
       const owner = BrowserWindow.fromWebContents(event.sender)
