@@ -15,11 +15,15 @@ import { settingsService } from './settings.service'
 const LEGACY_BUNDLE_ID = 'com.albatross.app'
 const LEGACY_BUNDLE_NAME = 'albatross.app'
 
-/** Where an app dragged in from a .dmg ends up: the system or the user's Applications. */
+/**
+ * Where an app dragged in from a .dmg ends up: the system or the user's
+ * Applications. macOS paths, so always joined with / (also when the tests
+ * run on Windows).
+ */
 export function legacyAppCandidates(home: string = os.homedir()): string[] {
   return [
-    path.join('/Applications', LEGACY_BUNDLE_NAME),
-    path.join(home, 'Applications', LEGACY_BUNDLE_NAME)
+    path.posix.join('/Applications', LEGACY_BUNDLE_NAME),
+    path.posix.join(home, 'Applications', LEGACY_BUNDLE_NAME)
   ]
 }
 
