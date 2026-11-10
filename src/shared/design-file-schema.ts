@@ -104,7 +104,9 @@ const simulationRunResultFileSchema = v.union([
  */
 export function parseSimulationRunResult(data: unknown): SimulationRunResult | null {
   const result = v.safeParse(simulationRunResultFileSchema, data)
-  return result.success ? (result.output as SimulationRunResult) : null
+  // No cast: the schema's output is checked against SimulationRunResult
+  const output: SimulationRunResult | null = result.success ? result.output : null
+  return output
 }
 
 const simulationResultEntryFileSchema = v.object({
@@ -130,7 +132,10 @@ export function parseStudyDesignFile(data: unknown): StudyDesignFileValidationRe
   const result = v.safeParse(studyDesignFileSchema, data)
 
   if (result.success) {
-    // Validated against the schema above, which mirrors StudyDesign.
+    // The one cast left, on purpose: each saved run's input is checked
+    // with the looser design shape (see the note at the top), while
+    // StudyDesign types it as a full SimulationRunInput. Everything else
+    // in the schema matches StudyDesign.
     return { success: true, data: result.output as StudyDesign }
   }
 

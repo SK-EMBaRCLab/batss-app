@@ -72,8 +72,10 @@ export type DecisionRule = {
 
 export interface SimulationSummaryRow {
   Outcome: SimulationOutcome
-  'Null Effect': number
-  'Target Effect': number
+  // Left out by batss-simulation.R when no simulated trial in that
+  // scenario ended this way, which reads as 0
+  'Null Effect'?: number
+  'Target Effect'?: number
 }
 
 export interface SimulationChartRow {

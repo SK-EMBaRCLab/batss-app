@@ -125,6 +125,19 @@ describe('parseSimulationRunResult', () => {
     expect(parseSimulationRunResult(result)).toEqual(result)
   })
 
+  test('accepts a row with no value for a scenario, which stays missing', () => {
+    const result = {
+      status: 'success',
+      package: '1.2.1',
+      table: [{ Outcome: 'Futility', 'Null Effect': 0.7 }],
+      chart: [{ Scenario: 'Null Effect', Outcome: 'Futility', Proportion: 0.7 }],
+      sampleSize: { H0: { control: [], experimental: [] }, H1: { control: [], experimental: [] } }
+    }
+    const parsed = parseSimulationRunResult(result)
+    expect(parsed?.status).toBe('success')
+    if (parsed?.status === 'success') expect(parsed.table[0]['Target Effect']).toBeUndefined()
+  })
+
   test('returns null for anything else', () => {
     expect(parseSimulationRunResult({ status: 'finished' })).toBeNull()
     expect(parseSimulationRunResult('not json')).toBeNull()

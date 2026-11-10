@@ -98,7 +98,8 @@ export function checkSimulationRunInput(data: unknown): SimulationRunInputCheck 
   const result = v.safeParse(simulationRunInputSchema, data)
 
   if (result.success) {
-    return { success: true, input: result.output as SimulationRunInput }
+    // No cast: the schema's output is checked against SimulationRunInput
+    return { success: true, input: result.output }
   }
 
   return {
