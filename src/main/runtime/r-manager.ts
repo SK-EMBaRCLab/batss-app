@@ -8,6 +8,7 @@ import { promisify } from 'util'
 
 import { getRLibraryPath } from '../services/filesystem/app-paths'
 import { REQUIRED_R_VERSION } from './r-config'
+import { abortErrorFrom, RAbortedError, RTimeoutError } from './r-errors'
 
 const execFileAsync = promisify(execFile)
 
@@ -320,7 +321,7 @@ export class RManager {
     // Cancelled while the run was still being set up (temp dir, finding
     // Rscript, building the env). An abort listener added below would
     // never fire for a signal that's already aborted, so R would start.
-    if (externalSignal?.aborted) throw this.toAbortError(externalSignal)
+    if (externalSignal?.aborted) throw abortErrorFrom(externalSignal.reason)
 
     return new Promise((resolve, reject) => {
       // Own AbortController so spawn() only has to know about one
@@ -333,9 +334,7 @@ export class RManager {
 
       const timeoutHandle = timeoutMs
         ? setTimeout(() => {
-            controller.abort(
-              new Error(`R process timed out after ${Math.round(timeoutMs / 1000)}s`)
-            )
+            controller.abort(new RTimeoutError(timeoutMs))
           }, timeoutMs)
         : undefined
 
@@ -424,7 +423,7 @@ export class RManager {
       })
 
       child.on('error', (error) => {
-        settleReject(controller.signal.aborted ? this.toAbortError(controller.signal) : error)
+        settleReject(controller.signal.aborted ? abortErrorFrom(controller.signal.reason) : error)
       })
 
       child.on('close', (code) => {
@@ -433,7 +432,7 @@ export class RManager {
         if (stderrTailRef.value) onOutput?.(clipLine(stderrTailRef.value), 'stderr')
 
         if (controller.signal.aborted) {
-          settleReject(this.toAbortError(controller.signal))
+          settleReject(abortErrorFrom(controller.signal.reason))
           return
         }
 
@@ -450,22 +449,11 @@ export class RManager {
     })
   }
 
-  // Produces a consistent, user-facing message whether the process was
-  // cancelled on purpose or hit timeoutMs. Tagging `name = 'AbortError'`
-  // lets toExecutionError() pass the message through unwrapped instead
-  // of prefixing it with "R execution failed:".
-  private toAbortError(signal: AbortSignal): Error {
-    const reason = signal.reason
-    const error =
-      reason instanceof Error ? new Error(reason.message) : new Error('Simulation cancelled')
-    error.name = 'AbortError'
-    return error
-  }
-
   private toExecutionError(error: unknown): Error {
-    // Cancellations/timeouts already carry a clear, user-facing message
-    // (see toAbortError) — pass them through as-is instead of wrapping.
-    if (error instanceof Error && error.name === 'AbortError') {
+    // Cancellations and timeouts already carry a clear, user-facing
+    // message (see r-errors.ts): pass them through instead of wrapping
+    // them in "R execution failed:"
+    if (error instanceof RAbortedError) {
       return error
     }
 

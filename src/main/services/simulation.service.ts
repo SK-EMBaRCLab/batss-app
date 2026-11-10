@@ -10,6 +10,7 @@ import { describeBusy } from '../../shared/engine-types'
 import { withReference } from '../../shared/error-reference'
 import { normaliseTimeoutMinutes } from '../../shared/settings-types'
 import type { SimulationRunInput, SimulationRunResult } from '../../shared/simulation-types'
+import { RCancelledError, RTimeoutError } from '../runtime/r-errors'
 import { OutputListener, rManager } from '../runtime/r-manager'
 import { SIMULATION_TIMEOUT_MINUTES_KEY } from '../settings.constants'
 import { engineService } from './engine.service'
@@ -66,26 +67,6 @@ function getSimulationScriptPath(): string {
   }
 
   return path.join(process.cwd(), 'resources', 'r', 'batss-simulation.R')
-}
-
-// `abortActive()` always passes a reason ending in "cancelled by
-// user" (see its call sites here and in batch.service.ts) — a timeout
-// abort (r-manager.ts) uses a distinct "R process timed out…"
-// message, so this check only matches genuine user cancellations.
-function isTimedOut(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    error.name === 'AbortError' &&
-    error.message.startsWith('R process timed out')
-  )
-}
-
-function isUserCancelled(error: unknown): error is Error {
-  return (
-    error instanceof Error &&
-    error.name === 'AbortError' &&
-    error.message.endsWith('cancelled by user')
-  )
 }
 
 export class SimulationService {
@@ -226,12 +207,13 @@ export class SimulationService {
     } catch (error) {
       const durationMs = Date.now() - startedAt
 
-      if (isUserCancelled(error)) {
+      // Cancelled through abortActive(): here, or by a batch being cancelled
+      if (error instanceof RCancelledError) {
         return { status: 'cancelled', message: error.message, durationMs }
       }
 
       // Expected: the run hit the Settings timeout
-      if (isTimedOut(error)) {
+      if (error instanceof RTimeoutError) {
         const minutes = Math.round(getSimulationTimeoutMs() / 60_000)
         return {
           status: 'error',
@@ -259,7 +241,7 @@ export class SimulationService {
   /** Abort whatever Rscript is alive, regardless of who owns the engine. */
   abortActive(reason: string): boolean {
     if (!this.activeRun) return false
-    this.activeRun.controller.abort(new Error(reason))
+    this.activeRun.controller.abort(new RCancelledError(reason))
     return true
   }
 }
