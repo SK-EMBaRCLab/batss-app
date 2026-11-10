@@ -18,7 +18,7 @@ import { useNavigation } from '@/stores/navigation'
 
 export default function Dashboard(): ReactElement {
   const design = useDesign((s) => s.design)
-  const selectResults = useDesign((s) => s.selectResults)
+  const showAllResults = useDesign((s) => s.showAllResults)
   const navigate = useNavigation((s) => s.navigate)
 
   if (!design) {
@@ -31,7 +31,7 @@ export default function Dashboard(): ReactElement {
   }
 
   function viewAllResults(): void {
-    selectResults([])
+    showAllResults()
     navigate('table')
   }
 

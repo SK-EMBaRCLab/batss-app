@@ -39,6 +39,8 @@ interface DesignState {
   openCount: number
   filePath: string | null
   selectedResultId: string | null
+  // The runs being compared, which the Results page's run list is
+  // narrowed to; null shows every run
   selectedResults: string[] | null
   isDirty: boolean
 
@@ -48,10 +50,12 @@ interface DesignState {
   appendResult: (entry: Omit<SimulationResultEntry, 'id'>) => void
   updateInput: (input: DesignInput) => void
   selectResult: (id: string) => void
-  selectResults: (ids: string[]) => void
+  // Stops comparing: the run list shows every run again
+  showAllResults: () => void
   // Opens the file manager at the saved design file
   showInFolder: () => Promise<void>
-  // Show these runs on the Results page, focused on the last one
+  // Show these runs on the Results page, focused on the last one. Two or
+  // more are compared (the run list shows only them); one is just opened.
   openResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
   saveDesignAs: () => Promise<boolean>
@@ -169,7 +173,7 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     selectResult: (id) => set({ selectedResultId: id }),
-    selectResults: (ids) => set({ selectedResults: ids }),
+    showAllResults: () => set({ selectedResults: null }),
 
     showInFolder: async () => {
       const { filePath } = get()
@@ -190,7 +194,7 @@ export const useDesign = create<DesignState>((set, get) => {
       const lastId = ids.at(-1)
       if (!lastId) return
 
-      set({ selectedResults: ids, selectedResultId: lastId })
+      set({ selectedResults: ids.length > 1 ? ids : null, selectedResultId: lastId })
       useNavigation.getState().navigate('results')
     },
 

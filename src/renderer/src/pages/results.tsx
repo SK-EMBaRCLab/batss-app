@@ -32,7 +32,7 @@ export default function Results(): ReactElement {
         <section className="flex flex-col gap-6">
           <Button variant="link" onClick={() => navigate('table')}>
             <Table />
-            View all runs
+            Open runs table
           </Button>
           <RunHeader />
 
