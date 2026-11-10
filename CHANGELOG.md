@@ -1,5 +1,29 @@
 # Changelog
 
+## [6.0.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.9.0...v6.0.0) (2026-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **batch:** batch CSVs describe rules with superiorityMargin, superiorityCutoff, futilityMargin and futilityCutoff; leave both of a rule's cells empty to leave it out. The decisionRuleType, decisionRuleDirection, decisionRuleMargin and decisionRuleThreshold columns are no longer read. Download the new template from the batch page.
+* **app:** Albatross is now BATSS Studio, with a new app ID. Installing it adds a new app rather than replacing Albatross, so uninstall Albatross by hand afterwards. Existing .design files open as before. On macOS, notifications must be allowed again.
+
+### Features
+
+* **app:** carry over data from the Albatross data folder ([129b809](https://github.com/SK-EMBaRCLab/batss-app/commit/129b8098230f9793f434c599474164233fdce78f))
+* **app:** rename app to BATSS Studio ([b91116d](https://github.com/SK-EMBaRCLab/batss-app/commit/b91116dcfe76980d175197788680584ee31e970f))
+* **batch:** one pair of columns per decision rule ([f624fc7](https://github.com/SK-EMBaRCLab/batss-app/commit/f624fc721f755ae89b64e05a53c0d734ba3bef68))
+* **icon:** new BATSS Studio app icon ([3429558](https://github.com/SK-EMBaRCLab/batss-app/commit/3429558126bc92bb9fa7ca6dc60d4b7b36402fbc))
+* **results:** show trials stopped for futility ([8a8b15f](https://github.com/SK-EMBaRCLab/batss-app/commit/8a8b15f7254c4646eade58245b13add150f1d642))
+* **review:** list each decision rule ([5e76888](https://github.com/SK-EMBaRCLab/batss-app/commit/5e76888e76c836f1fa9e7e02042972371c07427d))
+* **rules:** add futility decision rules ([d7a33ef](https://github.com/SK-EMBaRCLab/batss-app/commit/d7a33ef279a6fb7a0dd7f09ae0b0016b6677ea65))
+
+
+### Bug Fixes
+
+* **layout:** switch to the inset sidebar without page scroll ([08b061f](https://github.com/SK-EMBaRCLab/batss-app/commit/08b061f7dbee37977587af3d7a18bccde3320110))
+* **simulation:** keep reached steps open and fix the stepper layout ([c798460](https://github.com/SK-EMBaRCLab/batss-app/commit/c798460e0f99edae81caca547563b3a0dc2d6d12))
+
 ## [5.9.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v5.8.0...v5.9.0) (2026-11-02)
 
 
