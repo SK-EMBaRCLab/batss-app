@@ -16,17 +16,25 @@ import {
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { outcomeTypes } from '@/lib/design-options'
 import { cn } from '@/lib/utils'
+
+export type FacetedFilterOption = {
+  value: string
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+}
 
 interface DataTableFacetedFilterProps<TData extends RowData, TValue> {
   column?: Column<DataTableFeatures, TData, TValue>
   title?: string
+  // The values the column can be filtered to
+  options: readonly FacetedFilterOption[]
 }
 
 export function DataTableFacetedFilter<TData extends RowData, TValue>({
   column,
-  title
+  title,
+  options
 }: DataTableFacetedFilterProps<TData, TValue>): React.ReactElement {
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as string[])
@@ -56,15 +64,15 @@ export function DataTableFacetedFilter<TData extends RowData, TValue>({
                       {selectedValues.size} selected
                     </Badge>
                   ) : (
-                    outcomeTypes
-                      .filter((type) => selectedValues.has(type.value))
-                      .map((type) => (
+                    options
+                      .filter((option) => selectedValues.has(option.value))
+                      .map((option) => (
                         <Badge
                           variant="secondary"
-                          key={type.value}
+                          key={option.value}
                           className="rounded-sm border-primary/20 bg-primary/10 px-1 font-normal text-primary"
                         >
-                          {type.label}
+                          {option.label}
                         </Badge>
                       ))
                   )}
@@ -80,16 +88,16 @@ export function DataTableFacetedFilter<TData extends RowData, TValue>({
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {outcomeTypes.map((type) => {
-                const isSelected = selectedValues.has(type.value)
+              {options.map((option) => {
+                const isSelected = selectedValues.has(option.value)
                 return (
                   <CommandItem
-                    key={type.value}
+                    key={option.value}
                     onSelect={() => {
                       if (isSelected) {
-                        selectedValues.delete(type.value)
+                        selectedValues.delete(option.value)
                       } else {
-                        selectedValues.add(type.value)
+                        selectedValues.add(option.value)
                       }
                       const filterValues = Array.from(selectedValues)
                       column?.setFilterValue(filterValues.length ? filterValues : undefined)
@@ -105,11 +113,11 @@ export function DataTableFacetedFilter<TData extends RowData, TValue>({
                     >
                       <Check className="size-3.5 text-primary-foreground" />
                     </div>
-                    {type.icon && <type.icon className="size-4 text-muted-foreground" />}
-                    <span>{type.label}</span>
-                    {facets?.get(type.value) && (
+                    {option.icon && <option.icon className="size-4 text-muted-foreground" />}
+                    <span>{option.label}</span>
+                    {facets?.get(option.value) && (
                       <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs text-muted-foreground">
-                        {facets.get(type.value)}
+                        {facets.get(option.value)}
                       </span>
                     )}
                   </CommandItem>

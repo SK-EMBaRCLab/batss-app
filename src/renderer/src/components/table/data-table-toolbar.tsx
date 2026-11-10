@@ -7,6 +7,7 @@ import { type DataTableFeatures } from '@/components/results/data-table-features
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { outcomeTypes } from '@/lib/design-options'
 import { useDesign } from '@/stores/design'
 import { DataTableRow } from '@/types/data-table-types'
 
@@ -54,7 +55,11 @@ export function DataTableToolbar<TData extends DataTableRow>({
           <InputGroupAddon align="inline-end">{resultCount} results</InputGroupAddon>
         </InputGroup>
         {table.getColumn('outcomeType') && (
-          <DataTableFacetedFilter column={table.getColumn('outcomeType')} title="Outcome Type" />
+          <DataTableFacetedFilter
+            column={table.getColumn('outcomeType')}
+            title="Outcome Type"
+            options={outcomeTypes}
+          />
         )}
         {isFiltered && (
           <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>

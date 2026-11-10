@@ -31,6 +31,7 @@ type LabelledField = keyof typeof FIELD_LABELS
 // narrower windows (each header's tooltip shows the full name)
 export const SHORT_FIELD_LABELS = {
   outcomeType: 'Outcome Type',
+  probability: 'Control Probability',
   treatmentEffectType: 'Effect Type',
   treatmentEffect: 'Effect Value',
   meanOutcome: 'Control Mean',

@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from '@/components/table/data-table-column-head
 import { Checkbox } from '@/components/ui/checkbox'
 import { fieldsFor } from '@/lib/design-fields'
 import { formatRunDate, formatRunDuration } from '@/lib/run-format'
+import { runStatusLabel } from '@/lib/run-status'
 
 import { EmptyCell } from '../table/empty-cell'
 import { renderCellValue } from '../table/render-cell-value'
@@ -15,6 +16,7 @@ import { type DataTableFeatures } from './data-table-features'
 const columnHelper = createColumnHelper<DataTableFeatures, SimulationResultEntry>()
 
 const outcomeScopedColumnIds = [
+  'probability',
   'treatmentEffectType',
   'treatmentEffect',
   'meanOutcome',
@@ -35,6 +37,22 @@ function outcomeScopedField(key: OutcomeScopedColumnId): {
     field: (binaryField ?? continuousField)!,
     outcomeType: binaryField ? 'binary' : 'continuous'
   }
+}
+
+/**
+ * A run as the table shows it, for the search box: dates, labels and
+ * values as displayed (e.g. "Nov 10, 2026" or "Odds Ratio"), not as
+ * stored (an ISO date, "oddsRatio"), so what's on screen can be found.
+ */
+export function searchText(entry: SimulationResultEntry): string {
+  return [
+    formatRunDate(entry.createdAt),
+    runStatusLabel(entry.result.status),
+    formatRunDuration(entry.result.durationMs),
+    ...fieldsFor(entry.input.outcomeType).map((field) => field.value(entry.input))
+  ]
+    .filter((part) => part !== undefined && part !== null && part !== '')
+    .join(' ')
 }
 
 /**

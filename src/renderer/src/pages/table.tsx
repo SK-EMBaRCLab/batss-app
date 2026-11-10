@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
 
-import { columns, inapplicableColumnIds } from '@/components/results/columns'
+import { columns, inapplicableColumnIds, searchText } from '@/components/results/columns'
 import { DataTable } from '@/components/results/data-table'
 import { ResultsEmpty } from '@/components/results/results-empty'
 import { useDesign } from '@/stores/design'
@@ -23,6 +23,7 @@ export default function Table(): ReactElement {
         columns={columns}
         data={data}
         hiddenColumns={inapplicableColumnIds(data)}
+        searchText={searchText}
       />
     </div>
   )

@@ -1,3 +1,4 @@
+import { rankings, rankItem } from '@tanstack/match-sorter-utils'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -31,6 +32,9 @@ interface DataTableProps<TData extends DataTableRow> {
   data: TData[]
   // Columns hidden until the user turns them on from the Columns menu
   hiddenColumns?: string[]
+  // A row as it's shown, for the search box (see columns.tsx). Without
+  // it, the search matches each column's stored value.
+  searchText?: (row: TData) => string
 }
 
 // Keeps the checkbox and Created At columns in view while the rest of
@@ -60,7 +64,8 @@ export function DataTable<TData extends DataTableRow>({
   description,
   columns,
   data,
-  hiddenColumns = []
+  hiddenColumns = [],
+  searchText
 }: DataTableProps<TData>): ReactElement {
   const openResults = useDesign((state) => state.openResults)
   const [rowSelection, setRowSelection] = useState({})
@@ -82,7 +87,15 @@ export function DataTable<TData extends DataTableRow>({
     features,
     data,
     columns,
-    globalFilterFn: 'fuzzy',
+    // The search box matches the whole row as displayed when the table
+    // knows how (the result is the same for every column it's asked
+    // about). The text has to contain what was typed: rankItem's default,
+    // letters in order anywhere, matches almost any row's long text.
+    globalFilterFn: searchText
+      ? (row, _columnId, value) =>
+          rankItem(searchText(row.original), value as string, { threshold: rankings.CONTAINS })
+            .passed
+      : 'fuzzy',
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
