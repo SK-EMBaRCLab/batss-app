@@ -122,6 +122,7 @@ describe('runRScript', () => {
     expect(script.split('\n')[0]).toBe('# My trial – Baseline')
     expect(script).toContain('exported from BATSS Studio 6.1.0')
     expect(script).toContain('# The app ran it with BATSS 1.2.1.')
+    expect(script).toContain('gives the same results as the app')
   })
 
   test("keeps a name on its comment line, so it can't add code", () => {

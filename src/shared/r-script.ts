@@ -64,8 +64,8 @@ export function runRScript(entry: SimulationResultEntry, details: RScriptDetails
       ? [`# The app ran it with BATSS ${commentText(entry.result.package)}.`]
       : []),
     '#',
-    '# No random seed is set, so the results differ a little from run to run',
-    "# and from the app's."
+    "# BATSS sets each simulated trial's seed itself (1 to R), so with the",
+    '# same BATSS version this gives the same results as the app.'
   ]
 
   const outcome = binary
