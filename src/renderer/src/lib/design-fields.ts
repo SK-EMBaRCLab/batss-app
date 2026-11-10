@@ -1,9 +1,8 @@
-import { effectDirection } from '@shared/effect-direction'
 import { FIELD_LABELS } from '@shared/field-labels'
 import type { DecisionRule, DesignInput } from '@shared/simulation-types'
 
+import { decisionRuleFormula } from '@/lib/decision-rule-formula'
 import { getTreatmentEffectLabel } from '@/lib/design-options'
-import { decisionRuleFormula } from '@/lib/utils'
 
 /**
  * A loosely-typed "whatever design values we currently have" bag. Two
@@ -147,10 +146,6 @@ export function decisionRuleSummaries(
 ): { type: DecisionRule['type']; title: string; formula: string }[] {
   if (input.outcomeType !== 'binary' && input.outcomeType !== 'continuous') return []
 
-  const direction = effectDirection(input)
-  const treatmentEffectType =
-    input.outcomeType === 'continuous' ? 'meanDifference' : input.treatmentEffectType
-
   return RULE_ORDER.flatMap((type) => {
     const rule = input.decisionRules?.find((candidate) => candidate?.type === type)
     if (!rule) return []
@@ -158,7 +153,7 @@ export function decisionRuleSummaries(
       {
         type,
         title: RULE_TITLES[type],
-        formula: decisionRuleFormula({ ...rule, direction, treatmentEffectType })
+        formula: decisionRuleFormula({ ...rule, type }, input)
       }
     ]
   })

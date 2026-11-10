@@ -1,9 +1,5 @@
-import type { Direction } from '@shared/effect-direction'
-import type { DecisionRule, TreatmentEffectType } from '@shared/simulation-types'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-
-import { treatmentEffects } from '@/lib/design-options'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -67,32 +63,4 @@ export function toError(error: unknown): Error {
   }
 
   return new Error(typeof error === 'string' ? error : JSON.stringify(error))
-}
-
-export function decisionRuleFormula({
-  type,
-  direction,
-  margin,
-  threshold,
-  treatmentEffectType
-}: {
-  type?: DecisionRule['type']
-  direction?: Direction
-  margin?: string | number
-  threshold?: string | number
-  treatmentEffectType?: TreatmentEffectType | 'meanDifference'
-}): string {
-  const probabilitySymbol = direction === 'greater' ? '>' : '<'
-  let treatmentEffect = 'OR'
-  if (treatmentEffectType === 'meanDifference') {
-    treatmentEffect = 'MD'
-  } else {
-    treatmentEffect =
-      treatmentEffects.find(({ value }) => value === treatmentEffectType)?.symbol ?? 'OR'
-  }
-
-  const isFutility = type === 'futility'
-  const comparison = isFutility ? '<' : '>'
-  const defaultThreshold = isFutility ? '0.05' : '0.95'
-  return `P(${treatmentEffect} ${probabilitySymbol} ${margin ?? '1'}) ${comparison} ${threshold ?? defaultThreshold}`
 }

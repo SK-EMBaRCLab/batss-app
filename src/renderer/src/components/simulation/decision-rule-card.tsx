@@ -5,7 +5,7 @@ import { X } from 'lucide-react'
 import { type ReactElement, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { decisionRuleFormula } from '@/lib/utils'
+import { decisionRuleFormula, type FormulaDesign } from '@/lib/decision-rule-formula'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleFields } from './decision-rule-fields'
@@ -77,24 +77,20 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
     [ruleType, marginField.input, thresholdField.input]
   )
 
-  // Follows the sign of the treatment effect, as BATSS's `alternative` does
-  const direction = effectDirection({
+  const design: FormulaDesign = {
     outcomeType: outcomeType.input,
+    treatmentEffectType: treatmentEffectType.input,
     treatmentEffect: treatmentEffect.input,
     meanDiff: meanDiffInput.input
-  })
+  }
+
+  // Follows the sign of the treatment effect, as BATSS's `alternative` does
+  const direction = effectDirection(design)
 
   const value =
     outcomeType.input === 'binary' ? Number(treatmentEffect.input) : Number(meanDiffInput.input)
 
-  const formula = rule
-    ? decisionRuleFormula({
-        ...rule,
-        direction,
-        treatmentEffectType:
-          outcomeType.input === 'continuous' ? 'meanDifference' : treatmentEffectType.input
-      })
-    : ''
+  const formula = rule ? decisionRuleFormula(rule, design) : ''
 
   // Keep showing the last valid preview while margin/threshold are
   // momentarily empty (e.g. the user selected-all and is retyping a
