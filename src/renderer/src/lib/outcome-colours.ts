@@ -13,6 +13,17 @@ export const OUTCOME_COLOURS = {
   Inconclusive: 'oklch(0.62 0 0)'
 } as const satisfies Record<SimulationOutcome, string>
 
+/**
+ * The same colours as fixed hex values, the light theme's, for files the
+ * app makes (the Word report's chart): a document can't use the app's
+ * theme. Change them together with OUTCOME_COLOURS.
+ */
+export const OUTCOME_PRINT_COLOURS = {
+  'Experimental Superior': '#419547',
+  Futility: '#F7D979',
+  Inconclusive: '#868686'
+} as const satisfies Record<SimulationOutcome, string>
+
 /** The outcome a rule stops the trial with. */
 export const RULE_OUTCOME = {
   superiority: 'Experimental Superior',

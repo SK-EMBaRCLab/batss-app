@@ -6,15 +6,14 @@ const BYTES = new Uint8Array([1, 2, 3])
 
 describe('checkExportRequest', () => {
   test('accepts a chart image or a CSV, keeping the name', () => {
-    expect(checkExportRequest('test – chart – 2026-11-10 15.05.png', BYTES)).toEqual({
-      fileName: 'test – chart – 2026-11-10 15.05.png',
+    expect(checkExportRequest('test – chart – 2026-11-10.png', BYTES)).toEqual({
+      fileName: 'test – chart – 2026-11-10.png',
       extension: 'png',
       bytes: BYTES
     })
     expect(checkExportRequest('batch-template.csv', BYTES)?.extension).toBe('csv')
-    expect(checkExportRequest('My trial – R script – 2026-11-10 15.05.R', BYTES)?.extension).toBe(
-      'r'
-    )
+    expect(checkExportRequest('My trial – R script – 2026-11-10.R', BYTES)?.extension).toBe('r')
+    expect(checkExportRequest('My trial – report – 2026-11-10.docx', BYTES)?.extension).toBe('docx')
   })
 
   test('keeps only the name, never a folder', () => {

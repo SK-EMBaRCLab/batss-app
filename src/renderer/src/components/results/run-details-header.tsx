@@ -1,7 +1,7 @@
 import { MAX_RUN_NAME_LENGTH, MAX_RUN_NOTES_LENGTH } from '@shared/design-rules'
 import { runRScript } from '@shared/r-script'
 import type { SimulationResultEntry } from '@shared/simulation-types'
-import { FileCode, Trash2 } from 'lucide-react'
+import { FileCode, FileText, Trash2 } from 'lucide-react'
 import { type ReactElement, useId, useState } from 'react'
 
 import { EditableInPlaceInput } from '@/components/common/editable-inplace-input'
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/toast'
 import { runExportFileName, saveExport } from '@/lib/download'
 import { requestFailed } from '@/lib/error-reference'
+import { exportRunReport } from '@/lib/report/export-run-report'
 import { formatRunDate, formatRunDuration } from '@/lib/run-format'
 import { runStatusLabel } from '@/lib/run-status'
 import { useDesign, useSelectedEntry } from '@/stores/design'
@@ -23,7 +24,7 @@ import { ConfirmDeleteRuns } from './confirm-delete-runs'
 // The notes' character count shows once this close to the limit
 const NOTES_COUNT_FROM = 200
 
-/** The run being viewed: its name, notes, R script export and Delete. */
+/** The run being viewed: its name, notes, exports and Delete. */
 export function RunDetailsHeader(): ReactElement | null {
   const entry = useSelectedEntry()
   if (!entry) return null
@@ -75,6 +76,20 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
     }
   }
 
+  // Any run: a failed one's report has its design and the error
+  const exportReport = async (): Promise<void> => {
+    try {
+      await exportRunReport(entry, { designName, appVersion })
+    } catch (error) {
+      const failure = requestFailed(error, 'report export', 'Try again.')
+      toast.add({
+        type: 'error',
+        title: "Couldn't export the report",
+        description: failure.message
+      })
+    }
+  }
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
@@ -94,6 +109,10 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
           </div>
 
           <div className="flex shrink-0 flex-wrap justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => void exportReport()}>
+              <FileText />
+              Export report
+            </Button>
             <Button variant="outline" size="sm" onClick={() => void exportRScript()}>
               <FileCode />
               Export R script

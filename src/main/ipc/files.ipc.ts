@@ -1,5 +1,5 @@
 // Saving a file the app made (a chart image, the batch template, a run's
-// R script). The
+// R script or report). The
 // renderer used to hand these to the browser's download, which picks its
 // own name and place: with no Downloads folder (e.g. the Docker dev
 // container) Chromium asked where to save with the name "download". Here
