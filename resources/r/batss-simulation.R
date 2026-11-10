@@ -89,7 +89,7 @@ trials <- batss.glm(
     group = alloc.balanced
   ),
   var.control = varControl,
-  prob0 = c(Control = 1, Experimental = 1),
+  prob0 = c(Control = 0.5, Experimental = 0.5),
   alternative = input$alternative,
   beta = beta,
   which = 2,
