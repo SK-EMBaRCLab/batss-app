@@ -66,16 +66,20 @@ export function DecisionChart({
   // curve looks.
   const curveSpread = Math.max(0.1, Math.abs(value) * 0.25)
 
-  // The viewport has to fit both the effect estimate and the margin
+  // Where the curve peaks: the treatment effect for superiority, no
+  // effect (an odds ratio of 1, a mean difference of 0) for futility
+  const centre = rule.type === 'futility' ? getChartType(type).x : value
+
+  // The viewport has to fit both the curve's centre and the margin
   // reference line, with enough padding around each to read clearly.
   const fittedRange = useMemo(() => {
-    const padding = Math.max(curveSpread * 4, Math.abs(value - rule.margin) * 0.5)
-    const lo = Math.min(value, rule.margin) - padding
+    const padding = Math.max(curveSpread * 4, Math.abs(centre - rule.margin) * 0.5)
+    const lo = Math.min(centre, rule.margin) - padding
     return {
       min: type === 'binary' ? Math.max(0, lo) : lo,
-      max: Math.max(value, rule.margin) + padding
+      max: Math.max(centre, rule.margin) + padding
     }
-  }, [curveSpread, value, rule.margin, type])
+  }, [curveSpread, centre, rule.margin, type])
 
   // Frozen while dragging the margin line: refitting to every new margin
   // would shift the axis under the cursor. Refits when the drag ends.
@@ -90,7 +94,7 @@ export function DecisionChart({
     return Array.from({ length: points + 1 }, (_, index) => {
       const x = min + ((max - min) * index) / points
 
-      const distribution = normalDensity(x, value, curveSpread)
+      const distribution = normalDensity(x, centre, curveSpread)
 
       // The side of the margin whose probability the rule compares with
       // its cutoff: P(effect > margin) when the effect points up
@@ -106,7 +110,7 @@ export function DecisionChart({
         decisionRegion: isDecisionRegion ? distribution : null
       }
     })
-  }, [min, max, curveSpread, value, rule.margin, direction, type])
+  }, [min, max, curveSpread, centre, rule.margin, direction, type])
 
   const chartType = getChartType(type)
 
