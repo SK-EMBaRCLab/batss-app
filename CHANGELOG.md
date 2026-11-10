@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.1.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.0.1...v6.1.0) (2026-11-10)
+
+
+### Features
+
+* **results:** name, annotate and delete runs ([16d37f4](https://github.com/SK-EMBaRCLab/batss-app/commit/16d37f4b8f3146801e2dd8802f44b4ded7d21b64))
+* **results:** show run names in the run list and runs table, and delete several runs at once ([e5c47c3](https://github.com/SK-EMBaRCLab/batss-app/commit/e5c47c3216a5ec570bff92843de5175c3f511739))
+
+
+### Bug Fixes
+
+* **packaging:** build the macOS Applications paths the same on every platform ([a6a58a5](https://github.com/SK-EMBaRCLab/batss-app/commit/a6a58a54d2e376257b726f8ee453cdc99247f2a3))
+
 ## [6.0.1](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.0.0...v6.0.1) (2026-11-10)
 
 
