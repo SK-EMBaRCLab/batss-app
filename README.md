@@ -31,6 +31,7 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
   - [Quick Start](#quick-start)
     - [Local Development](#local-development)
     - [Development with Docker](#development-with-docker)
+    - [Upgrading from Albatross](#upgrading-from-albatross)
   - [Available Scripts](#available-scripts)
   - [Testing](#testing)
   - [Project Structure](#project-structure)
@@ -55,7 +56,9 @@ BATSS Studio is a desktop application for designing and simulating **two-arm Bay
 
 Rather than hand-writing simulation scripts in R, BATSS Studio walks you through a guided wizard to configure a trial design — outcome type (binary or continuous), treatment effect assumptions, sample size and interim analysis schedule, and superiority and futility decision rules — then runs the simulation locally using your machine's R installation. Results are presented as interactive tables and charts: simulated trial outcome probabilities under the null and target-effect scenarios, and sample size distributions across simulated trials.
 
-Every design and its accumulated simulation runs are saved to a single `.design` file, so you can revisit, compare, and re-run a design without losing prior results. A batch-processing mode lets you run many designs from a CSV in one pass.
+Every design and its accumulated simulation runs are saved to a single `.design` file, so you can revisit, compare, and re-run a design without losing prior results. Runs can be named, annotated and deleted, and any run can be exported as a chart image, an editable Word report, or a standalone R script that reproduces it. A batch-processing mode lets you run many designs from a CSV in one pass.
+
+BATSS Studio was called **Albatross** before version 6.0. See [Upgrading from Albatross](#upgrading-from-albatross).
 
 > ⚠️ BATSS Studio is a research and trial-design exploration tool developed by the [Heath Lab](https://lab.research.sickkids.ca/heath/) at SickKids. It is intended to support methodological work and trial planning discussions, not to replace formal statistical review of a trial protocol.
 
@@ -66,10 +69,13 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 - 🧙 **Guided design wizard** — step through outcome type, treatment effect, sample size, and superiority and futility decision rule configuration with inline guidance at every step
 - 🧮 **Local BATSS/INLA simulation** — runs entirely on your machine via your local R installation; no data leaves your computer
 - 📊 **Interactive results** — sortable/filterable simulation history table, outcome probability charts, and sample size distribution summaries
+- 🏷️ **Named and annotated runs** — give a run a name and notes, find runs by either in the runs table, and delete runs you no longer need (one at a time or several at once)
+- 📤 **Exports** — save a run's chart as a PNG, its full results as an editable Word report (`.docx`, with the R script as an appendix), or a standalone R script that reruns it with BATSS. BATSS sets each simulated trial's seed itself, so the script gives the same results as the app
 - 📁 **Batch processing** — upload a CSV of design variations and run them sequentially, with per-row results saved back into your study design
 - 💾 **Save/load `.design` files** — a design and every simulation run against it live in one portable, versioned file, with unsaved-changes protection on exit
 - ⏹️ **Cancellable runs** — stop a single simulation or an in-progress batch at any time
 - 🔄 **Automatic R runtime setup** — BATSS, INLA, and their dependencies are detected and installed automatically on first launch, with live install progress
+- ⬆️ **In-app updates** — checks GitHub for a newer release and offers to download it; nothing is downloaded without your say
 - ⌨️ **Command palette** — quick keyboard-driven navigation and actions (`⌘/Ctrl+K`)
 - 🌗 **Light / Dark / System theme** — full dark mode support
 - 🐳 **Docker development environment** — containerised environment with docker-compose for Linux development without a local R/Node setup
@@ -81,7 +87,7 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 **To run a downloaded release:**
 
-- [R](https://www.r-project.org/) installed and on your system (version 4.5.x recommended; other recent versions are generally compatible). BATSS Studio detects your R installation automatically — see [How It Works](#how-it-works) — and installs the required R packages (`BATSS`, `INLA`, `fmesher`, `jsonlite`) into an app-private library on first launch, so no manual `install.packages()` step is needed.
+- [R](https://www.r-project.org/) installed and on your system (version 4.5.x recommended; other recent versions are generally compatible). BATSS Studio detects your R installation automatically — see [How It Works](#how-it-works) — and installs the required R packages (`BATSS`, `INLA`, `fmesher`, `jsonlite`, `R.utils`) into an app-private library on first launch, so no manual `install.packages()` step is needed.
 - On Linux, installing from source requires standard build tooling (a C/Fortran toolchain, `cmake`) and the geospatial libraries INLA's dependencies need (GDAL, GEOS, PROJ, UDUNITS). See the [Dockerfile](Dockerfile) for the exact package list used in the containerised dev environment.
 
 **To build or develop BATSS Studio:**
@@ -133,8 +139,10 @@ The container provides a Linux environment with Node, R, and every system librar
 1. **Build and start the container:**
 
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
+
+   (Older Docker installs use `docker-compose`, with a hyphen.)
 
 2. **Open a shell inside it:**
 
@@ -142,7 +150,7 @@ The container provides a Linux environment with Node, R, and every system librar
    docker exec -it batss-studio-dev bash
    ```
 
-3. **Install dependencies and run the app** (inside the container):
+3. **Install dependencies and run the app** (inside the container). The container keeps its own `node_modules`, so run `npm install` there again whenever `package.json` changes:
 
    ```bash
    npm install
@@ -150,6 +158,16 @@ The container provides a Linux environment with Node, R, and every system librar
    ```
 
    The container is configured for X11 forwarding with software rendering (see `docker-compose.yml`), so the Electron window renders on your host display.
+
+### Upgrading from Albatross
+
+BATSS Studio is the new name for Albatross (versions before 6.0). Your designs and settings carry over:
+
+- **Data:** on first launch, BATSS Studio moves the old Albatross data folder (settings, installed R packages, error log) to its own, so nothing needs reinstalling. `.design` files are untouched wherever you saved them.
+- **Windows:** the installer removes Albatross after installing BATSS Studio.
+- **Linux (`.deb`):** installing BATSS Studio removes the `albatross` package.
+- **Linux (AppImage):** delete the old Albatross AppImage yourself.
+- **macOS:** the `.dmg` can't replace an app with a different name, so on first launch BATSS Studio offers once to move the old Albatross app to the Trash.
 
 ---
 
@@ -184,16 +202,20 @@ npm test              # run every test once (about a second)
 npm run test:watch    # keep running and re-test on every save
 ```
 
-The tests cover code where a mistake would be serious but easy to miss by clicking around:
+The tests cover code where a mistake would be serious but easy to miss by clicking around. The main areas, with an example file for each:
 
-| Test file                                     | What it checks                                                              |
-| --------------------------------------------- | --------------------------------------------------------------------------- |
-| `src/main/ipc/app-page.test.ts`               | Only the app's own page can talk to the main process (spaces, Windows case) |
-| `src/main/ipc/runtime-queue.test.ts`          | R checks and updates never overlap, and an update is never skipped          |
-| `src/main/services/error-log.service.test.ts` | The error log is written, kept small, and never causes a second error       |
-| `src/shared/design-file-schema.test.ts`       | `.design` files load, and damaged ones are rejected with a clear message    |
-| `src/shared/settings-types.test.ts`           | A damaged or hand-edited timeout setting falls back to the default          |
-| `src/shared/error-reference.test.ts`          | Error references look like `7F3A-92CD` and don't repeat                     |
+| Area                                                                      | Example test file                                |
+| ------------------------------------------------------------------------- | ------------------------------------------------ |
+| Validation of designs, runs and batch CSVs (form and main process)        | `src/shared/simulation-input-schema.test.ts`     |
+| `.design` files load, and damaged ones are rejected with a clear message  | `src/shared/design-file-schema.test.ts`          |
+| Decision rules: direction, formulas, outcome models                       | `src/shared/effect-direction.test.ts`            |
+| Exports: file names, the R script, the Word report and its chart          | `src/renderer/src/lib/report/run-report.test.ts` |
+| Runs: naming, notes, deleting, and what's selected afterwards             | `src/renderer/src/stores/design.test.ts`         |
+| Security: only the app's own page can talk to the main process            | `src/main/ipc/app-page.test.ts`                  |
+| R setup and updates: checks never overlap, updates aren't skipped         | `src/main/ipc/runtime-queue.test.ts`             |
+| App updates: checking for a new release, including in a development build | `src/main/services/update.service.test.ts`       |
+
+To see them all: `find src -name "*.test.ts"`.
 
 Simulations themselves (R, BATSS, INLA) and the screens aren't tested automatically; check those by hand before a release.
 
@@ -210,7 +232,9 @@ Simulations themselves (R, BATSS, INLA) and the screens aren't tested automatica
 
 ```
 batss-app/
-├── .github/workflows/          # CI: release-please + multi-platform build/publish
+├── .github/workflows/          # CI: check.yml (every push) and release.yml (release-please + builds)
+├── build/                      # Packaging resources: icons, macOS entitlements, Windows installer script
+├── docs/                       # Developer guides, e.g. adding a new outcome type
 ├── resources/
 │   ├── icon.png                # App icon
 │   └── r/
@@ -224,11 +248,12 @@ batss-app/
 │   │   └── index.ts               # App entrypoint: window lifecycle, IPC registration
 │   ├── preload/                 # contextBridge API exposed to the renderer
 │   ├── renderer/src/            # React application (the UI)
+│   │   ├── commands/              # Command palette actions and keyboard shortcuts
 │   │   ├── components/            # UI components, grouped by feature area
 │   │   ├── config/                 # Navigation and view registration
 │   │   ├── hooks/
 │   │   ├── layouts/
-│   │   ├── lib/                     # Schemas, mappers, and other framework-free logic
+│   │   ├── lib/                     # Schemas, mappers, exports and other framework-free logic
 │   │   ├── pages/                   # Top-level routed views (dashboard, simulation, batch, results, ...)
 │   │   ├── stores/                   # Zustand stores (design, simulation, batch, runtime, engine, ...)
 │   │   └── types/
@@ -248,10 +273,10 @@ batss-app/
 
 ## How It Works
 
-1. **Runtime bootstrap** — on launch, BATSS Studio searches common install locations for `Rscript` (including the Windows registry, since the CRAN installer doesn't add R to `PATH` by default), checks whether `BATSS`, `INLA`, `fmesher`, and `jsonlite` are installed in an app-private R library, and installs anything missing before the app becomes usable.
+1. **Runtime bootstrap** — on launch, BATSS Studio searches common install locations for `Rscript` (including the Windows registry, since the CRAN installer doesn't add R to `PATH` by default), checks whether `BATSS`, `INLA`, `fmesher`, `jsonlite` and `R.utils` are installed in an app-private R library, and installs anything missing before the app becomes usable.
 2. **Design the trial** — the simulation wizard collects the outcome type, treatment effect assumptions, sample size/interim schedule, and superiority and futility decision rules, validating inputs at every step.
 3. **Run the simulation** — BATSS Studio serializes the design to JSON and runs `resources/r/batss-simulation.R` via your local `Rscript`, streaming live log output back to the UI. Results are read back from a temporary file rather than parsed from console output, so nothing from R/INLA's own logging can corrupt them.
-4. **Review results** — each run is appended to the open `.design` file with its own results (outcome probability tables/charts, sample size distributions), so you can compare runs against each other over time.
+4. **Review results** — each run is appended to the open `.design` file with its own results (outcome probability tables/charts, sample size distributions), so you can compare runs against each other over time. Runs can be named, annotated, deleted and exported (chart image, Word report, R script).
 5. **Batch mode** — for exploring many design variations at once, upload a CSV (see the in-app template) and BATSS Studio validates and runs each row sequentially, saving every result into the same design.
 
 ---
@@ -337,7 +362,12 @@ On every merged release PR, GitHub Actions builds and uploads:
 - **Windows** — `.exe` NSIS installer
 - **macOS** — `.dmg` disk image (Apple Silicon). BATSS Studio also updates from it: it downloads the `.dmg` and opens it in Finder, and the user drags BATSS Studio into Applications (unsigned macOS apps can't install their own updates)
 
-Each platform also gets a `latest*.yml` file (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`), which is what installed copies on that platform check for updates. If a platform fails to build, the others are still published, but the run then fails with a "Missing from the release" error naming what's absent. Re-run the failed job from the Actions tab (**Re-run failed jobs**) to add the missing files to the same release.
+Each platform also gets a `latest*.yml` file (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`), which is what installed copies on that platform check for updates. If a platform fails to build, the others are still published, but the run then fails with a "Missing from the release" error naming what's absent. What to do depends on why it failed:
+
+- **A one-off failure** (a network error, a runner problem): re-run the failed job from the Actions tab (**Re-run failed jobs**) to add the missing files to the same release.
+- **A real failure** (for example a test failing on that platform): re-running builds the same code and fails again. Fix it in a `fix:` commit instead; release-please then opens the next patch release, which publishes every platform.
+
+The workflow can also be started by hand (**Run workflow** on the Release workflow, with an existing tag such as `v6.2.0`) to build that tag again and attach its files to its release.
 
 ### Release Security
 
@@ -383,6 +413,7 @@ Dependabot's `github-actions` ecosystem can automate this (it bumps the SHA and 
 2. Create a feature branch: `git checkout -b feat/my-feature`
 3. Follow conventional commits
 4. Before opening a PR, make sure `npm run check` passes (types, lint, formatting and tests)
+   - Adding a new outcome type? Follow [docs/adding-an-outcome-type.md](docs/adding-an-outcome-type.md).
 5. Open a pull request
 
 ---
