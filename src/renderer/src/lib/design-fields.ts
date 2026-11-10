@@ -47,7 +47,7 @@ type DesignField = {
   value: (input: DesignSnapshot) => string | number | undefined
 }
 
-export const designFields: DesignField[] = [
+const designFields: DesignField[] = [
   {
     key: 'outcomeType',
     label: FIELD_LABELS.outcomeType,

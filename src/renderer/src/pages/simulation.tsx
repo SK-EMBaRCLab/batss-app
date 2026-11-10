@@ -63,7 +63,7 @@ export default function Simulation(): ReactElement {
         initialInput={design?.input}
         header={
           <CardTitle>
-            {design?.name ?? 'BATSS Simulation Design'}
+            {design?.name}
             {design && design.results.length > 0 && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 · {design.results.length} run{design.results.length === 1 ? '' : 's'} so far

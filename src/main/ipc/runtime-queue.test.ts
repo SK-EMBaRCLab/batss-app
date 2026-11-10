@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import type { RuntimeResult } from '../runtime/types'
 import { isUpdatingPackages, runExclusive } from './runtime-queue'
 
-const RESULT: RuntimeResult = { ready: true, r: true, packages: [] }
+const RESULT: RuntimeResult = { ready: true, packages: [] }
 
 /** A run that only finishes when the test says so (even if it hasn't started yet). */
 function controlledRun(): {

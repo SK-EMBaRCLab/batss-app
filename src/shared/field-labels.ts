@@ -25,7 +25,7 @@ export const FIELD_LABELS = {
   futilityThreshold: 'Futility cutoff'
 } as const
 
-export type LabelledField = keyof typeof FIELD_LABELS
+type LabelledField = keyof typeof FIELD_LABELS
 
 // Shorter names for the results table's column headers, so it fits
 // narrower windows (each header's tooltip shows the full name)

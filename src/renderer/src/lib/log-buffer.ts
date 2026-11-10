@@ -1,4 +1,4 @@
-export const MAX_LOG_LINES = 2000
+const MAX_LOG_LINES = 2000
 
 /** Append `lines`, keeping only the most recent `max`. */
 export function appendLogs(logs: string[], lines: string[], max = MAX_LOG_LINES): string[] {

@@ -16,19 +16,13 @@ import {
 import { useDesign } from '@/stores/design'
 import { useNavigation } from '@/stores/navigation'
 
-export default function Dashboard(): ReactElement {
+export default function Dashboard(): ReactElement | null {
   const design = useDesign((s) => s.design)
   const showAllResults = useDesign((s) => s.showAllResults)
   const navigate = useNavigation((s) => s.navigate)
 
-  if (!design) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">No study design is open.</p>
-      </div>
-    )
-  }
+  // Never shown: without a design the app shows the welcome screen instead
+  if (!design) return null
 
   function viewAllResults(): void {
     showAllResults()

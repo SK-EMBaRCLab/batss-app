@@ -173,10 +173,7 @@ export default function Batch(): ReactElement {
           )}
 
           <div className="flex items-center gap-2">
-            <Button
-              onClick={handleRun}
-              disabled={validInputs.length === 0 || busy !== 'idle' || !design}
-            >
+            <Button onClick={handleRun} disabled={validInputs.length === 0 || busy !== 'idle'}>
               <Play className="mr-2 h-4 w-4" />
               Run Batch ({validInputs.length})
             </Button>
@@ -188,12 +185,6 @@ export default function Batch(): ReactElement {
               </Button>
             )}
           </div>
-
-          {!design && (
-            <p className="text-sm text-muted-foreground">
-              Open or create a study design first — batch results are saved into it.
-            </p>
-          )}
 
           {busy === 'simulation' && (
             <p className="text-sm text-muted-foreground">

@@ -29,15 +29,17 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
   const ruleErrors = shownErrors(ruleArray.errors, ruleArray.isTouched, attempted)
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4">
-      <div className="shrink-0 space-y-1">
+    // The step body scrolls (see form.tsx), so this is plain stacked
+    // content: nothing here has a height to fill or scroll within
+    <div className="space-y-4">
+      <div className="space-y-1">
         <h3 className="font-semibold">Decision Rules</h3>
         <p className="text-sm text-muted-foreground">
           Add at least one rule. Trials often use both.
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {RULE_BUTTONS.map(({ type, label }) => (
           <Button
             key={type}
@@ -61,7 +63,7 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
           only shows after a rule was removed, or once Next is tried */}
       {ruleErrors?.[0] && <p className="text-sm text-destructive">{ruleErrors[0]}</p>}
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
+      <div className="space-y-3">
         {ruleArray.items.map((id, index) => (
           <DecisionRuleCard
             key={id}

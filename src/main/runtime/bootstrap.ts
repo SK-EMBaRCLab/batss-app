@@ -42,7 +42,6 @@ export async function bootstrapRuntime(reporter: RuntimeReporter): Promise<Runti
 
     return {
       ready: status.every((pkg) => pkg.installed),
-      r: true,
       packages: status
     }
   } catch (error) {
@@ -81,7 +80,6 @@ export async function updateRuntime(
 
       return {
         ready: status.every((pkg) => pkg.installed),
-        r: true,
         packages: status
       }
     }
@@ -98,7 +96,6 @@ export async function updateRuntime(
 
     return {
       ready: updatedStatus.every((pkg) => pkg.installed),
-      r: true,
       packages: updatedStatus
     }
   } catch (error) {

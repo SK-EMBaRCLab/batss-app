@@ -12,12 +12,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary
       FallbackComponent={AppError}
-      onError={(error, info) => {
-        console.error(error)
-        console.error(info.componentStack)
-
-        // window.electronAPI.logError(...)
-      }}
+      // The fallback logs the error itself, with its reference; only the
+      // component stack, which it doesn't get, is added here
+      onError={(_error, info) => console.error(info.componentStack)}
     >
       <App />
     </ErrorBoundary>

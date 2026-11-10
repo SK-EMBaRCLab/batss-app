@@ -119,7 +119,7 @@ const simulationResultEntryFileSchema = v.object({
   result: simulationRunResultFileSchema
 })
 
-export const studyDesignFileSchema = v.object({
+const studyDesignFileSchema = v.object({
   version: v.literal(2),
   id: v.string(),
   name: v.string(),

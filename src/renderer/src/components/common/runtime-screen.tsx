@@ -9,7 +9,10 @@ import { useRuntime } from '@/stores/runtime'
 
 import { TechnicalDetails } from './technical-details'
 
-function useElapsedSeconds(active: boolean): number {
+// Whole seconds since `active` last became true, ticking once a second,
+// and 0 while it's false. Not the shared useElapsedSeconds (hooks/), which
+// counts from a given start time.
+function useSecondsWhile(active: boolean): number {
   const [seconds, setSeconds] = useState(0)
 
   useEffect(() => {
@@ -44,7 +47,7 @@ export function RuntimeScreen(): ReactElement {
   const isError = status === 'error'
   const isWorking = isChecking || isInstalling
 
-  const elapsed = useElapsedSeconds(isChecking || isInstalling)
+  const elapsed = useSecondsWhile(isChecking || isInstalling)
 
   const copyDetails = async (): Promise<void> => {
     const details = [
