@@ -1,37 +1,23 @@
-import type { BatchRowValidation } from '@shared/batch-types'
-import { MAX_BATCH_ROWS } from '@shared/design-rules'
 import { Download, Play, Square, Upload } from 'lucide-react'
-import { type ChangeEvent, type ReactElement, useMemo, useState } from 'react'
+import { type ReactElement } from 'react'
 
+import { BatchResultsTable } from '@/components/batch/batch-results-table'
 import { LogViewer } from '@/components/common/log-viewer'
-import { RunStatusIcon } from '@/components/common/run-status-icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { buildBatchValidations, buildTemplateCsv } from '@/lib/batch-mapper'
-import { downloadCsv, parseCsvFile } from '@/lib/csv'
-import { formatRunDuration } from '@/lib/run-format'
+import { useBatchCsv } from '@/hooks/use-batch-csv'
+import { buildTemplateCsv } from '@/lib/batch-mapper'
+import { downloadCsv } from '@/lib/csv'
 import { STAGE_LABEL, useRunProgress } from '@/lib/run-progress'
-import { runResultDetail, runStatusLabel } from '@/lib/run-status'
 import { useBatch } from '@/stores/batch'
-import { useDesign } from '@/stores/design'
 import { useEngine } from '@/stores/engine'
 
-export default function Batch(): ReactElement {
-  const design = useDesign((s) => s.design)
-  const openResults = useDesign((s) => s.openResults)
+// Invalid rows listed by name; the rest are counted
+const MAX_LISTED_ERRORS = 8
 
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [parseError, setParseError] = useState<string | null>(null)
-  const [validations, setValidations] = useState<BatchRowValidation[]>([])
+export default function Batch(): ReactElement {
+  const { fileName, parseError, validations, invalidRows, validInputs, handleFile } = useBatchCsv()
 
   const status = useBatch((s) => s.status)
   const completed = useBatch((s) => s.completed)
@@ -54,59 +40,6 @@ export default function Batch(): ReactElement {
     estimate: rowEstimate,
     done: !isRunning
   })
-
-  const invalidRows = useMemo(
-    () =>
-      validations.filter(
-        (v): v is Extract<BatchRowValidation, { status: 'invalid' }> => v.status === 'invalid'
-      ),
-    [validations]
-  )
-
-  const validInputs = useMemo(
-    () =>
-      validations
-        .filter((v): v is Extract<BatchRowValidation, { status: 'valid' }> => v.status === 'valid')
-        .map((v) => ({ rowIndex: v.rowIndex, input: v.input })),
-    [validations]
-  )
-
-  const handleFile = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const file = event.target.files?.[0]
-    const input = event.target
-
-    if (!file) return
-
-    setParseError(null)
-    setFileName(file.name)
-
-    try {
-      const parsed = await parseCsvFile(file)
-
-      if (parsed.rows.length === 0) {
-        setParseError('The CSV has no data rows.')
-        setValidations([])
-        return
-      }
-
-      // Same limit the main process enforces, reported before Run
-      if (parsed.rows.length > MAX_BATCH_ROWS) {
-        setParseError(
-          `A batch can have at most ${MAX_BATCH_ROWS} rows; this file has ${parsed.rows.length}.`
-        )
-        setValidations([])
-        return
-      }
-
-      setValidations(buildBatchValidations(parsed.rows))
-    } catch (error) {
-      setParseError(error instanceof Error ? error.message : 'Failed to parse CSV')
-      setValidations([])
-    } finally {
-      // Reset so re-selecting the exact same file still fires onChange.
-      input.value = ''
-    }
-  }
 
   const handleRun = async (): Promise<void> => {
     if (validInputs.length === 0) return
@@ -158,10 +91,12 @@ export default function Batch(): ReactElement {
                     be skipped:
                   </p>
                   <ul className="list-disc space-y-0.5 pl-5 text-destructive/90">
-                    {invalidRows.slice(0, 8).map((row) => (
+                    {invalidRows.slice(0, MAX_LISTED_ERRORS).map((row) => (
                       <li key={row.rowIndex}>{row.errors[0]}</li>
                     ))}
-                    {invalidRows.length > 8 && <li>…and {invalidRows.length - 8} more</li>}
+                    {invalidRows.length > MAX_LISTED_ERRORS && (
+                      <li>…and {invalidRows.length - MAX_LISTED_ERRORS} more</li>
+                    )}
                   </ul>
                 </div>
               ) : (
@@ -225,59 +160,7 @@ export default function Batch(): ReactElement {
           </CardHeader>
 
           <CardContent className="min-h-0 overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Row</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Detail</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {entries.map((entry) => {
-                  // BatchRunEntry doesn't carry the id design.appendResult()
-                  // generated for it — correlate by createdAt, which
-                  // stores/batch.ts passes through unchanged.
-                  const match = design?.results.find(
-                    (result) => result.createdAt === entry.createdAt
-                  )
-
-                  return (
-                    <TableRow
-                      key={entry.rowIndex}
-                      onClick={() => {
-                        if (match) openResults([match.id])
-                      }}
-                      // Reachable and openable from the keyboard, not just by click
-                      tabIndex={match ? 0 : undefined}
-                      onKeyDown={(event) => {
-                        if (match && (event.key === 'Enter' || event.key === ' ')) {
-                          event.preventDefault()
-                          openResults([match.id])
-                        }
-                      }}
-                      className={
-                        match
-                          ? 'cursor-pointer outline-none hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring'
-                          : undefined
-                      }
-                    >
-                      <TableCell>{entry.rowIndex + 1}</TableCell>
-                      <TableCell>
-                        <span className="flex items-center gap-1.5">
-                          <RunStatusIcon status={entry.result.status} />
-                          {runStatusLabel(entry.result.status)}
-                        </span>
-                      </TableCell>
-                      <TableCell>{formatRunDuration(entry.result.durationMs) ?? '—'}</TableCell>
-                      <TableCell>{runResultDetail(entry.result)}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+            <BatchResultsTable entries={entries} />
           </CardContent>
         </Card>
       )}
