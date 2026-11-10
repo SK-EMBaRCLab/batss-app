@@ -1,11 +1,11 @@
 import { Field as FormischField } from '@formisch/react'
 import { type ComponentProps, type ReactElement, useId } from 'react'
 
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { SimulationFormStore } from '@/types/form-types'
 
-import { shownErrors, useStepAttempted } from './step-errors'
+import { ValidatedField } from './validated-field'
 
 type NumericFieldPath =
   | ['N']
@@ -17,6 +17,7 @@ type NumericFieldPath =
   | ['meanOutcome']
   | ['meanDiff']
   | ['sd']
+  | ['decisionRules', number, 'margin' | 'threshold']
 
 type NumericFieldProps = {
   form: SimulationFormStore
@@ -34,35 +35,23 @@ export function NumericField({
 }: NumericFieldProps): ReactElement {
   const generatedId = useId()
   const id = inputProps.id ?? generatedId
-  const attempted = useStepAttempted()
 
   return (
     <FormischField of={form} path={path}>
-      {(field) => {
-        const errors = shownErrors(field.errors, field.isTouched, attempted)
-        return (
-          <Field data-invalid={errors !== null} className={className}>
-            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      {(field) => (
+        <ValidatedField field={field} className={className}>
+          <FieldLabel htmlFor={id}>{label}</FieldLabel>
 
-            <Input
-              {...field.props}
-              {...inputProps}
-              id={id}
-              type="number"
-              value={field.input ?? ''}
-              onChange={(event) => field.onChange(event.target.value)}
-            />
-
-            {errors && (
-              <FieldError
-                errors={errors.map((message) => ({
-                  message
-                }))}
-              />
-            )}
-          </Field>
-        )
-      }}
+          <Input
+            {...field.props}
+            {...inputProps}
+            id={id}
+            type="number"
+            value={field.input ?? ''}
+            onChange={(event) => field.onChange(event.target.value)}
+          />
+        </ValidatedField>
+      )}
     </FormischField>
   )
 }

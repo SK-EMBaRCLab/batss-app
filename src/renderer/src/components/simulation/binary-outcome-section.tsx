@@ -1,26 +1,14 @@
 import { Field as FormischField } from '@formisch/react'
 import { FIELD_LABELS } from '@shared/field-labels'
-import { type ReactElement, useId } from 'react'
+import { type ReactElement } from 'react'
 
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
-import { useFormLocked } from './form-locked'
 import { NumericField } from './numeric-field'
-import { shownErrors, useStepAttempted } from './step-errors'
+import { SelectField } from './select-field'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
-  const locked = useFormLocked()
-  const labelId = useId()
-  const attempted = useStepAttempted()
   return (
     <div className="space-y-6">
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
@@ -36,66 +24,16 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
         />
 
         <FormischField of={form} path={['treatmentEffectType']}>
-          {(field) => {
-            const selectedTreatmentEffect = treatmentEffects.find(
-              (effect) => effect.value === field.input
-            )
-            const errors = shownErrors(field.errors, field.isTouched, attempted)
-
-            return (
-              <Field data-invalid={errors !== null} className="max-w-lg">
-                <FieldLabel id={labelId}>{FIELD_LABELS.treatmentEffectType}</FieldLabel>
-                <FieldDescription>
-                  Difference between treatment arm and control arm
-                </FieldDescription>
-
-                <Select
-                  disabled={locked}
-                  value={field.input ?? ''}
-                  onValueChange={(value) => {
-                    if (
-                      value === 'oddsRatio' ||
-                      value === 'riskDifference' ||
-                      value === 'riskRatio'
-                    ) {
-                      field.onChange(value)
-                    }
-                  }}
-                >
-                  <SelectTrigger
-                    aria-labelledby={labelId}
-                    // formisch's focus and blur: mark the choice touched, so
-                    // its error shows once used (see step-errors.ts)
-                    onFocus={field.props.onFocus}
-                    onBlur={field.props.onBlur}
-                  >
-                    <SelectValue placeholder="Select effect type">
-                      {selectedTreatmentEffect?.label}
-                    </SelectValue>
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {treatmentEffects.map((effect) => (
-                      <SelectItem
-                        key={effect.value}
-                        value={effect.value}
-                        disabled={!effect.enabled}
-                      >
-                        {effect.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors && (
-                  <FieldError
-                    errors={errors.map((message) => ({
-                      message
-                    }))}
-                  />
-                )}
-              </Field>
-            )
-          }}
+          {(field) => (
+            <SelectField
+              field={field}
+              label={FIELD_LABELS.treatmentEffectType}
+              description="Difference between treatment arm and control arm"
+              placeholder="Select effect type"
+              options={treatmentEffects}
+              className="max-w-lg"
+            />
+          )}
         </FormischField>
         <NumericField
           form={form}

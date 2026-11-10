@@ -1,88 +1,26 @@
 import { Field as FormischField } from '@formisch/react'
 import { FIELD_LABELS } from '@shared/field-labels'
-import { type ReactElement, useId } from 'react'
+import { type ReactElement } from 'react'
 
-import {
-  Field as ShadcnField,
-  FieldDescription,
-  FieldError,
-  FieldLabel
-} from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import { outcomeTypes } from '@/lib/design-options'
+import { outcomeTypes, upcomingOutcomeTypes } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
-import { useFormLocked } from './form-locked'
-import { shownErrors, useStepAttempted } from './step-errors'
-
-type OutcomeType = (typeof outcomeTypes)[number]['value']
+import { SelectField } from './select-field'
 
 export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): ReactElement {
-  const locked = useFormLocked()
-  const labelId = useId()
-  const attempted = useStepAttempted()
   return (
     <FormischField of={form} path={['outcomeType']}>
-      {(field) => {
-        const errors = shownErrors(field.errors, field.isTouched, attempted)
-        return (
-          <>
-            <ShadcnField data-invalid={errors !== null} className="max-w-lg">
-              <FieldLabel id={labelId}>{FIELD_LABELS.outcomeType}</FieldLabel>
-              <FieldDescription>
-                Select the outcome type that matches your primary study endpoint
-              </FieldDescription>
-
-              <Select
-                disabled={locked}
-                value={field.input ?? ''}
-                onValueChange={(value) => {
-                  if (outcomeTypes.some((type) => type.value === value)) {
-                    field.onChange(value as OutcomeType)
-                  }
-                }}
-              >
-                <SelectTrigger
-                  aria-labelledby={labelId}
-                  // formisch's focus and blur: mark the choice touched, so
-                  // its error shows once used (see step-errors.ts)
-                  onFocus={field.props.onFocus}
-                  onBlur={field.props.onBlur}
-                >
-                  <SelectValue placeholder="Select outcome type" className="capitalize" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {outcomeTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value} disabled={!type.enabled}>
-                      {type.label}
-                      {!type.enabled && ' (under development)'}
-                    </SelectItem>
-                  ))}
-
-                  <SelectItem value="count" disabled>
-                    Count (under development)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              {errors && (
-                <FieldError
-                  errors={errors.map((message) => ({
-                    message
-                  }))}
-                />
-              )}
-            </ShadcnField>
-          </>
-        )
-      }}
+      {(field) => (
+        <SelectField
+          field={field}
+          label={FIELD_LABELS.outcomeType}
+          description="Select the outcome type that matches your primary study endpoint"
+          placeholder="Select outcome type"
+          options={outcomeTypes}
+          upcoming={upcomingOutcomeTypes}
+          className="max-w-lg"
+        />
+      )}
     </FormischField>
   )
 }

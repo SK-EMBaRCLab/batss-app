@@ -11,7 +11,6 @@ import type { SimulationFormStore } from '@/types/form-types'
 import { DecisionRuleFields } from './decision-rule-fields'
 import { DecisionRulePreview } from './decision-rule-preview'
 import { useFormLocked } from './form-locked'
-import { shownErrors, useStepAttempted } from './step-errors'
 
 const RULE_TEXT = {
   superiority: {
@@ -59,7 +58,6 @@ type DecisionRuleCardProps = {
 
 export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProps): ReactElement {
   const locked = useFormLocked()
-  const attempted = useStepAttempted()
   const typeField = useField(form, { path: ['decisionRules', index, 'type'] })
   const marginField = useField(form, { path: ['decisionRules', index, 'margin'] })
   const thresholdField = useField(form, { path: ['decisionRules', index, 'threshold'] })
@@ -151,25 +149,7 @@ export function DecisionRuleCard({ form, index, onRemove }: DecisionRuleCardProp
             />
           )}
 
-          <DecisionRuleFields
-            type={ruleType}
-            margin={marginField.input}
-            threshold={thresholdField.input}
-            marginProps={marginField.props}
-            thresholdProps={thresholdField.props}
-            onMarginChange={(margin) => {
-              marginField.onChange(margin)
-            }}
-            onThresholdChange={(threshold) => {
-              thresholdField.onChange(threshold)
-            }}
-            marginErrors={
-              shownErrors(marginField.errors, marginField.isTouched, attempted) ?? undefined
-            }
-            thresholdErrors={
-              shownErrors(thresholdField.errors, thresholdField.isTouched, attempted) ?? undefined
-            }
-          />
+          <DecisionRuleFields form={form} index={index} type={ruleType} />
         </div>
       </div>
     </div>

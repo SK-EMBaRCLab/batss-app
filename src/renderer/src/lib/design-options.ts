@@ -12,6 +12,9 @@ export const outcomeTypes: Array<{
   { value: 'ordinal', label: 'Ordinal', icon: ListOrdered, enabled: false }
 ]
 
+// Planned outcome types that aren't an OutcomeType yet, listed disabled
+export const upcomingOutcomeTypes = ['Count'] as const
+
 export const treatmentEffects = [
   {
     value: 'oddsRatio',
@@ -23,7 +26,7 @@ export const treatmentEffects = [
   },
   {
     value: 'riskDifference',
-    label: 'Risk Difference (under development)',
+    label: 'Risk Difference',
     symbol: 'RD',
     enabled: false,
     description:
@@ -31,7 +34,7 @@ export const treatmentEffects = [
   },
   {
     value: 'riskRatio',
-    label: 'Risk Ratio (under development)',
+    label: 'Risk Ratio',
     symbol: 'RR',
     enabled: false,
     description:
