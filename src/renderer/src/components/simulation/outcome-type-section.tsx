@@ -19,18 +19,21 @@ import { outcomeTypes } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { useFormLocked } from './form-locked'
+import { shownErrors, useStepAttempted } from './step-errors'
 
 type OutcomeType = (typeof outcomeTypes)[number]['value']
 
 export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
   const labelId = useId()
+  const attempted = useStepAttempted()
   return (
     <FormischField of={form} path={['outcomeType']}>
       {(field) => {
+        const errors = shownErrors(field.errors, field.isTouched, attempted)
         return (
           <>
-            <ShadcnField data-invalid={field.errors !== null} className="max-w-lg">
+            <ShadcnField data-invalid={errors !== null} className="max-w-lg">
               <FieldLabel id={labelId}>{FIELD_LABELS.outcomeType}</FieldLabel>
               <FieldDescription>
                 Select the outcome type that matches your primary study endpoint
@@ -63,9 +66,9 @@ export function OutcomeTypeSection({ form }: { form: SimulationFormStore }): Rea
                 </SelectContent>
               </Select>
 
-              {field.errors && (
+              {errors && (
                 <FieldError
-                  errors={field.errors.map((message) => ({
+                  errors={errors.map((message) => ({
                     message
                   }))}
                 />

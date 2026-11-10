@@ -15,10 +15,12 @@ import type { SimulationFormStore } from '@/types/form-types'
 
 import { useFormLocked } from './form-locked'
 import { NumericField } from './numeric-field'
+import { shownErrors, useStepAttempted } from './step-errors'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
   const labelId = useId()
+  const attempted = useStepAttempted()
   return (
     <div className="space-y-6">
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
@@ -38,9 +40,10 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
             const selectedTreatmentEffect = treatmentEffects.find(
               (effect) => effect.value === field.input
             )
+            const errors = shownErrors(field.errors, field.isTouched, attempted)
 
             return (
-              <Field data-invalid={field.errors !== null} className="max-w-lg">
+              <Field data-invalid={errors !== null} className="max-w-lg">
                 <FieldLabel id={labelId}>{FIELD_LABELS.treatmentEffectType}</FieldLabel>
                 <FieldDescription>
                   Difference between treatment arm and control arm
@@ -77,9 +80,9 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
                     ))}
                   </SelectContent>
                 </Select>
-                {field.errors && (
+                {errors && (
                   <FieldError
-                    errors={field.errors.map((message) => ({
+                    errors={errors.map((message) => ({
                       message
                     }))}
                   />

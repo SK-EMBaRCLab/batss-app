@@ -9,6 +9,7 @@ import type { SimulationFormStore } from '@/types/form-types'
 
 import { DecisionRuleCard } from './decision-rule-card'
 import { useFormLocked } from './form-locked'
+import { shownErrors, useStepAttempted } from './step-errors'
 
 const RULE_BUTTONS: { type: DecisionRule['type']; label: string }[] = [
   { type: 'superiority', label: 'Add superiority rule' },
@@ -19,11 +20,13 @@ const RULE_BUTTONS: { type: DecisionRule['type']; label: string }[] = [
 // button adds its rule once; removing the rule's card brings it back.
 export function DecisionRuleSection({ form }: { form: SimulationFormStore }): ReactElement {
   const locked = useFormLocked()
+  const attempted = useStepAttempted()
   const ruleArray = useFieldArray(form, { path: ['decisionRules'] })
   const rules = useField(form, { path: ['decisionRules'] })
   const outcomeType = useField(form, { path: ['outcomeType'] })
 
   const types = (rules.input ?? []).map((rule) => rule?.type)
+  const ruleErrors = shownErrors(ruleArray.errors, ruleArray.isTouched, attempted)
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
@@ -54,7 +57,9 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
         ))}
       </div>
 
-      {ruleArray.errors?.[0] && <p className="text-sm text-destructive">{ruleArray.errors[0]}</p>}
+      {/* Adding or removing a rule touches the list, so "Add at least one"
+          only shows after a rule was removed, or once Next is tried */}
+      {ruleErrors?.[0] && <p className="text-sm text-destructive">{ruleErrors[0]}</p>}
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
         {ruleArray.items.map((id, index) => (

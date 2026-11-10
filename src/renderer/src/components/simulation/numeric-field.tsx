@@ -5,6 +5,8 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { SimulationFormStore } from '@/types/form-types'
 
+import { shownErrors, useStepAttempted } from './step-errors'
+
 type NumericFieldPath =
   | ['N']
   | ['m0']
@@ -32,31 +34,35 @@ export function NumericField({
 }: NumericFieldProps): ReactElement {
   const generatedId = useId()
   const id = inputProps.id ?? generatedId
+  const attempted = useStepAttempted()
 
   return (
     <FormischField of={form} path={path}>
-      {(field) => (
-        <Field data-invalid={field.errors !== null} className={className}>
-          <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      {(field) => {
+        const errors = shownErrors(field.errors, field.isTouched, attempted)
+        return (
+          <Field data-invalid={errors !== null} className={className}>
+            <FieldLabel htmlFor={id}>{label}</FieldLabel>
 
-          <Input
-            {...field.props}
-            {...inputProps}
-            id={id}
-            type="number"
-            value={field.input ?? ''}
-            onChange={(event) => field.onChange(event.target.value)}
-          />
-
-          {field.errors && (
-            <FieldError
-              errors={field.errors.map((message) => ({
-                message
-              }))}
+            <Input
+              {...field.props}
+              {...inputProps}
+              id={id}
+              type="number"
+              value={field.input ?? ''}
+              onChange={(event) => field.onChange(event.target.value)}
             />
-          )}
-        </Field>
-      )}
+
+            {errors && (
+              <FieldError
+                errors={errors.map((message) => ({
+                  message
+                }))}
+              />
+            )}
+          </Field>
+        )
+      }}
     </FormischField>
   )
 }

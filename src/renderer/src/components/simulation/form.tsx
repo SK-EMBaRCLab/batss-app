@@ -30,8 +30,9 @@ import { ReviewHelp } from './review-help'
 import { ReviewSection } from './review-section'
 import { SampleSizeHelp } from './sample-size-help'
 import { SampleSizeSection } from './sample-size-section'
+import { StepAttemptedContext } from './step-errors'
 import { StepHelpCard } from './step-help-card'
-import { hasAnyFieldError } from './utils'
+import { firstInvalidStep, hasAnyFieldError } from './utils'
 
 type SimulationFormProps = {
   onRun: (input: SimulationRunInput, output: DesignInput) => Promise<void>
@@ -100,7 +101,19 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   const busy = useEngine((s) => s.busy)
   const cancel = useSimulation((s) => s.cancel)
   const isRunning = busy === 'simulation'
+  // A design that can already run (one opened from a file) has every step
+  // filled in, so all of them can be visited and show their problems
+  const [complete] = useState(
+    () => initialInput !== undefined && checkSimulationRunInput(initialInput).success
+  )
   const [step, setStep] = useState(0)
+  // The furthest step reached: it and every step before it stay clickable
+  const [reachedStep, setReachedStep] = useState(complete ? steps.length - 1 : 0)
+  // Steps where Next (or a jump past them) has been tried, which show all
+  // their errors (see step-errors.ts)
+  const [attemptedSteps, setAttemptedSteps] = useState<ReadonlySet<number>>(
+    () => new Set(complete ? steps.map((_, index) => index) : [])
+  )
   const stepHeights = useTallestHeight(steps.length)
   const form = useForm({
     schema: designSchema,
@@ -109,12 +122,49 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
     initialInput: initialInput ?? initialDesignInput
   })
 
-  const validateStep = async (): Promise<boolean> => {
+  const goTo = (index: number): void => {
+    setStep(index)
+    setReachedStep((reached) => Math.max(reached, index))
+  }
+
+  /**
+   * Checks every step from `from` up to (not including) `to`, marking them
+   * as tried so their errors show. Goes to the first with problems and
+   * returns false, or returns true if they're all fine.
+   */
+  const checkSteps = async (from: number, to: number): Promise<boolean> => {
     await validate(form)
-
     const errors = getDeepErrorEntries(form)
+    const invalid = firstInvalidStep(
+      from,
+      to,
+      (index) => !hasAnyFieldError(errors, steps[index].fields)
+    )
 
-    return !hasAnyFieldError(errors, steps[step].fields)
+    const checkedUpTo = invalid ?? to - 1
+    setAttemptedSteps((tried) => {
+      const next = new Set(tried)
+      for (let index = from; index <= checkedUpTo; index++) next.add(index)
+      return next
+    })
+
+    if (invalid !== null) {
+      goTo(invalid)
+      return false
+    }
+    return true
+  }
+
+  const handleStepClick = (index: number): void => {
+    // Going back, or looking around while a run is in progress, needs no check
+    if (isRunning || index <= step) {
+      setStep(index)
+      return
+    }
+
+    void checkSteps(step, index).then((valid) => {
+      if (valid) goTo(index)
+    })
   }
 
   const handleSubmit: SubmitHandler<typeof designSchema> = async (output) => {
@@ -134,14 +184,14 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   }
 
   const handlePrimaryAction = async (): Promise<void> => {
-    const valid = await validateStep()
-    if (!valid) return
     if (step < steps.length - 1) {
-      setStep((current) => current + 1)
+      if (await checkSteps(step, step + 1)) goTo(step + 1)
       return
     }
 
-    submit(form)
+    // Run: every step, so a problem on one is shown there rather than
+    // the run quietly not starting
+    if (await checkSteps(0, steps.length)) submit(form)
   }
 
   const runButton = (): ReactElement => {
@@ -204,15 +254,14 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
             }}
             className="flex min-h-0 flex-col"
           >
-            <div className="shrink-0 pb-6">
-              <Stepper
-                steps={steps}
-                currentStep={step}
-                onStepClick={setStep}
-                allowAnyStep={isRunning}
-                className="shrink-0 pb-4"
-              />
-            </div>
+            <Stepper
+              steps={steps}
+              currentStep={step}
+              reachedStep={reachedStep}
+              onStepClick={handleStepClick}
+              allowAnyStep={isRunning}
+              className="shrink-0 pb-6"
+            />
             <Separator className="h-px" />
             <div
               className="min-h-0 overflow-y-auto"
@@ -241,7 +290,9 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
                         )}
                       >
                         <div ref={stepHeights.ref(index)} className="p-6">
-                          {wizardStep.render(form)}
+                          <StepAttemptedContext value={attemptedSteps.has(index)}>
+                            {wizardStep.render(form)}
+                          </StepAttemptedContext>
                         </div>
                       </div>
                     ))}
