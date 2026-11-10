@@ -2,11 +2,12 @@ import type { DesignInput, SimulationRunInput, SimulationRunResult } from '@shar
 import { create } from 'zustand'
 
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
+import { requestFailed } from '@/lib/error-reference'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { type RunStage, withLogLines } from '@/lib/run-progress'
 import { formatDuration } from '@/lib/utils'
 
-import { requestFailed, runWithEngine } from './run-session'
+import { runWithEngine } from './run-session'
 
 type SimulationState = {
   logs: string[]

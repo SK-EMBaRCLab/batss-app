@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
+import { requestFailed } from '@/lib/error-reference'
 
 import { useEngine } from './engine'
 import { useNavigation } from './navigation'
@@ -85,13 +86,10 @@ export const useDesign = create<DesignState>((set, get) => {
 
       return true
     } catch (error) {
-      // Details go to the console; the toast stays generic
-      console.error('Saving the design failed:', error)
-      toast.add({
-        type: 'error',
-        title: 'Save failed',
-        description: 'Could not save the design file.'
-      })
+      // Details go to the error log; the toast says what failed, with the
+      // reference to find them by
+      const failure = requestFailed(error, 'design save', 'Could not save the design file.')
+      toast.add({ type: 'error', title: 'Save failed', description: failure.message })
       return false
     }
   }

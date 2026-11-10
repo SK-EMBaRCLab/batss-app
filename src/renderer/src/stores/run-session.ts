@@ -2,9 +2,6 @@ import type { EngineBusy } from '@shared/engine-types'
 import { describeBusy } from '@shared/engine-types'
 import type { DesignInput, SimulationResultEntry } from '@shared/simulation-types'
 
-import { createErrorReference, logError, withReference } from '@/lib/error-reference'
-import { toError } from '@/lib/utils'
-
 import { useDesign } from './design'
 import { useEngine } from './engine'
 
@@ -58,19 +55,4 @@ export async function runWithEngine<T>(
   } finally {
     useEngine.getState().release()
   }
-}
-
-/**
- * For a run request that failed outright (the request, not R): records
- * the details in the error log and returns `message` with the reference
- * appended, to show users and to save with the design.
- */
-export function requestFailed(
-  error: unknown,
-  context: string,
-  message: string
-): { reference: string; message: string } {
-  const reference = createErrorReference()
-  logError(reference, toError(error), context)
-  return { reference, message: withReference(message, reference) }
 }

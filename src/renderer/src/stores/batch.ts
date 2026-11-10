@@ -8,11 +8,12 @@ import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
 import { type DurationEstimate, estimateSimulationDuration } from '@/lib/duration-estimate'
+import { requestFailed } from '@/lib/error-reference'
 import { appendLogs, subscribeLogs } from '@/lib/log-buffer'
 import { type RunStage, withLogLines } from '@/lib/run-progress'
 
 import { useNavigation } from './navigation'
-import { requestFailed, runWithEngine } from './run-session'
+import { runWithEngine } from './run-session'
 
 type BatchState = {
   status: BatchStatus

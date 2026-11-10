@@ -1,6 +1,8 @@
 import type { StudyDesign } from '@shared/simulation-types'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { toast } from '@/components/ui/toast'
+
 import { useDesign } from './design'
 import { useNavigation } from './navigation'
 
@@ -22,6 +24,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
 })
 
 describe('openResults', () => {
@@ -45,5 +48,34 @@ describe('showAllResults', () => {
     useDesign.getState().openResults(['run-1', 'run-3'])
     useDesign.getState().showAllResults()
     expect(useDesign.getState()).toMatchObject({ selectedResults: null, selectedResultId: 'run-3' })
+  })
+})
+
+describe('saveDesign', () => {
+  test('a failed save is recorded, and the message gives its reference', async () => {
+    const recordError = vi.fn()
+    vi.stubGlobal('window', {
+      app: { recordError },
+      design: {
+        setDirty: vi.fn(),
+        saveResult: vi.fn(async () => {
+          throw new Error('EACCES: permission denied')
+        })
+      }
+    })
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const shown = vi.spyOn(toast, 'add').mockImplementation(() => '')
+
+    expect(await useDesign.getState().saveDesign()).toBe(false)
+
+    const [reference, context, details] = recordError.mock.calls[0]
+    expect(context).toBe('design save')
+    expect(details).toContain('EACCES: permission denied')
+    expect(shown).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'error',
+        description: expect.stringContaining(reference)
+      })
+    )
   })
 })

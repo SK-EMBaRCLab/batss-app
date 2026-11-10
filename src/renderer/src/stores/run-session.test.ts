@@ -5,9 +5,11 @@ import type {
 } from '@shared/simulation-types'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { requestFailed } from '@/lib/error-reference'
+
 import { useDesign } from './design'
 import { useEngine } from './engine'
-import { requestFailed, runWithEngine } from './run-session'
+import { runWithEngine } from './run-session'
 
 const RESULT: SimulationRunResult = { status: 'error', message: 'R stopped' }
 

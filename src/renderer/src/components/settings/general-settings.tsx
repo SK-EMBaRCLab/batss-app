@@ -14,6 +14,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { toast } from '@/components/ui/toast'
+import { logFailure, requestFailed } from '@/lib/error-reference'
 import { updateButtonLabel } from '@/lib/update-label'
 import { useRuntime } from '@/stores/runtime'
 import { Theme, useTheme } from '@/stores/theme'
@@ -81,12 +82,8 @@ export function AppIconSetting(): ReactElement {
     try {
       await setIconAppearance(choice)
     } catch (error) {
-      console.error('Changing the app icon failed:', error)
-      toast.add({
-        type: 'error',
-        title: 'Could not change app icon',
-        description: 'Please try again.'
-      })
+      const failure = requestFailed(error, 'app icon', 'Please try again.')
+      toast.add({ type: 'error', title: 'Could not change app icon', description: failure.message })
     } finally {
       setIsSaving(false)
     }
@@ -141,10 +138,14 @@ export function NotifySetting(): ReactElement {
         // Otherwise the checkbox would stay disabled for good. Shows the
         // setting's default (on, as in settings.ipc.ts); changing it saves
         // as usual.
-        console.error('Loading the notification setting failed:', error)
+        const failure = requestFailed(error, 'notification setting load', 'Showing the default.')
         if (cancelled) return
         setEnabled(true)
-        toast.add({ type: 'error', title: "Couldn't load the notification setting" })
+        toast.add({
+          type: 'error',
+          title: "Couldn't load the notification setting",
+          description: failure.message
+        })
       })
     return () => {
       cancelled = true
@@ -157,9 +158,9 @@ export function NotifySetting(): ReactElement {
       await window.settings.setNotifyOnRunFinish(checked)
     } catch (error) {
       // Put the checkbox back so it shows what's actually saved
-      console.error('Saving the notification setting failed:', error)
       setEnabled(!checked)
-      toast.add({ type: 'error', title: 'Could not save', description: 'Please try again.' })
+      const failure = requestFailed(error, 'notification setting save', 'Please try again.')
+      toast.add({ type: 'error', title: 'Could not save', description: failure.message })
     }
   }
 
@@ -225,7 +226,7 @@ export function ErrorLogSetting(): ReactElement {
       .then((value) => {
         if (!cancelled) setLogPath(value)
       })
-      .catch((error) => console.error('Loading the error log path failed:', error))
+      .catch((error) => logFailure(error, 'error log path'))
     return () => {
       cancelled = true
     }
@@ -238,8 +239,12 @@ export function ErrorLogSetting(): ReactElement {
         toast.add({ type: 'info', description: 'No errors have been recorded yet.' })
       }
     } catch (error) {
-      console.error('Opening the error log failed:', error)
-      toast.add({ type: 'error', title: "Couldn't open the error log" })
+      const failure = requestFailed(error, 'error log', 'Try again, or ask for help.')
+      toast.add({
+        type: 'error',
+        title: "Couldn't open the error log",
+        description: failure.message
+      })
     }
   }
 

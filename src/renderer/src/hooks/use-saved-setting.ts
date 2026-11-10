@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { toast } from '@/components/ui/toast'
+import { logFailure, requestFailed } from '@/lib/error-reference'
 
 type SaveResult = { saved: boolean; error?: string }
 
@@ -40,7 +41,8 @@ export function useSavedSetting({
       .then((stored) => {
         if (!cancelled) setValueState(stored)
       })
-      .catch((loadError) => console.error('Loading a setting failed:', loadError))
+      // Keeps showing the default; recorded, as it shouldn't happen
+      .catch((loadError) => logFailure(loadError, 'setting load'))
       .finally(() => {
         if (!cancelled) setIsLoading(false)
       })
@@ -73,8 +75,8 @@ export function useSavedSetting({
       setIsDirty(false)
       toast.add({ type: 'success', description: savedMessage })
     } catch (saveError) {
-      console.error('Saving a setting failed:', saveError)
-      toast.add({ type: 'error', title: 'Could not save', description: 'Please try again.' })
+      const failure = requestFailed(saveError, 'setting save', 'Please try again.')
+      toast.add({ type: 'error', title: 'Could not save', description: failure.message })
     } finally {
       setIsSaving(false)
     }
