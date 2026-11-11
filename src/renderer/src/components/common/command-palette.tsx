@@ -1,3 +1,4 @@
+import { FolderClock } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { commands } from '@/commands'
@@ -11,12 +12,16 @@ import {
   CommandList,
   CommandShortcut
 } from '@/components/ui/command'
+import { useRecentDesigns } from '@/hooks/use-recent-designs'
 import { formatShortcut } from '@/lib/utils'
 import { useCommandPalette } from '@/stores/command-palette'
+import { useDesign } from '@/stores/design'
 
 export function CommandPalette(): ReactElement {
   const open = useCommandPalette((state) => state.open)
   const setOpen = useCommandPalette((state) => state.setOpen)
+
+  const loadDesign = useDesign((state) => state.loadDesign)
 
   const groupedCommands = Object.groupBy(
     commands.filter((command) => command.showInPalette),
@@ -65,8 +70,40 @@ export function CommandPalette(): ReactElement {
               })}
             </CommandGroup>
           ))}
+
+          {/* Read when the palette opens, so it's current */}
+          {open && (
+            <RecentDesignCommands
+              onOpen={(id) => {
+                setOpen(false)
+                void loadDesign(id)
+              }}
+            />
+          )}
         </CommandList>
       </Command>
     </CommandDialog>
+  )
+}
+
+// "Open recent: …" for each recent design that's still where it was
+function RecentDesignCommands({ onOpen }: { onOpen: (id: string) => void }): ReactElement | null {
+  const { recent } = useRecentDesigns()
+  const found = recent.filter((item) => item.found)
+  if (found.length === 0) return null
+
+  return (
+    <CommandGroup heading="Recent designs">
+      {found.map((item) => (
+        <CommandItem
+          key={item.id}
+          value={`Open recent ${item.name} ${item.id}`}
+          onSelect={() => onOpen(item.id)}
+        >
+          <FolderClock className="mr-2 h-4 w-4" />
+          Open recent: {item.name}
+        </CommandItem>
+      ))}
+    </CommandGroup>
   )
 }

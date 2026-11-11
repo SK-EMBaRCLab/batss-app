@@ -1,6 +1,7 @@
 import { FilePlus2, FolderOpen } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 
+import { RecentDesignsList } from '@/components/common/recent-designs-list'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
@@ -97,6 +98,8 @@ export function WelcomeScreen(): ReactElement {
               {isLoading ? 'Loading…' : 'Load Existing Design'}
             </Button>
           </div>
+
+          <RecentDesignsList />
         </CardContent>
       </Card>
     </div>

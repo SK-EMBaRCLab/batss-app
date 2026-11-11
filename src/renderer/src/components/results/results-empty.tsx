@@ -31,7 +31,7 @@ export function ResultsEmpty(): ReactElement {
             <Play className="mr-2 h-4 w-4" />
             Run Simulation
           </Button>
-          <Button variant="outline" onClick={loadDesign}>
+          <Button variant="outline" onClick={() => void loadDesign()}>
             Load Design
           </Button>
         </EmptyContent>

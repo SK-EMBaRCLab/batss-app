@@ -31,7 +31,11 @@ export const IPC = {
     closeConfirmed: 'design:close-confirmed',
     canLeave: 'design:can-leave',
     confirmStopRun: 'design:confirm-stop-run',
-    showInFolder: 'design:show-in-folder'
+    showInFolder: 'design:show-in-folder',
+    recentList: 'design:recent-list',
+    openRecent: 'design:open-recent',
+    forgetRecent: 'design:forget-recent',
+    clearRecent: 'design:clear-recent'
   },
   files: {
     // Save a file the app made, after asking where (see files.ipc.ts)

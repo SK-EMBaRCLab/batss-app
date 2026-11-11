@@ -163,6 +163,18 @@ export interface StudyDesign {
 /** What saving a design returns; filePath is where it was written. */
 export type SaveResultResponse = { saved: boolean; filePath?: string }
 
+/** A recently used design, as the welcome screen lists it. Opened by id, never by path. */
+export type RecentDesignItem = {
+  id: string
+  name: string
+  description?: string
+  // The folder it's in, with the home folder shortened to ~ where that's usual
+  folder: string
+  openedAt: string
+  // False if the file has been moved or deleted since
+  found: boolean
+}
+
 export type SampleSizeScenario = {
   control: number[]
   experimental: number[]

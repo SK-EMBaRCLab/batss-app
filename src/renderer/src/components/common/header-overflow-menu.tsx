@@ -1,4 +1,4 @@
-import { FilePlus2, FolderOpen, FolderSearch, MoreHorizontal, Save } from 'lucide-react'
+import { FileClock, FilePlus2, FolderOpen, FolderSearch, MoreHorizontal, Save } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,8 +6,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+
+import { RecentDesignMenuItems } from './recent-design-menu-items'
 
 export function HeaderOverflowMenu({
   onNew,
@@ -35,7 +40,7 @@ export function HeaderOverflowMenu({
         }
       />
       <DropdownMenuContent align="end">
-        {/* New, Open and Save are header buttons from lg up; only listed here below that */}
+        {/* New, Open, Recent and Save are header buttons from lg up; only listed here below that */}
         <DropdownMenuItem onClick={onNew} className="lg:hidden">
           <FilePlus2 />
           New Design
@@ -45,6 +50,16 @@ export function HeaderOverflowMenu({
           <FolderOpen />
           Open Design
         </DropdownMenuItem>
+
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="lg:hidden">
+            <FileClock />
+            Open Recent
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <RecentDesignMenuItems />
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
 
         <DropdownMenuItem disabled={!canSave} onClick={onSave} className="lg:hidden">
           <Save />

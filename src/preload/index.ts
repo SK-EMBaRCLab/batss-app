@@ -12,6 +12,7 @@ import { IPC } from '../shared/ipc-channels'
 import type { RuntimeResult, RuntimeUpdate } from '../shared/runtime-types'
 import type { SettingSaveResult } from '../shared/settings-types'
 import type {
+  RecentDesignItem,
   SaveResultResponse,
   SimulationRunInput,
   SimulationRunResult,
@@ -67,7 +68,18 @@ const design = {
     ipcRenderer.invoke(IPC.design.confirmStopRun, kind),
 
   showInFolder: (filePath: string): Promise<boolean> =>
-    ipcRenderer.invoke(IPC.design.showInFolder, filePath)
+    ipcRenderer.invoke(IPC.design.showInFolder, filePath),
+
+  // The recent designs; one is opened by its id, so the window never
+  // hands main a path to open
+  recentList: (): Promise<RecentDesignItem[]> => ipcRenderer.invoke(IPC.design.recentList),
+
+  openRecent: (id: string): Promise<{ design: StudyDesign; filePath: string } | null> =>
+    ipcRenderer.invoke(IPC.design.openRecent, id),
+
+  forgetRecent: (id: string): Promise<void> => ipcRenderer.invoke(IPC.design.forgetRecent, id),
+
+  clearRecent: (): Promise<void> => ipcRenderer.invoke(IPC.design.clearRecent)
 }
 
 const files = {

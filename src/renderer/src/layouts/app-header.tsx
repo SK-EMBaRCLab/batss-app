@@ -1,9 +1,15 @@
-import { FilePlus2, FolderOpen, Save, SearchIcon } from 'lucide-react'
+import { ChevronDown, FilePlus2, FolderOpen, Save, SearchIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { EditableInPlaceInput } from '@/components/common/editable-inplace-input'
 import { HeaderOverflowMenu } from '@/components/common/header-overflow-menu'
+import { RecentDesignMenuItems } from '@/components/common/recent-design-menu-items'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -66,6 +72,20 @@ export function AppHeader(): ReactElement {
             <FolderOpen />
             Load
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="ghost" size="sm">
+                  Recent
+                  <ChevronDown />
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end">
+              <RecentDesignMenuItems />
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {design && (
             <Button variant="secondary" size="sm" onClick={saveDesign} disabled={!isDirty}>

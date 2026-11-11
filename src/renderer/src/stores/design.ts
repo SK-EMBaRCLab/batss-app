@@ -70,7 +70,8 @@ interface DesignState {
   openResults: (ids: string[]) => void
   saveDesign: () => Promise<boolean>
   saveDesignAs: () => Promise<boolean>
-  loadDesign: () => Promise<boolean>
+  // From the Open dialog, or from the recent list when given an entry's id
+  loadDesign: (recentId?: string) => Promise<boolean>
   closeDesign: () => void
 }
 
@@ -265,10 +266,12 @@ export const useDesign = create<DesignState>((set, get) => {
     // Always shows the picker, regardless of a remembered path.
     saveDesignAs: () => save(),
 
-    loadDesign: async () => {
+    loadDesign: async (recentId) => {
       if (!(await confirmLeave())) return false
 
-      const loaded = await window.design.loadResult()
+      const loaded = recentId
+        ? await window.design.openRecent(recentId)
+        : await window.design.loadResult()
       if (!loaded) return false
 
       if (!(await confirmStopActiveRun())) return false
