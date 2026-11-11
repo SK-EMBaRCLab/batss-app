@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+import type { MenuAction, MenuState } from '../shared/app-menu'
 import type { AppearanceState, IconAppearance, ThemeSource } from '../shared/appearance-types'
 import type { BatchPreparedInput, BatchRunEntry, BatchUpdate } from '../shared/batch-types'
 import type {
@@ -35,7 +36,11 @@ const app = {
     ipcRenderer.send(IPC.app.setProgress, value, mode),
 
   onOpenRunResult: (callback: (summary: RunFinishedSummary) => void) =>
-    listen(IPC.app.openRunResult, callback)
+    listen(IPC.app.openRunResult, callback),
+
+  // The menu bar: which items are available, and the ones picked
+  setMenuState: (state: MenuState) => ipcRenderer.send(IPC.app.menuState, state),
+  onMenuAction: (callback: (action: MenuAction) => void) => listen(IPC.app.menuAction, callback)
 }
 
 const runtime = {

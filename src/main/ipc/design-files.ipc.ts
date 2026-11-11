@@ -85,8 +85,23 @@ function rememberChosenPath(filePath: string): void {
 const recentDesigns = (): RecentDesign[] =>
   readRecentDesigns(settingsService.get<unknown>(RECENT_DESIGNS_KEY, []))
 
-const storeRecentDesigns = (list: RecentDesign[]): void =>
+// Told whenever the list changes (the menu bar's Open Recent)
+const recentListeners = new Set<() => void>()
+
+const storeRecentDesigns = (list: RecentDesign[]): void => {
   settingsService.set(RECENT_DESIGNS_KEY, list)
+  for (const listener of recentListeners) listener()
+}
+
+/** The recent designs, newest first (for the menu bar). */
+export const listRecentDesigns = (): RecentDesign[] => recentDesigns()
+
+export const clearRecentDesigns = (): void => storeRecentDesigns([])
+
+/** Calls `listener` whenever the recent list changes. */
+export function onRecentDesignsChange(listener: () => void): void {
+  recentListeners.add(listener)
+}
 
 // Called after a design is opened or saved, so it's at the top of the
 // list with its current name
@@ -318,7 +333,7 @@ export function registerDesignFilesIPC(): void {
     if (typeof id === 'string') storeRecentDesigns(forgetRecentDesign(recentDesigns(), id))
   })
 
-  handle(IPC.design.clearRecent, async (): Promise<void> => storeRecentDesigns([]))
+  handle(IPC.design.clearRecent, async (): Promise<void> => clearRecentDesigns())
 }
 
 /**

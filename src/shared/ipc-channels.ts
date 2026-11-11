@@ -14,7 +14,10 @@ export const IPC = {
     recordError: 'app:record-error',
     errorLogPath: 'app:error-log-path',
     showErrorLog: 'app:show-error-log',
-    openRunResult: 'app:open-run-result'
+    openRunResult: 'app:open-run-result',
+    // The menu bar: which items are available, and one picked
+    menuState: 'app:menu-state',
+    menuAction: 'app:menu-action'
   },
   runtime: {
     check: 'runtime:check',

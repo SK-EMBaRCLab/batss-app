@@ -20,6 +20,7 @@ import { registerSimulationIPC } from './ipc/simulation.ipc'
 import { registerThemeIPC } from './ipc/theme.ipc'
 import { on } from './ipc/trusted-ipc'
 import { registerUpdateIPC } from './ipc/update.ipc'
+import { registerAppMenu } from './menu/app-menu'
 import { rManager } from './runtime/r-manager'
 import { batchService } from './services/batch.service'
 import { migrateLegacyDataFolder, pinAppIdentity } from './services/filesystem/app-paths'
@@ -133,7 +134,9 @@ function createWindow(): void {
     minWidth: 960,
     minHeight: 600,
     show: false,
-    autoHideMenuBar: true,
+    // The menu bar (see menu/app-menu.ts) stays in view on Windows and
+    // Linux, rather than appearing only when Alt is pressed
+    autoHideMenuBar: false,
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -291,6 +294,8 @@ if (!isRelaunching) {
     registerThemeIPC()
 
     registerUpdateIPC()
+
+    registerAppMenu(() => mainWindow)
 
     on(IPC.design.closeConfirmed, () => {
       clearUnsavedDesignChanges()

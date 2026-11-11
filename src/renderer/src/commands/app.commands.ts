@@ -1,3 +1,4 @@
+import { MENU_SHORTCUTS } from '@shared/app-menu'
 import { Search } from 'lucide-react'
 
 import { useCommandPalette } from '@/stores/command-palette'
@@ -10,7 +11,7 @@ export const appCommands: AppCommand[] = [
     group: 'Application',
     icon: Search,
     shortcut: {
-      binding: 'mod+k'
+      binding: MENU_SHORTCUTS['open-command-palette']
     },
     showInPalette: false,
     action: () => {

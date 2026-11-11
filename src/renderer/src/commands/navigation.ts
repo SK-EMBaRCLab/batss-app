@@ -1,3 +1,4 @@
+import { MENU_SHORTCUTS } from '@shared/app-menu'
 import { Home } from 'lucide-react'
 
 import { useNavigation } from '@/stores/navigation'
@@ -10,7 +11,7 @@ export const navigationCommands: AppCommand[] = [
     group: 'Navigation',
     icon: Home,
     shortcut: {
-      binding: 'mod+1'
+      binding: MENU_SHORTCUTS['go-dashboard']
     },
     showInPalette: true,
     action: () => {

@@ -11,6 +11,24 @@ import { handle, on } from './trusted-ipc'
 
 const PROGRESS_MODES: readonly TaskbarProgressMode[] = ['normal', 'indeterminate', 'error']
 
+/**
+ * Opens the file manager at the error log, or at its folder if nothing
+ * has been logged yet. Resolves to whether a log file exists. Also used
+ * by the menu bar's Help > Show Error Log.
+ */
+export async function showErrorLog(): Promise<boolean> {
+  const file = getErrorLogPath()
+  if (existsSync(file)) {
+    shell.showItemInFolder(file)
+    return true
+  }
+
+  mkdirSync(path.dirname(file), { recursive: true })
+  const openError = await shell.openPath(path.dirname(file))
+  if (openError) console.error('Could not open the error log folder:', openError)
+  return false
+}
+
 export function registerAppIPC(): void {
   handle(IPC.app.version, () => {
     return app.getVersion()
@@ -73,16 +91,5 @@ export function registerAppIPC(): void {
   // Resolves to whether a log file exists.
   handle(IPC.app.errorLogPath, () => getErrorLogPath())
 
-  handle(IPC.app.showErrorLog, async (): Promise<boolean> => {
-    const file = getErrorLogPath()
-    if (existsSync(file)) {
-      shell.showItemInFolder(file)
-      return true
-    }
-
-    mkdirSync(path.dirname(file), { recursive: true })
-    const openError = await shell.openPath(path.dirname(file))
-    if (openError) console.error('Could not open the error log folder:', openError)
-    return false
-  })
+  handle(IPC.app.showErrorLog, showErrorLog)
 }

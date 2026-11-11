@@ -6,7 +6,7 @@ import { RuntimeScreen } from '@/components/common/runtime-screen'
 import { ViewErrorBoundary } from '@/components/common/view-error-boundary'
 import { WelcomeScreen } from '@/components/common/welcome-screen'
 import { views } from '@/config/views'
-import { useCommandShortcuts } from '@/hooks/use-command-shortcuts'
+import { useAppMenu } from '@/hooks/use-app-menu'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { useTaskbarProgress } from '@/hooks/use-taskbar-progress'
 import { AppLayout } from '@/layouts/app-layout'
@@ -26,7 +26,7 @@ export default function App(): ReactElement {
   const initializeUpdate = useUpdate((s) => s.initialize)
   const bootstrapped = useRuntime((state) => state.bootstrapped)
 
-  useCommandShortcuts()
+  useAppMenu()
   useDocumentTitle()
   useTaskbarProgress()
 

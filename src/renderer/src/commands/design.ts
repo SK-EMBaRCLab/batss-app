@@ -1,3 +1,4 @@
+import { MENU_SHORTCUTS } from '@shared/app-menu'
 import { FilePlus2, FolderOpen, FolderSearch, Save, SavePen } from 'lucide-react'
 
 import { initialDesignInput } from '@/lib/schema'
@@ -11,7 +12,7 @@ export const designCommands: AppCommand[] = [
     group: 'Design',
     icon: FilePlus2,
     shortcut: {
-      binding: 'mod+n'
+      binding: MENU_SHORTCUTS['new-design']
     },
     showInPalette: true,
     action: async () => {
@@ -24,7 +25,7 @@ export const designCommands: AppCommand[] = [
     group: 'Design',
     icon: FolderOpen,
     shortcut: {
-      binding: 'mod+o'
+      binding: MENU_SHORTCUTS['open-design']
     },
     showInPalette: true,
     action: async () => {
@@ -37,7 +38,7 @@ export const designCommands: AppCommand[] = [
     group: 'Design',
     icon: Save,
     shortcut: {
-      binding: 'mod+s'
+      binding: MENU_SHORTCUTS['save-design']
     },
     showInPalette: true,
     enabled: () => useDesign.getState().isDirty,
@@ -50,7 +51,7 @@ export const designCommands: AppCommand[] = [
     label: 'Save Design As…',
     group: 'Design',
     icon: SavePen,
-    shortcut: { binding: 'mod+shift+s' },
+    shortcut: { binding: MENU_SHORTCUTS['save-design-as'] },
     showInPalette: true,
     enabled: () => !!useDesign.getState().design,
     action: async () => {
