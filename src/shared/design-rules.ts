@@ -17,6 +17,8 @@ export const MAX_BATCH_ROWS = 500
 // A run's own name and notes (see SimulationResultEntry)
 export const MAX_RUN_NAME_LENGTH = 100
 export const MAX_RUN_NOTES_LENGTH = 2000
+// A design's own description (see StudyDesign)
+export const MAX_DESIGN_DESCRIPTION_LENGTH = 2000
 
 // Allowed values. Some can be stored and picked in the form but can't be
 // run yet (ordinal outcomes, risk difference and ratio);

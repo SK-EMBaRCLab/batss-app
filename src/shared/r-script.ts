@@ -8,6 +8,8 @@ import type { DecisionRule, SimulationResultEntry } from './simulation-types'
 
 export type RScriptDetails = {
   designName: string
+  // What the design is for, if it has a description
+  designDescription?: string
   appVersion: string
 }
 
@@ -59,6 +61,12 @@ export function runRScript(entry: SimulationResultEntry, details: RScriptDetails
 
   const header = [
     `# ${commentText(details.designName) || 'Design'}${entry.name ? ` – ${commentText(entry.name)}` : ''}`,
+    // Each line of the description its own comment, so none can end it
+    ...(details.designDescription ?? '')
+      .split(/\r?\n/)
+      .map(commentText)
+      .filter(Boolean)
+      .map((line) => `# ${line}`),
     `# Run of ${entry.createdAt}, exported from BATSS Studio ${commentText(details.appVersion)}`,
     ...(entry.result.status === 'success'
       ? [`# The app ran it with BATSS ${commentText(entry.result.package)}.`]

@@ -1,3 +1,4 @@
+import { MAX_DESIGN_DESCRIPTION_LENGTH } from '@shared/design-rules'
 import type { SimulationResultEntry, StudyDesign } from '@shared/simulation-types'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -125,6 +126,26 @@ describe('editResult', () => {
       name: undefined,
       notes: 'Kept'
     })
+  })
+})
+
+describe('setDescription', () => {
+  test("sets the design's description, trimmed, and marks the design changed", () => {
+    useDesign.setState({ design: DESIGN, isDirty: false })
+
+    useDesign.getState().setDescription('  Phase II, version 3  ')
+
+    expect(useDesign.getState().design!.description).toBe('Phase II, version 3')
+    expect(useDesign.getState().isDirty).toBe(true)
+  })
+
+  test('empty text clears it, and long text is cut to the limit', () => {
+    useDesign.setState({ design: { ...DESIGN, description: 'Old' } })
+    useDesign.getState().setDescription('   ')
+    expect(useDesign.getState().design!.description).toBeUndefined()
+
+    useDesign.getState().setDescription('x'.repeat(5000))
+    expect(useDesign.getState().design!.description).toHaveLength(MAX_DESIGN_DESCRIPTION_LENGTH)
   })
 })
 

@@ -37,6 +37,7 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   const editResult = useDesign((state) => state.editResult)
   const deleteResults = useDesign((state) => state.deleteResults)
   const designName = useDesign((state) => state.design?.name ?? '')
+  const designDescription = useDesign((state) => state.design?.description)
   const appVersion = useRuntime((state) => state.appVersion)
   // Not while a run or batch is adding results
   const busy = useEngine((state) => state.busy) !== 'idle'
@@ -61,7 +62,7 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   // error in R itself
   const exportRScript = async (): Promise<void> => {
     try {
-      const script = runRScript(entry, { designName, appVersion })
+      const script = runRScript(entry, { designName, designDescription, appVersion })
       await saveExport(
         runExportFileName(designName, 'R script', entry.createdAt, 'R'),
         new Blob([script], { type: 'text/plain;charset=utf-8' })
@@ -79,7 +80,7 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   // Any run: a failed one's report has its design and the error
   const exportReport = async (): Promise<void> => {
     try {
-      await exportRunReport(entry, { designName, appVersion })
+      await exportRunReport(entry, { designName, designDescription, appVersion })
     } catch (error) {
       const failure = requestFailed(error, 'report export', 'Try again.')
       toast.add({

@@ -32,6 +32,8 @@ import { CHART_HEIGHT, CHART_WIDTH } from './outcome-chart-svg'
 
 export type RunReportDetails = {
   designName: string
+  // What the design is for, if it has a description
+  designDescription?: string
   appVersion: string
   // When the report was made, an ISO date
   generatedAt: string
@@ -112,6 +114,7 @@ function titleBlock(entry: SimulationResultEntry, details: RunReportDetails): Pa
       heading: HeadingLevel.TITLE,
       children: [new TextRun(plain(details.designName) || 'Design')]
     }),
+    ...paragraphs(details.designDescription ?? ''),
     ...(entry.name ? [heading(plain(entry.name), HeadingLevel.HEADING_2)] : []),
     paragraph(
       [`Run of ${createdAt}`, runStatusLabel(entry.result.status), duration]

@@ -152,6 +152,9 @@ export interface StudyDesign {
   version: 2
   id: string
   name: string
+  // What the design is for, e.g. "Phase II, primary endpoint
+  // exacerbations". Optional: older files and new designs have none.
+  description?: string
   createdAt: string
   input: DesignInput
   results: SimulationResultEntry[]

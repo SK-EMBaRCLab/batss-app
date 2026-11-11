@@ -78,6 +78,17 @@ describe('buildRunReport', () => {
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
   })
 
+  test("puts the design's description under its name, a paragraph per line", async () => {
+    const xml = await documentXml(SUCCESS, {
+      ...DETAILS,
+      designDescription: 'Phase II trial\nVersion 3'
+    })
+    const title = xml.indexOf('>My trial<')
+    expect(title).toBeGreaterThan(-1)
+    expect(xml.indexOf('>Phase II trial<')).toBeGreaterThan(title)
+    expect(xml.indexOf('>Version 3<')).toBeLessThan(xml.indexOf('>Baseline<'))
+  })
+
   test('is on Letter paper', async () => {
     const xml = await documentXml(SUCCESS)
     expect(xml).toMatch(/<w:pgSz w:w="12240" w:h="15840"/)

@@ -12,7 +12,11 @@ import { buildRunReport } from './run-report'
 /** Asks where to save the run's report. False if the user cancelled. */
 export async function exportRunReport(
   entry: SimulationResultEntry,
-  { designName, appVersion }: { designName: string; appVersion: string }
+  {
+    designName,
+    designDescription,
+    appVersion
+  }: { designName: string; designDescription?: string; appVersion: string }
 ): Promise<boolean> {
   const chartPng =
     entry.result.status === 'success'
@@ -21,6 +25,7 @@ export async function exportRunReport(
 
   const document = buildRunReport(entry, {
     designName,
+    designDescription,
     appVersion,
     generatedAt: new Date().toISOString(),
     chartPng

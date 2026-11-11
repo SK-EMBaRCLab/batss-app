@@ -16,6 +16,7 @@ import * as v from 'valibot'
 import {
   CORE_PERCENTS,
   DECISION_RULE_TYPES,
+  MAX_DESIGN_DESCRIPTION_LENGTH,
   MAX_RUN_NAME_LENGTH,
   MAX_RUN_NOTES_LENGTH,
   OUTCOME_TYPES,
@@ -133,6 +134,8 @@ const studyDesignFileSchema = v.object({
   version: v.literal(2),
   id: v.string(),
   name: v.string(),
+  // Dropped if it isn't text or is too long, rather than rejecting the file
+  description: runText(MAX_DESIGN_DESCRIPTION_LENGTH),
   createdAt: v.string(),
   input: designInputFileSchema,
   results: v.array(simulationResultEntryFileSchema)

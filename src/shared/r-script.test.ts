@@ -137,6 +137,16 @@ describe('runRScript', () => {
     expect(lines.filter((line) => line.includes('system('))).toHaveLength(1)
   })
 
+  test("writes the design's description as comments, one per line", () => {
+    const script = runRScript(BINARY, {
+      ...DETAILS,
+      designDescription: 'Phase II\nsystem("rm -rf ~")\r\n\nVersion 3'
+    })
+    const lines = script.split('\n')
+    expect(lines.slice(1, 4)).toEqual(['# Phase II', '# system("rm -rf ~")', '# Version 3'])
+    expect(lines.filter((line) => line.includes('system('))).toEqual(['# system("rm -rf ~")'])
+  })
+
   test('refuses a run with a value R could not read', () => {
     const entry: SimulationResultEntry = {
       ...BINARY,

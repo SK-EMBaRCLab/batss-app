@@ -90,6 +90,20 @@ describe('parseStudyDesignFile', () => {
     }
   })
 
+  test("loads a design's description, and drops one that isn't valid", () => {
+    const described = parseStudyDesignFile(designFile({ description: 'Phase II, version 3' }))
+    expect(described.success && described.data.description).toBe('Phase II, version 3')
+
+    for (const description of [42, 'x'.repeat(5000)]) {
+      const parsed = parseStudyDesignFile(designFile({ description }))
+      expect(parsed.success).toBe(true)
+      if (parsed.success) expect(parsed.data.description).toBeUndefined()
+    }
+
+    const plain = parseStudyDesignFile(designFile())
+    expect(plain.success && plain.data).not.toHaveProperty('description')
+  })
+
   test('ignores keys added by a newer version of the app', () => {
     const parsed = parseStudyDesignFile(designFile({ addedLater: true }))
     expect(parsed.success).toBe(true)

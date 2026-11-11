@@ -1,4 +1,8 @@
-import { MAX_RUN_NAME_LENGTH, MAX_RUN_NOTES_LENGTH } from '@shared/design-rules'
+import {
+  MAX_DESIGN_DESCRIPTION_LENGTH,
+  MAX_RUN_NAME_LENGTH,
+  MAX_RUN_NOTES_LENGTH
+} from '@shared/design-rules'
 import type { DesignInput, SimulationResultEntry, StudyDesign } from '@shared/simulation-types'
 import { useMemo } from 'react'
 import { create } from 'zustand'
@@ -48,6 +52,8 @@ interface DesignState {
   newDesign: (input: DesignInput, name?: string) => Promise<void>
   startNewDesign: (input: DesignInput, name?: string) => void
   renameDesign: (name: string) => void
+  // Sets what the design is for; empty text clears it
+  setDescription: (description: string) => void
   appendResult: (entry: Omit<SimulationResultEntry, 'id'>) => void
   updateInput: (input: DesignInput) => void
   selectResult: (id: string) => void
@@ -152,6 +158,15 @@ export const useDesign = create<DesignState>((set, get) => {
       if (!trimmed) return
 
       set((state) => (state.design ? { design: { ...state.design, name: trimmed } } : state))
+
+      setDirty(true)
+    },
+
+    setDescription: (text) => {
+      // Trimmed and capped as the file allows; empty means none
+      const description = text.trim().slice(0, MAX_DESIGN_DESCRIPTION_LENGTH) || undefined
+
+      set((state) => (state.design ? { design: { ...state.design, description } } : state))
 
       setDirty(true)
     },
