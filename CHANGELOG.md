@@ -1,5 +1,25 @@
 # Changelog
 
+## [6.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.2.0...v6.3.0) (2026-11-11)
+
+
+### Features
+
+* **app:** add BATSS Studio's commands to the menu bar ([95634e2](https://github.com/SK-EMBaRCLab/batss-app/commit/95634e2903dbdeccc33c9281f6c21ef46c34cfe3))
+* **dashboard:** give a design a description ([5d3e41f](https://github.com/SK-EMBaRCLab/batss-app/commit/5d3e41f6b8d9d177da98872eb93f9829cc1189c3))
+* **designs:** open recent designs from the welcome screen and the header ([df45a89](https://github.com/SK-EMBaRCLab/batss-app/commit/df45a89da1824c468f5572fb38e11c02c34ce8ce))
+* **results:** export a run as a Word report ([f788839](https://github.com/SK-EMBaRCLab/batss-app/commit/f78883931e0a0b500d3d2f91a95b262209d40406))
+* **results:** start a new run from an earlier run's settings ([3292078](https://github.com/SK-EMBaRCLab/batss-app/commit/3292078385568aef78ee4559ee942779b8d32477))
+
+
+### Bug Fixes
+
+* **app:** grey out Settings and About in the menu bar on the welcome screen ([5b1a1b7](https://github.com/SK-EMBaRCLab/batss-app/commit/5b1a1b70a3f2a9dc9e8bab0c789471787926b5c5))
+* batts now expects to use 0.5 for prob0 ([35cb594](https://github.com/SK-EMBaRCLab/batss-app/commit/35cb59432282c158a19f358f515ce9bc33575539))
+* **results:** stack futility on top, and colour superiority green and futility light yellow ([3753b17](https://github.com/SK-EMBaRCLab/batss-app/commit/3753b17b51db1b8752ebf737493af3100d3a7b8f))
+* **results:** use the same prob0 in the exported R script as the app ([767fb76](https://github.com/SK-EMBaRCLab/batss-app/commit/767fb7689d1de6e743392361b0e5b4ba893dcbba))
+* **simulation:** centre the futility rule's chart on no effect ([1a618c9](https://github.com/SK-EMBaRCLab/batss-app/commit/1a618c9ed44d67a46fb242c809e951daf063995c))
+
 ## [6.2.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.1.0...v6.2.0) (2026-11-10)
 
 
