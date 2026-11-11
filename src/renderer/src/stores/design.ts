@@ -9,6 +9,8 @@ import { create } from 'zustand'
 
 import { toast } from '@/components/ui/toast'
 import { requestFailed } from '@/lib/error-reference'
+import { formatRunDate } from '@/lib/run-format'
+import { designInputFromRun } from '@/lib/schema'
 
 import { useEngine } from './engine'
 import { useNavigation } from './navigation'
@@ -48,6 +50,12 @@ interface DesignState {
   // narrowed to; null shows every run
   selectedResults: string[] | null
   isDirty: boolean
+  // An earlier run's settings to start the wizard from, instead of the
+  // design's own (the last successful run's). Not part of the design:
+  // choosing it changes nothing until a new run is added
+  startFrom: { input: DesignInput; runId: string; runLabel: string } | null
+  // Goes up each time a starting point is chosen, so the wizard refills
+  startFromCount: number
 
   newDesign: (input: DesignInput, name?: string) => Promise<void>
   startNewDesign: (input: DesignInput, name?: string) => void
@@ -56,6 +64,10 @@ interface DesignState {
   setDescription: (description: string) => void
   appendResult: (entry: Omit<SimulationResultEntry, 'id'>) => void
   updateInput: (input: DesignInput) => void
+  // Opens the wizard filled in with that run's settings
+  startFromRun: (id: string) => void
+  // Back to the latest run's settings (the design's own) in the wizard
+  clearStartFrom: () => void
   selectResult: (id: string) => void
   // Sets a run's name and/or notes; empty text clears them
   editResult: (id: string, changes: { name?: string; notes?: string }) => void
@@ -120,6 +132,8 @@ export const useDesign = create<DesignState>((set, get) => {
     selectedResultId: null,
     selectedResults: null,
     isDirty: false,
+    startFrom: null,
+    startFromCount: 0,
 
     newDesign: async (input, name = 'Untitled Design') => {
       if (!(await confirmLeave())) return
@@ -143,7 +157,8 @@ export const useDesign = create<DesignState>((set, get) => {
         openCount: state.openCount + 1,
         filePath: null,
         selectedResultId: null,
-        selectedResults: null
+        selectedResults: null,
+        startFrom: null
       }))
 
       setDirty(true)
@@ -191,6 +206,29 @@ export const useDesign = create<DesignState>((set, get) => {
     },
 
     selectResult: (id) => set({ selectedResultId: id }),
+
+    startFromRun: (id) => {
+      const entry = get().design?.results.find((candidate) => candidate.id === id)
+      if (!entry) return
+
+      set((state) => ({
+        startFrom: {
+          input: designInputFromRun(entry.input),
+          runId: entry.id,
+          // "Nov 10, 2026, 3:05 p.m. (Baseline)", or just the date
+          runLabel: entry.name
+            ? `${formatRunDate(entry.createdAt)} (${entry.name})`
+            : formatRunDate(entry.createdAt)
+        },
+        startFromCount: state.startFromCount + 1
+      }))
+      useNavigation.getState().navigate('simulation')
+    },
+
+    clearStartFrom: () =>
+      set((state) =>
+        state.startFrom ? { startFrom: null, startFromCount: state.startFromCount + 1 } : state
+      ),
 
     editResult: (id, changes) => {
       // Trimmed and capped as the file allows; empty means none
@@ -282,7 +320,8 @@ export const useDesign = create<DesignState>((set, get) => {
         filePath: loaded.filePath,
         selectedResultId: loaded.design.results.at(-1)?.id ?? null,
         // The previous design's run ids mean nothing here
-        selectedResults: null
+        selectedResults: null,
+        startFrom: null
       }))
 
       setDirty(false)
@@ -301,7 +340,8 @@ export const useDesign = create<DesignState>((set, get) => {
         openCount: state.openCount + 1,
         filePath: null,
         selectedResultId: null,
-        selectedResults: null
+        selectedResults: null,
+        startFrom: null
       }))
 
       setDirty(false)

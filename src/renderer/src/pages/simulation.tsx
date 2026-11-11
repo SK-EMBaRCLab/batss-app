@@ -1,9 +1,10 @@
 import { DesignInput, SimulationRunInput } from '@shared/simulation-types'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, History } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 
 import { SimulationForm } from '@/components/simulation/form'
 import { SimulationStatus } from '@/components/simulation/simulation-status'
+import { Alert, AlertAction, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -16,6 +17,9 @@ export default function Simulation(): ReactElement {
   const navigate = useNavigation((state) => state.navigate)
   const design = useDesign((s) => s.design)
   const openCount = useDesign((s) => s.openCount)
+  const startFrom = useDesign((s) => s.startFrom)
+  const startFromCount = useDesign((s) => s.startFromCount)
+  const clearStartFrom = useDesign((s) => s.clearStartFrom)
   const busy = useEngine((s) => s.busy)
   const isRunning = busy === 'simulation'
   const logs = useSimulation((s) => s.logs)
@@ -41,6 +45,9 @@ export default function Simulation(): ReactElement {
     setLogsOpen(true)
     const result = await run(input, formInput)
 
+    // The design's settings are now these, so there's nothing to go back to
+    if (result.status === 'success') clearStartFrom()
+
     if (result.status !== 'success') {
       setLogsOpen(true)
     }
@@ -55,12 +62,28 @@ export default function Simulation(): ReactElement {
     // Wider than the other capped pages: the form card plus the help card
     // beside it fill the space a single centred form would leave empty
     <div className="mx-auto flex h-full min-h-0 w-full max-w-352 flex-col gap-4 p-6">
+      {startFrom && (
+        <Alert className="shrink-0">
+          <History />
+          <AlertDescription>
+            Starting from the run of {startFrom.runLabel}. Change what you need, then run it.
+          </AlertDescription>
+          <AlertAction>
+            <Button variant="link" size="sm" disabled={isRunning} onClick={clearStartFrom}>
+              Use the latest run&apos;s settings instead
+            </Button>
+          </AlertAction>
+        </Alert>
+      )}
+
       <SimulationForm
         // The form only reads initialInput when it mounts; remount for a new
-        // or loaded design so it doesn't keep the previous design's values
-        key={openCount}
+        // or loaded design, or a new starting point, so it doesn't keep the
+        // previous values
+        key={`${openCount}-${startFromCount}`}
         onRun={handleRun}
-        initialInput={design?.input}
+        initialInput={startFrom?.input ?? design?.input}
+        startOnReview={startFrom !== null}
         header={
           <CardTitle>
             {design?.name}

@@ -37,6 +37,9 @@ import { firstInvalidStep, hasAnyFieldError } from './utils'
 type SimulationFormProps = {
   onRun: (input: SimulationRunInput, output: DesignInput) => Promise<void>
   initialInput?: DesignInput
+  // Open on the Review step when the values can already run (starting
+  // from an earlier run), so everything is in view at once
+  startOnReview?: boolean
   // Shown at the top of the form card (e.g. the design name)
   header?: ReactNode
 }
@@ -97,7 +100,12 @@ const steps: WizardStep[] = [
   }
 ]
 
-export function SimulationForm({ onRun, initialInput, header }: SimulationFormProps): ReactElement {
+export function SimulationForm({
+  onRun,
+  initialInput,
+  startOnReview = false,
+  header
+}: SimulationFormProps): ReactElement {
   const busy = useEngine((s) => s.busy)
   const cancel = useSimulation((s) => s.cancel)
   const isRunning = busy === 'simulation'
@@ -106,7 +114,7 @@ export function SimulationForm({ onRun, initialInput, header }: SimulationFormPr
   const [complete] = useState(
     () => initialInput !== undefined && checkSimulationRunInput(initialInput).success
   )
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(startOnReview && complete ? steps.length - 1 : 0)
   // The furthest step reached: it and every step before it stay clickable
   const [reachedStep, setReachedStep] = useState(complete ? steps.length - 1 : 0)
   // Steps where Next (or a jump past them) has been tried, which show all

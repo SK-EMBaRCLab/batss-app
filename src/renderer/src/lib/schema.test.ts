@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 import { describe, expect, test } from 'vitest'
 
-import { designSchema } from './schema'
+import { designInputFromRun, designSchema, initialDesignInput } from './schema'
 
 // What the form accepts and the message shown under each field. The form
 // gets numbers as typed text, so most values here are strings.
@@ -218,5 +218,34 @@ describe('designSchema (the simulation form)', () => {
         expect(problems({ ...BINARY, decisionRules })).toEqual([])
       })
     })
+  })
+})
+
+describe('designInputFromRun', () => {
+  const common = { N: 216, m0: 60, m: 12, R: 10, decisionRules: [] }
+
+  test("keeps the run's own values and leaves the other outcome's fields empty", () => {
+    const input = designInputFromRun({
+      outcomeType: 'binary',
+      probability: 0.3,
+      treatmentEffectType: 'oddsRatio',
+      treatmentEffect: 1.5,
+      corePercent: 50,
+      ...common
+    })
+    expect(input).toMatchObject({ outcomeType: 'binary', probability: 0.3, corePercent: 50 })
+    expect(input.meanDiff).toBeUndefined()
+  })
+
+  test('uses the default core usage for a run from before it was a setting', () => {
+    const input = designInputFromRun({
+      outcomeType: 'continuous',
+      meanOutcome: 10,
+      meanDiff: 3,
+      sd: 2.5,
+      ...common
+    })
+    expect(input.corePercent).toBe(initialDesignInput.corePercent)
+    expect(input.probability).toBeUndefined()
   })
 })

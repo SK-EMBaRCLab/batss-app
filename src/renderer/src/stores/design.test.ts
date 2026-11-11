@@ -129,6 +129,57 @@ describe('editResult', () => {
   })
 })
 
+describe('startFromRun', () => {
+  test("opens the wizard with the run's settings, without changing the design", () => {
+    useDesign.setState({
+      design: { ...DESIGN, results: [run('a'), { ...run('b'), name: 'Baseline' }] },
+      isDirty: false,
+      startFrom: null
+    })
+
+    useDesign.getState().startFromRun('b')
+
+    const { startFrom, design, isDirty } = useDesign.getState()
+    expect(startFrom).toMatchObject({
+      runId: 'b',
+      input: { outcomeType: 'continuous', meanDiff: 3, corePercent: 75 }
+    })
+    expect(startFrom?.runLabel).toMatch(/\(Baseline\)$/)
+    expect(design!.input).toEqual(DESIGN.input)
+    expect(isDirty).toBe(false)
+    expect(useNavigation.getState().currentView).toBe('simulation')
+  })
+
+  test('clearStartFrom goes back to the design settings, and a new starting point refills the wizard', () => {
+    useDesign.setState({ design: { ...DESIGN, results: [run('a')] }, startFrom: null })
+    const before = useDesign.getState().startFromCount
+
+    useDesign.getState().startFromRun('a')
+    useDesign.getState().clearStartFrom()
+
+    expect(useDesign.getState().startFrom).toBeNull()
+    expect(useDesign.getState().startFromCount).toBe(before + 2)
+  })
+
+  test('is dropped when the design is closed or another is started', () => {
+    useDesign.setState({ design: { ...DESIGN, results: [run('a')] }, startFrom: null })
+    useDesign.getState().startFromRun('a')
+    useDesign.getState().closeDesign()
+    expect(useDesign.getState().startFrom).toBeNull()
+
+    useDesign.setState({ design: { ...DESIGN, results: [run('a')] } })
+    useDesign.getState().startFromRun('a')
+    useDesign.getState().startNewDesign(DESIGN.input, 'Another')
+    expect(useDesign.getState().startFrom).toBeNull()
+  })
+
+  test('does nothing for a run that is not in the design', () => {
+    useDesign.setState({ design: DESIGN, startFrom: null })
+    useDesign.getState().startFromRun('missing')
+    expect(useDesign.getState().startFrom).toBeNull()
+  })
+})
+
 describe('setDescription', () => {
   test("sets the design's description, trimmed, and marks the design changed", () => {
     useDesign.setState({ design: DESIGN, isDirty: false })

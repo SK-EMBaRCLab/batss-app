@@ -1,12 +1,18 @@
 import { MAX_RUN_NAME_LENGTH, MAX_RUN_NOTES_LENGTH } from '@shared/design-rules'
 import { runRScript } from '@shared/r-script'
 import type { SimulationResultEntry } from '@shared/simulation-types'
-import { FileCode, FileText, Trash2 } from 'lucide-react'
+import { ChevronDown, FileCode, FileText, History, Trash2 } from 'lucide-react'
 import { type ReactElement, useId, useState } from 'react'
 
 import { EditableInPlaceInput } from '@/components/common/editable-inplace-input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/toast'
@@ -40,7 +46,9 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
   const designDescription = useDesign((state) => state.design?.description)
   const appVersion = useRuntime((state) => state.appVersion)
   // Not while a run or batch is adding results
-  const busy = useEngine((state) => state.busy) !== 'idle'
+  const engineBusy = useEngine((state) => state.busy)
+  const busy = engineBusy !== 'idle'
+  const startFromRun = useDesign((state) => state.startFromRun)
 
   const [confirming, setConfirming] = useState(false)
   const [notes, setNotes] = useState(entry.notes ?? '')
@@ -110,14 +118,39 @@ function RunDetails({ entry }: { entry: SimulationResultEntry }): ReactElement {
           </div>
 
           <div className="flex shrink-0 flex-wrap justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => void exportReport()}>
-              <FileText />
-              Export report
+            {/* Any run, failed ones too: fixing a failed run's settings is a
+                common reason to start from it. Not while a simulation runs,
+                when the wizard is locked */}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={engineBusy === 'simulation'}
+              onClick={() => startFromRun(entry.id)}
+            >
+              <History />
+              Start from this run
             </Button>
-            <Button variant="outline" size="sm" onClick={() => void exportRScript()}>
-              <FileCode />
-              Export R script
-            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="outline" size="sm">
+                    Export
+                    <ChevronDown />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => void exportReport()}>
+                  <FileText />
+                  Word report
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void exportRScript()}>
+                  <FileCode />R script
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="destructive"
               size="sm"

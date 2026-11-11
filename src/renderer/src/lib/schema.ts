@@ -8,7 +8,12 @@ import {
   TREATMENT_EFFECT_TYPES
 } from '@shared/design-rules'
 import { FIELD_LABELS as L } from '@shared/field-labels'
-import { DecisionRule, DesignInput, OutcomeType } from '@shared/simulation-types'
+import {
+  DecisionRule,
+  DesignInput,
+  OutcomeType,
+  SimulationRunInput
+} from '@shared/simulation-types'
 import * as v from 'valibot'
 
 // The simulation form's check. Each field's rules (and the rules between
@@ -222,4 +227,17 @@ export const initialDesignInput: DesignInput = {
   decisionRules: [],
 
   corePercent: DEFAULT_CORE_PERCENT
+}
+
+/**
+ * A run's settings as the wizard's starting values. A run only keeps its
+ * own outcome's fields, and runs from before core usage was a setting
+ * have none, so the rest come from a new design's defaults.
+ */
+export function designInputFromRun(input: SimulationRunInput): DesignInput {
+  return {
+    ...initialDesignInput,
+    ...input,
+    corePercent: input.corePercent ?? initialDesignInput.corePercent
+  }
 }
