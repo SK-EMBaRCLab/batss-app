@@ -53,6 +53,8 @@ describe('runRScript', () => {
     expect(script).toContain('family = "binomial"')
     expect(script).toContain('link = "logit"')
     expect(script).toContain('var = list(y = rbinom, group = alloc.balanced)')
+    // As in batss-simulation.R: BATSS needs the arms' shares to add up to 1
+    expect(script).toContain('prob0 = c(Control = 0.5, Experimental = 0.5)')
     expect(script).toContain('alternative = "greater"')
     // Odds ratio margins on the log scale, like beta[2]
     expect(script).toContain('delta.eff = log(1)')

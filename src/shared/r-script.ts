@@ -130,7 +130,8 @@ export function runRScript(entry: SimulationResultEntry, details: RScriptDetails
     `  link = "${model.link}",`,
     `  var = list(y = ${model.varY}, group = alloc.balanced),`,
     '  var.control = var_control,',
-    '  prob0 = c(Control = 1, Experimental = 1),',
+    // Each arm's share of patients, which BATSS needs to add up to 1
+    '  prob0 = c(Control = 0.5, Experimental = 0.5),',
     `  alternative = "${alternative}",`,
     '  beta = beta,',
     '  which = 2,',
