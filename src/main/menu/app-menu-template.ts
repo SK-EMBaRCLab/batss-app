@@ -43,14 +43,18 @@ export function appMenuTemplate(options: AppMenuOptions): Item[] {
     click: () => run({ type: 'command', id })
   })
 
+  // Pages, so only with a design open: without one the app shows the
+  // welcome screen, and these would do nothing visible
   const about: Item = {
     label: 'About BATSS Studio',
+    enabled: state.hasDesign,
     click: () => run({ type: 'navigate', view: 'about' })
   }
   const checkForUpdates = command('check-for-updates', 'Check for Updates…')
   const settings: Item = {
     label: mac ? 'Settings…' : 'Settings',
     accelerator: 'CmdOrCtrl+,',
+    enabled: state.hasDesign,
     click: () => run({ type: 'navigate', view: 'settings' })
   }
 

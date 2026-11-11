@@ -84,6 +84,8 @@ describe('appMenuTemplate', () => {
     expect(item(menu(template, 'File'), 'Save').enabled).toBe(false)
     expect(item(menu(template, 'File'), 'New Design').enabled).toBe(true)
     expect(item(menu(template, 'View'), 'Dashboard').enabled).toBe(false)
+    expect(item(menu(template, 'BATSS Studio'), 'Settings…').enabled).toBe(false)
+    expect(item(menu(template, 'BATSS Studio'), 'About BATSS Studio').enabled).toBe(false)
   })
 
   test('gives the commands their shortcuts', () => {
