@@ -16,7 +16,7 @@ const CREDITS = [
   {
     name: 'R-INLA',
     description:
-      'Integrated Nested Laplace Approximation, the inference engine BATSS uses under the hood.',
+      'Integrated Nested Laplace Approximation, the Bayesian inference engine BATSS uses under the hood.',
     url: 'https://www.r-inla.org/'
   },
   {

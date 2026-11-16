@@ -7,6 +7,7 @@ const REPO_URL = 'https://github.com/SK-EMBaRCLab/batss-app'
 const LAB_URL = 'https://lab.research.sickkids.ca/heath/'
 const LICENSE_URL = 'https://www.gnu.org/licenses/gpl-3.0'
 const DSI_URL = 'https://datasciences.utoronto.ca/research-software-development-support-program/'
+const PROJECT_LEAD_EMAIL = 'arlene.jiang@sickkids.ca'
 
 export function AboutLinks(): ReactElement {
   return (
@@ -39,7 +40,7 @@ export function AboutLinks(): ReactElement {
           render={<a href={LAB_URL} target="_blank" rel="noreferrer" />}
         >
           <Globe />
-          Heath Lab
+          EMBaRC Lab
         </Button>
 
         <Button
@@ -54,7 +55,14 @@ export function AboutLinks(): ReactElement {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Heath Lab, SickKids · Licensed under{' '}
+        Project lead and statistical methodology by{' '}
+        <a href={`mailto:${PROJECT_LEAD_EMAIL}`} className="underline">
+          Arlene Jiang
+        </a>
+      </p>
+
+      <p className="text-xs text-muted-foreground">
+        © {new Date().getFullYear()} EMBaRC Lab, SickKids · Licensed under{' '}
         <a href={LICENSE_URL} target="_blank" rel="noreferrer" className="underline">
           GPL-3.0
         </a>

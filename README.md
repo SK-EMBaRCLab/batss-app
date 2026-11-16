@@ -29,6 +29,7 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
   - [Features](#features)
   - [Requirements](#requirements)
   - [Quick Start](#quick-start)
+    - [Opening a downloaded macOS release](#opening-a-downloaded-macos-release)
     - [Local Development](#local-development)
     - [Development with Docker](#development-with-docker)
     - [Upgrading from Albatross](#upgrading-from-albatross)
@@ -38,6 +39,9 @@ A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design
   - [How It Works](#how-it-works)
   - [Troubleshooting](#troubleshooting)
     - [Error Log](#error-log)
+      - [Where to find it](#where-to-find-it)
+      - [What's in it](#whats-in-it)
+      - [Good to know](#good-to-know)
   - [CI/CD](#cicd)
     - [Checks](#checks)
     - [Automatic Versioning](#automatic-versioning)
@@ -60,7 +64,7 @@ Every design and its accumulated simulation runs are saved to a single `.design`
 
 BATSS Studio was called **Albatross** before version 6.0. See [Upgrading from Albatross](#upgrading-from-albatross).
 
-> ⚠️ BATSS Studio is a research and trial-design exploration tool developed by the [Heath Lab](https://lab.research.sickkids.ca/heath/) at SickKids. It is intended to support methodological work and trial planning discussions, not to replace formal statistical review of a trial protocol.
+> ⚠️ BATSS Studio is a research and trial-design exploration tool developed by the [EMBaRC Lab](https://lab.research.sickkids.ca/heath/) at SickKids. It is intended to support methodological work and trial planning discussions, not to replace formal statistical review of a trial protocol.
 
 ---
 
@@ -434,6 +438,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Acknowledgments
 
+- **Arlene Jiang** ([arlene.jiang@sickkids.ca](mailto:arlene.jiang@sickkids.ca)) — project lead and statistical methodology
 - [BATSS](https://batss-dev.github.io/BATSS/) — the Bayesian Adaptive Trial Simulator Software R package this application is built around
 - [R-INLA](https://www.r-inla.org/) — Integrated Nested Laplace Approximation, the inference engine BATSS uses under the hood
 - [Electron](https://www.electronjs.org/) / [electron-vite](https://electron-vite.org/) — desktop application framework and build tooling

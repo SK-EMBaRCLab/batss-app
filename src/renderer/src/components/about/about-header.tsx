@@ -9,10 +9,7 @@ export function AboutHeader(): ReactElement {
     <>
       <small className="text-muted-foreground">Version {appVersion}</small>
       <h1 className="text-6xl font-semibold">BATSS Studio</h1>
-      <p>
-        A desktop application facilitating Adaptive Bayesian Clinical (ABC) Trial Design using
-        Integrated Nested Laplace Approximations (INLA): ABC-INLA
-      </p>
+      <p>A desktop application facilitating Bayesian adaptive clinical trial design.</p>
     </>
   )
 }
