@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.4.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.3.0...v6.4.0) (2026-11-16)
+
+
+### Features
+
+* **about:** credit Arlene Jiang and rename Heath Lab to EMBaRC Lab ([01cda01](https://github.com/SK-EMBaRCLab/batss-app/commit/01cda01974647397d78e4688374a030e7fa101f2))
+* **app:** make renamable names look editable ([309f0a3](https://github.com/SK-EMBaRCLab/batss-app/commit/309f0a3a1530d91476d038230f6f3b2beb0d5f7d))
+* **decision-rules:** reword the step and name the chart's colours ([014592e](https://github.com/SK-EMBaRCLab/batss-app/commit/014592ef569558fef03577ff125b6d7b86aefc5d))
+* **review:** explain run time instead of estimating it ([97c4f57](https://github.com/SK-EMBaRCLab/batss-app/commit/97c4f57f09761eb6884ee7ca76a1f5bddcb86ef6))
+* **simulation:** label the treatment effect value by the chosen effect ([17dc2b0](https://github.com/SK-EMBaRCLab/batss-app/commit/17dc2b0cda1eb582f985979ed31b354d59a3f5d5))
+* **simulation:** start a new design's sample sizes blank ([66b4976](https://github.com/SK-EMBaRCLab/batss-app/commit/66b4976176f6d0d49e62a4ad21143041d012f33f))
+
 ## [6.3.0](https://github.com/SK-EMBaRCLab/batss-app/compare/v6.2.0...v6.3.0) (2026-11-11)
 
 
