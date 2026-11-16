@@ -133,10 +133,11 @@ export type DesignInput = {
   meanDiff?: number
   sd?: number
 
-  N: number
-  m0: number
-  m: number
-  R: number
+  // Missing until filled in: a new design starts without them
+  N?: number
+  m0?: number
+  m?: number
+  R?: number
   decisionRules: DecisionRule[]
 
   corePercent?: CorePercent

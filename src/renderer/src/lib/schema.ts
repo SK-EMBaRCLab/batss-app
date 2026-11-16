@@ -217,11 +217,12 @@ export const initialDesignInput: DesignInput = {
   meanDiff: undefined,
   sd: undefined,
 
-  N: 216,
-  m0: 60,
-  m: 12,
+  // Sample size, left for the user to fill in
+  N: undefined,
+  m0: undefined,
+  m: undefined,
 
-  R: 10,
+  R: undefined,
 
   // Added with the decision rules step's buttons; at least one is needed
   decisionRules: [],

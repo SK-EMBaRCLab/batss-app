@@ -47,10 +47,11 @@ const designInputFileSchema = v.object({
   meanDiff: v.optional(v.number()),
   sd: v.optional(v.number()),
 
-  N: v.number(),
-  m0: v.number(),
-  m: v.number(),
-  R: v.number(),
+  // Missing in a design whose sample sizes aren't filled in yet
+  N: v.optional(v.number()),
+  m0: v.optional(v.number()),
+  m: v.optional(v.number()),
+  R: v.optional(v.number()),
   // Must be listed or v.object strips it, and every loaded design falls
   // back to the default CPU share. An unexpected value is dropped (so the
   // default applies) rather than rejecting the whole file.

@@ -117,9 +117,7 @@ describe('parseStudyDesignFile', () => {
   })
 
   test('rejects a damaged file and says where the problem is', () => {
-    const withoutN: Record<string, unknown> = { ...INPUT }
-    delete withoutN.N
-    const parsed = parseStudyDesignFile(designFile({ input: withoutN }))
+    const parsed = parseStudyDesignFile(designFile({ input: { ...INPUT, N: 'two hundred' } }))
     expect(parsed.success).toBe(false)
     if (!parsed.success)
       expect(parsed.issues.some((issue) => issue.startsWith('input.N:'))).toBe(true)

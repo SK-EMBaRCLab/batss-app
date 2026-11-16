@@ -1,3 +1,4 @@
+import { parseStudyDesignFile } from '@shared/design-file-schema'
 import * as v from 'valibot'
 import { describe, expect, test } from 'vitest'
 
@@ -247,5 +248,33 @@ describe('designInputFromRun', () => {
     })
     expect(input.corePercent).toBe(initialDesignInput.corePercent)
     expect(input.probability).toBeUndefined()
+  })
+})
+
+describe('initialDesignInput', () => {
+  test('starts with the sample sizes blank', () => {
+    expect(initialDesignInput).toMatchObject({
+      N: undefined,
+      m0: undefined,
+      m: undefined,
+      R: undefined
+    })
+  })
+
+  test('a new design saves and reopens with the sample sizes still blank', () => {
+    // Saved as JSON, which leaves out the blank fields
+    const file = JSON.parse(
+      JSON.stringify({
+        version: 2,
+        id: 'design-1',
+        name: 'New design',
+        createdAt: '2026-11-16T12:00:00.000Z',
+        input: initialDesignInput,
+        results: []
+      })
+    )
+    const parsed = parseStudyDesignFile(file)
+    expect(parsed.success).toBe(true)
+    if (parsed.success) expect(parsed.data.input.N).toBeUndefined()
   })
 })
