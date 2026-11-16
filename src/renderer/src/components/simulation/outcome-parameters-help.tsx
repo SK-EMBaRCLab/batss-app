@@ -2,7 +2,7 @@ import { useField } from '@formisch/react'
 import { FIELD_LABELS } from '@shared/field-labels'
 import { Fragment, type ReactElement } from 'react'
 
-import { treatmentEffects } from '@/lib/design-options'
+import { getTreatmentEffectValueLabel, treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { HelpPanel, HelpSection } from './help-panel'
@@ -15,6 +15,8 @@ export function OutcomeParametersHelp({
   const outcomeType = useField(form, {
     path: ['outcomeType']
   })
+  const treatmentEffectType = useField(form, { path: ['treatmentEffectType'] })
+  const valueLabel = getTreatmentEffectValueLabel(treatmentEffectType.input)
 
   if (outcomeType.input === 'binary') {
     return (
@@ -38,7 +40,7 @@ export function OutcomeParametersHelp({
           </dl>
         </HelpSection>
 
-        <HelpSection title={FIELD_LABELS.treatmentEffect}>
+        <HelpSection title={valueLabel ?? FIELD_LABELS.treatmentEffect}>
           <p className="pl-5 leading-relaxed">
             The assumed size of the treatment effect used in the simulation. This value is often
             based on previous research, clinical expertise, or the minimum improvement that would

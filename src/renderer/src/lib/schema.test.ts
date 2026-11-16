@@ -88,7 +88,7 @@ describe('designSchema (the simulation form)', () => {
     [
       'an odds ratio of 0',
       { treatmentEffect: '0' },
-      'treatmentEffect: Treatment effect value (odds ratio) must be greater than 0.'
+      'treatmentEffect: Odds ratio must be greater than 0.'
     ],
     [
       'a risk ratio',

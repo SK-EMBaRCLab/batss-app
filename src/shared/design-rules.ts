@@ -60,10 +60,11 @@ export const NUMBER_FIELDS = {
     v.gtValue(0, `${L.probability} must be greater than 0.`),
     v.ltValue(1, `${L.probability} must be less than 1.`)
   ),
-  // An odds ratio, the only treatment effect that can be run so far
+  // An odds ratio, the only treatment effect that can be run so far, so
+  // its messages name it as the form's field label does
   treatmentEffect: v.pipe(
-    finiteNumber(L.treatmentEffect),
-    v.gtValue(0, `${L.treatmentEffect} (odds ratio) must be greater than 0.`)
+    finiteNumber('Odds ratio'),
+    v.gtValue(0, 'Odds ratio must be greater than 0.')
   ),
 
   meanOutcome: finiteNumber(L.meanOutcome),

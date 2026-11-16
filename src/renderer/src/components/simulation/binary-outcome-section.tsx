@@ -1,14 +1,18 @@
-import { Field as FormischField } from '@formisch/react'
+import { Field as FormischField, useField } from '@formisch/react'
 import { FIELD_LABELS } from '@shared/field-labels'
 import { type ReactElement } from 'react'
 
-import { treatmentEffects } from '@/lib/design-options'
+import { getTreatmentEffectValueLabel, treatmentEffects } from '@/lib/design-options'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { NumericField } from './numeric-field'
 import { SelectField } from './select-field'
 
 export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): ReactElement {
+  const treatmentEffectType = useField(form, { path: ['treatmentEffectType'] })
+  // Shown once an effect is chosen, labelled by it (e.g. "Odds ratio")
+  const valueLabel = getTreatmentEffectValueLabel(treatmentEffectType.input)
+
   return (
     <div className="space-y-6">
       <h3 className="font-semibold">Binary Outcome Parameters</h3>
@@ -35,12 +39,14 @@ export function BinaryOutcomeSection({ form }: { form: SimulationFormStore }): R
             />
           )}
         </FormischField>
-        <NumericField
-          form={form}
-          path={['treatmentEffect']}
-          label={FIELD_LABELS.treatmentEffect}
-          className="max-w-lg"
-        />
+        {valueLabel && (
+          <NumericField
+            form={form}
+            path={['treatmentEffect']}
+            label={valueLabel}
+            className="max-w-lg"
+          />
+        )}
       </div>
     </div>
   )

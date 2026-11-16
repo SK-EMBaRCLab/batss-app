@@ -96,11 +96,7 @@ describe('checkSimulationRunInput', () => {
       { treatmentEffectType: 'riskRatio' },
       'Only the odds ratio treatment effect is supported.'
     ],
-    [
-      'an odds ratio of 0',
-      { treatmentEffect: 0 },
-      'Treatment effect value (odds ratio) must be greater than 0.'
-    ],
+    ['an odds ratio of 0', { treatmentEffect: 0 }, 'Odds ratio must be greater than 0.'],
     ['too large a sample', { N: 100_001 }, 'Maximum sample size must be at most 100,000.'],
     [
       'an unknown rule type',

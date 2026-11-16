@@ -53,3 +53,12 @@ export function getTreatmentEffectLabel(
 ): string {
   return treatmentEffects.find((effect) => effect.value === value)?.label ?? '—'
 }
+
+// The treatment effect value's field label, named after the chosen effect
+// in sentence case like the form's other labels (e.g. "Odds ratio")
+export function getTreatmentEffectValueLabel(
+  value: (typeof treatmentEffects)[number]['value'] | undefined
+): string | undefined {
+  const label = treatmentEffects.find((effect) => effect.value === value)?.label
+  return label && label.charAt(0) + label.slice(1).toLowerCase()
+}
