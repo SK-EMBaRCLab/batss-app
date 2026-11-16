@@ -76,12 +76,14 @@ export function EditableInPlaceInput({
             type="button"
             onClick={startEditing}
             className={cn(
-              'group/rename flex max-w-56 items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground hover:bg-muted',
+              'group/rename flex max-w-56 items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm font-medium text-foreground outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
               className
             )}
           >
             <span className="min-w-0 truncate">{name || emptyLabel}</span>
-            <Pencil className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/rename:opacity-100" />
+            {/* Always shown, so it's clear the name can be edited; darker
+                when pointed at or focused */}
+            <Pencil className="h-3 w-3 shrink-0 text-muted-foreground/60 transition-colors group-hover/rename:text-foreground group-focus-visible/rename:text-foreground" />
           </button>
         }
       />
