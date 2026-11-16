@@ -1,13 +1,11 @@
 import { useField } from '@formisch/react'
 import { DEFAULT_CORE_PERCENT, resolveCoreCount } from '@shared/cores'
-import { ChevronDown, Clock, SlidersHorizontal } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal } from 'lucide-react'
 import { Fragment, type ReactElement, useEffect, useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { decisionRuleSummaries, type DesignSnapshot, fieldsFor } from '@/lib/design-fields'
-import { estimateSimulationDuration, formatEstimatedDurationRange } from '@/lib/duration-estimate'
 import type { SimulationFormStore } from '@/types/form-types'
 
 import { CoreUsageField } from './core-usage-field'
@@ -50,15 +48,6 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
     window.app.cpuCount().then(setCpuCount)
   }, [])
 
-  const estimate = estimateSimulationDuration({
-    N: N.input,
-    m0: m0.input,
-    m: m.input,
-    R: R.input,
-    corePercent: corePercent.input as number | undefined,
-    cpuCount
-  })
-
   const corePercentValue = (corePercent.input ?? DEFAULT_CORE_PERCENT) as number
   const resolvedCores = cpuCount
     ? resolveCoreCount(cpuCount, corePercentValue, Number(R.input) || undefined)
@@ -85,23 +74,24 @@ export function ReviewSection({ form }: { form: SimulationFormStore }): ReactEle
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <h3 className="font-semibold">Review Simulation Design</h3>
+      </div>
 
-        {estimate && (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock className="h-3.5 w-3.5 shrink-0" />
-                  Estimated run time:{' '}
-                  {formatEstimatedDurationRange(estimate.minSeconds, estimate.maxSeconds)}
-                </p>
-              }
-            />
-            <TooltipContent>
-              A rough guide based on your settings; actual time depends on your computer.
-            </TooltipContent>
-          </Tooltip>
-        )}
+      <div className="space-y-2 text-sm text-muted-foreground">
+        <p>
+          The Bayesian adaptive trial simulation process can be lengthy. As each interim analysis
+          takes about a few seconds, you can calculate an approximate trial simulation time by
+          multiplying the duration for each interim analysis (~5 seconds), by the number of interim
+          analyses in one trial ((maximum sample size - burn-in sample size) divided by patients
+          between interim analyses), by the number of trial simulations (number of simulated
+          trials). The simulator will run these analyses for the target treatment effect and a null
+          treatment effect, effectively doubling the calculated length of time. This simulation time
+          will be divided across all active cores. You can modify the number of active cores under
+          Performance Settings.
+        </p>
+        <p>
+          Feel free to click away while you&apos;re running a design - a desktop notification will
+          alert you when your results are ready.
+        </p>
       </div>
 
       <Card>

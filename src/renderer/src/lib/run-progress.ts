@@ -76,8 +76,7 @@ const STAGE_SHARE: Record<RunStage, number> = {
 
 function stageBudgetSeconds(stage: RunStage, estimate: DurationEstimate | null): number | null {
   if (!estimate) return null
-  const midpoint = (estimate.minSeconds + estimate.maxSeconds) / 2
-  return midpoint * STAGE_SHARE[stage]
+  return estimate.seconds * STAGE_SHARE[stage]
 }
 
 /**

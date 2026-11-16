@@ -13,8 +13,8 @@ export function ReviewHelp(): ReactElement {
 
       <ol className="list-decimal space-y-3 pl-5 leading-relaxed">
         <li>
-          BATSS runs on this computer, using the CPU share set in Performance Settings. The
-          estimated run time is shown at the top of the review.
+          BATSS runs on this computer, using the CPU share set in Performance Settings. The top of
+          the review explains how to work out roughly how long it will take.
         </li>
         <li>Progress appears below the form as the run works through its stages.</li>
         <li>
