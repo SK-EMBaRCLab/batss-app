@@ -15,11 +15,11 @@ import { useFormLocked } from './form-locked'
 const RULE_TEXT = {
   superiority: {
     title: 'Superiority rule',
-    description: 'Stops the trial early and declares the treatment arm superior'
+    description: 'Stops the trial early if there is a high probability of treatment benefit'
   },
   futility: {
     title: 'Futility rule',
-    description: 'Stops the trial early when the treatment is unlikely to show a benefit'
+    description: 'Stops the trial early if there is a low probability of treatment benefit'
   }
 } as const satisfies Record<DecisionRule['type'], { title: string; description: string }>
 

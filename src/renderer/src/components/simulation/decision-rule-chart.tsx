@@ -4,7 +4,12 @@ import { type ReactElement, useMemo, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart'
-import { OUTCOME_COLOURS, RULE_OUTCOME } from '@/lib/outcome-colours'
+import {
+  DECISION_CHART_COLOURS,
+  DECISION_SHADING_OPACITY,
+  OUTCOME_COLOURS,
+  RULE_OUTCOME
+} from '@/lib/outcome-colours'
 
 type DecisionChartProps = {
   rule: DecisionRule
@@ -17,7 +22,7 @@ type DecisionChartProps = {
 const chartConfig = {
   distribution: {
     label: 'Odds ratio',
-    color: 'var(--chart-1)'
+    color: DECISION_CHART_COLOURS.distribution.colour
   },
   decisionRegion: {
     label: 'Decision region',
@@ -195,8 +200,8 @@ export function DecisionChart({
         <Area
           type="monotone"
           dataKey="distribution"
-          stroke="var(--chart-1)"
-          fill="var(--chart-1)"
+          stroke={DECISION_CHART_COLOURS.distribution.colour}
+          fill={DECISION_CHART_COLOURS.distribution.colour}
           fillOpacity={0.04}
           strokeWidth={2}
         />
@@ -208,7 +213,7 @@ export function DecisionChart({
           dataKey="decisionRegion"
           stroke="none"
           fill={OUTCOME_COLOURS[RULE_OUTCOME[rule.type]]}
-          fillOpacity={0.55}
+          fillOpacity={DECISION_SHADING_OPACITY}
         />
 
         {/* No effect (an odds ratio of 1, a mean difference of 0). Left out
@@ -220,7 +225,7 @@ export function DecisionChart({
         {/* The rule's margin */}
         <ReferenceLine
           x={rule.margin}
-          stroke="var(--destructive)"
+          stroke={DECISION_CHART_COLOURS.margin.colour}
           strokeWidth={3}
           label={{
             value: `${MARGIN_ABBREVIATIONS[rule.type]} = ${rule.margin}`,

@@ -3,9 +3,28 @@ import type { DecisionRule, OutcomeType } from '@shared/simulation-types'
 import { MoveHorizontal } from 'lucide-react'
 import { type ReactElement } from 'react'
 
+import {
+  DECISION_CHART_COLOURS,
+  DECISION_SHADING_OPACITY,
+  OUTCOME_COLOUR_NAMES,
+  OUTCOME_COLOURS,
+  RULE_OUTCOME
+} from '@/lib/outcome-colours'
 import { cn } from '@/lib/utils'
 
 import { DecisionChart } from './decision-rule-chart'
+
+// A dot in a chart mark's colour, after the word naming it. It uses the
+// same CSS variable as the chart, so it follows the light or dark theme.
+function ColourDot({ colour, opacity }: { colour: string; opacity?: number }): ReactElement {
+  return (
+    <span
+      aria-hidden="true"
+      className="mx-0.5 inline-block size-2 rounded-full align-middle"
+      style={{ backgroundColor: colour, opacity }}
+    />
+  )
+}
 
 type DecisionRulePreviewProps = {
   rule: DecisionRule
@@ -26,12 +45,19 @@ export function DecisionRulePreview({
   onMarginChange,
   stale
 }: DecisionRulePreviewProps): ReactElement {
+  const typeText = type === 'continuous' ? 'mean difference' : 'odds ratio'
+  // The side of the margin the rule's probability is on, as in its formula
+  const sideText = direction === 'less' ? 'less than' : 'greater than'
+  const outcome = RULE_OUTCOME[rule.type]
+  const { distribution, margin } = DECISION_CHART_COLOURS
   return (
     <div className={cn('space-y-3 transition-opacity', stale && 'opacity-50')}>
       <div>
         <h3 className="text-sm font-medium">Treatment effect</h3>
         <p className="text-xs text-muted-foreground">
-          {type === 'continuous' ? 'Mean difference' : 'Odds ratio'} and {rule.type} margin
+          Treatment effect distribution in {distribution.name}
+          <ColourDot colour={distribution.colour} />; {rule.type} margin in {margin.name}
+          <ColourDot colour={margin.colour} />
         </p>
       </div>
 
@@ -48,7 +74,13 @@ export function DecisionRulePreview({
       {/* The curve is an illustration around the target effect, so say
           what the shading stands for and which way the rule reads it */}
       <p className="text-xs text-muted-foreground">
-        Shaded: the probability in the rule. The {rule.type} rule is met when it is{' '}
+        The probability that the{' '}
+        <strong className="font-medium text-foreground">
+          {typeText} is {sideText} {rule.margin}
+        </strong>{' '}
+        is shaded in {OUTCOME_COLOUR_NAMES[outcome]}
+        <ColourDot colour={OUTCOME_COLOURS[outcome]} opacity={DECISION_SHADING_OPACITY} />. The{' '}
+        {rule.type} rule is met when it is{' '}
         <strong className="font-medium text-foreground">
           {rule.type === 'futility' ? 'below' : 'above'} {rule.threshold}
         </strong>

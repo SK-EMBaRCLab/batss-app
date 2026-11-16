@@ -35,7 +35,10 @@ export function DecisionRuleSection({ form }: { form: SimulationFormStore }): Re
       <div className="space-y-1">
         <h3 className="font-semibold">Decision Rules</h3>
         <p className="text-sm text-muted-foreground">
-          Add at least one rule. Trials often use both.
+          Bayesian adaptive trials calculate the distribution of the treatment effect at each
+          interim analysis. The analysis team evaluates whether the treatment effect distribution
+          meets pre-specified rules to trigger adaptations. In this section, you will pre-specify
+          rules for early stopping based on the treatment effect distribution.
         </p>
       </div>
 

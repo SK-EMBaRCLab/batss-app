@@ -14,6 +14,30 @@ export const OUTCOME_COLOURS = {
 } as const satisfies Record<SimulationOutcome, string>
 
 /**
+ * Each outcome's colour by name, for text that points at it (the decision
+ * rule preview's "shaded in green"). The same in the light and dark
+ * themes. Change them together with OUTCOME_COLOURS.
+ */
+export const OUTCOME_COLOUR_NAMES = {
+  'Experimental Superior': 'green',
+  Futility: 'yellow',
+  Inconclusive: 'grey'
+} as const satisfies Record<SimulationOutcome, string>
+
+/**
+ * The decision rule chart's other marks, named in the preview's text
+ * ("distribution in blue; margin in red"), so the text, its colour dots
+ * and the chart agree
+ */
+export const DECISION_CHART_COLOURS = {
+  distribution: { colour: 'var(--chart-1)', name: 'blue' },
+  margin: { colour: 'var(--destructive)', name: 'red' }
+} as const
+
+/** How opaque the chart's shading is, which its colour dot matches. */
+export const DECISION_SHADING_OPACITY = 0.55
+
+/**
  * The same colours as fixed hex values, the light theme's, for files the
  * app makes (the Word report's chart): a document can't use the app's
  * theme. Change them together with OUTCOME_COLOURS.
